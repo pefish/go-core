@@ -145,7 +145,7 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 func (this *ApiSessionClass) logParams(struct_ interface{}) {
 	map_ := p_format.Format.StructToMap(struct_)
 	for key, _ := range map_ {
-		if p_slice.Slice.IncludesBySliceString([]string{`pass`, `password`}, key) {
+		if p_slice.Slice.IncludesBySliceString([]string{`pass`, `password`, `key`, `api_key`}, key) {
 			map_[key] = `*****`
 		}
 	}

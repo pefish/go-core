@@ -40,7 +40,7 @@ require (
 	github.com/pefish/go-error v0.0.7
 	github.com/pefish/go-file v0.0.3
 	github.com/pefish/go-format v0.0.3
-	github.com/pefish/go-http v0.0.3
+	github.com/pefish/go-http v0.0.4
 	github.com/pefish/go-json v0.0.1
 	github.com/pefish/go-jwt v0.0.2
 	github.com/pefish/go-logger v0.0.2

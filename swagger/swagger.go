@@ -3,10 +3,10 @@ package swagger
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kataras/iris/core/errors"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-file"
-	"github.com/kataras/iris/core/errors"
 	"github.com/pefish/yaml"
 	"reflect"
 	"strings"

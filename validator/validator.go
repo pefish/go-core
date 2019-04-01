@@ -3,11 +3,11 @@ package validator
 import (
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator"
 	"github.com/pefish/go-decimal"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-reflect"
 	"github.com/pefish/go-string"
-	"github.com/go-playground/validator"
 	"reflect"
 	"regexp"
 	"strings"

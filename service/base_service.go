@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/pefish/go-application"
-	"github.com/pefish/go-logger"
-	"github.com/pefish/go-reflect"
+	"github.com/iris-contrib/middleware/cors"
+	"github.com/kataras/iris"
+	"github.com/kataras/iris/context"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
@@ -16,9 +16,6 @@ import (
 	"github.com/pefish/go-http"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
-	"github.com/iris-contrib/middleware/cors"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
 	"reflect"
 	"time"
 )
@@ -40,6 +37,7 @@ type BaseServiceClass struct {
 	GlobalMiddlewires map[string]context.Handler                    // 每个api的前置处理器（iris的）
 	App               *iris.Application                             // iris实例
 	HealthyCheckFun   func()                                        // health check 控制器
+	Opts              map[string]interface{}                        // 一些可选参数
 }
 
 func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
@@ -83,12 +81,27 @@ func (this *BaseServiceClass) GetRoutes() map[string]*api_session.Route {
 	return this.Routes
 }
 
-/**
-http请求其他服务。
-apiName：请求哪个api
-args：args[0]是参数，可以是struct或者map；args[1]是ApiSessionClass，如果存在则会转发一些预制header；
-*/
-func (this *BaseServiceClass) Request(apiName string, args ...interface{}) (data interface{}) {
+func (this *BaseServiceClass) ExactOpt(name string) interface{} {
+	if name == `jwt_header_name` && (this.Opts == nil || this.Opts[name] == nil) {
+		return `Json-Web-Token`
+	} else {
+		return this.Opts[name]
+	}
+}
+
+func (this *BaseServiceClass) RequestWithErr(apiName string, args ...interface{}) (interface{}, error) {
+	body := this.RequestRawMap(apiName, args...)
+	if !body[`succeed`].(bool) {
+		errorMessage := p_error.INTERNAL_ERROR
+		if body[`error_message`] != nil {
+			errorMessage = body[`error_message`].(string)
+		}
+		return body, errors.New(errorMessage)
+	}
+	return body[`data`], nil
+}
+
+func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{}) map[string]interface{} {
 	var params interface{}
 	if len(args) > 0 && args[0] != nil {
 		params = args[0]
@@ -99,34 +112,47 @@ func (this *BaseServiceClass) Request(apiName string, args ...interface{}) (data
 	headers := map[string]string{}
 	// header内容转发
 	if len(args) > 1 && args[1] != nil {
-		apiSession := args[1].(*api_session.ApiSessionClass)
-		headers = map[string]string{
-			`lang`:            apiSession.Lang,
-			`client_type`:     apiSession.ClientType,
-			jwtHeaderName:     apiSession.Ctx.GetHeader(jwtHeaderName),
-			`X-Forwarded-For`: apiSession.Ctx.GetHeader(`X-Forwarded-For`),
+		if apiSession, ok := args[1].(*api_session.ApiSessionClass); ok {
+			jwtHeaderName := p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`))
+			headers = map[string]string{
+				`lang`:            apiSession.Lang,
+				`client_type`:     apiSession.ClientType,
+				jwtHeaderName:     apiSession.Ctx.GetHeader(jwtHeaderName),
+				`X-Forwarded-For`: apiSession.Ctx.GetHeader(`X-Forwarded-For`),
+			}
 		}
 	}
 	if this.Routes[apiName] == nil {
-		p_error.ThrowInternal(`api request 404`)
+		p_error.Throw(`api request 404`, p_error.CODE_ERROR)
 	}
 	method := this.Routes[apiName].Method
 	fullUrl := this.GetRequestUrl(apiName)
+	body := map[string]interface{}{}
 	if method == `GET` {
-		body := p_http.Http.GetWithParamsForMap(fullUrl, params, headers)
-		if !body[`succeed`].(bool) {
-			p_error.ThrowErrorWithData(body[`error_message`].(string), p_reflect.Reflect.ToInt64(body[`error_code`]), body[`data`], nil)
-		}
-		data = body[`data`]
+		body = p_http.Http.GetWithParamsForMap(fullUrl, params, headers)
 	} else if method == `POST` {
-		body := p_http.Http.PostForMap(fullUrl, params, headers)
-		if !body[`succeed`].(bool) {
-			p_error.ThrowErrorWithData(body[`error_message`].(string), p_reflect.Reflect.ToInt64(body[`error_code`]), body[`data`], nil)
-		}
-		data = body[`data`]
+		body = p_http.Http.PostForMap(fullUrl, params, headers)
 	} else {
-		p_error.ThrowInternal(`request not support method`)
+		p_error.Throw(`request not support method`, p_error.CODE_ERROR)
 	}
+	return body
+}
+
+/**
+http请求其他服务。
+apiName：请求哪个api
+args：args[0]是参数，可以是struct或者map；args[1]是ApiSessionClass，如果存在则会转发一些预制header；
+*/
+func (this *BaseServiceClass) Request(apiName string, args ...interface{}) (data interface{}) {
+	body := this.RequestRawMap(apiName, args...)
+	if !body[`succeed`].(bool) {
+		errorMessage := p_error.INTERNAL_ERROR
+		if body[`error_message`] != nil {
+			errorMessage = body[`error_message`].(string)
+		}
+		p_error.ThrowErrorWithData(errorMessage, p_reflect.Reflect.ToUint64(body[`error_code`]), body[`data`], nil)
+	}
+	data = body[`data`]
 	return
 }
 
@@ -219,12 +245,12 @@ func (this *BaseServiceClass) buildRoutes() {
 					apiChannelBuilder = apiChannelBuilder.ParamValidate(myValidator.Validator)
 				} else if slice_[0] == `jwt_auth` {
 					if len(slice_) < 2 {
-						panic(errors.New(`jwt_auth config error`))
+						p_error.ThrowInternal(`jwt_auth config error`)
 					}
 					apiChannelBuilder = apiChannelBuilder.JwtAuth(jwtHeaderName, slice_[1])
 				} else if slice_[0] == `rate_limit` {
 					if len(slice_) < 2 {
-						panic(errors.New(`rate_limit config error`))
+						p_error.ThrowInternal(`rate_limit config error`)
 					}
 					apiChannelBuilder = apiChannelBuilder.RateLimit(slice_[1].(time.Duration))
 				}

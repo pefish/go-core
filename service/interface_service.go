@@ -7,7 +7,7 @@ import (
 )
 
 type InterfaceService interface {
-	// opts[0]: map[string]interface{} (apiControllers、)
+	// opts[0]: map[string]interface{}
 	Init(opts ...interface{}) InterfaceService
 	// 设置安全检查函数
 	SetHealthyCheck(func_ func()) InterfaceService
@@ -29,6 +29,8 @@ type InterfaceService interface {
 	GetRequestUrl(apiName string) string
 	// 发起请求
 	Request(apiName string, args ...interface{}) interface{}
+	RequestWithErr(apiName string, args ...interface{}) (interface{}, error)
+	RequestRawMap(apiName string, args ...interface{}) map[string]interface{}
 	RequestForMap(apiName string, args ...interface{}) map[string]interface{}
 	RequestForMapWithScan(dest interface{}, apiName string, args ...interface{})
 	RequestForSlice(apiName string, args ...interface{}) []map[string]interface{}

@@ -2,15 +2,15 @@ package api_channel_builder
 
 import (
 	"fmt"
+	"github.com/go-playground/validator"
+	"github.com/kataras/iris"
+	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
-	"github.com/go-playground/validator"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/hero"
 	"reflect"
 	"runtime/debug"
 	"time"
@@ -179,7 +179,7 @@ func (this *ApiChannelBuilderClass) Wrap(func_ api_session.ApiHandlerType) func(
 
 type ApiResult struct {
 	ErrorMessage string      `json:"error_message"`
-	ErrorCode    int64       `json:"error_code"`
+	ErrorCode    uint64       `json:"error_code"`
 	Data         interface{} `json:"data"`
 	Succeed      bool        `json:"succeed"`
 }
