@@ -12,6 +12,7 @@ import (
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
 	"reflect"
+	"runtime/debug"
 	"time"
 )
 
@@ -200,6 +201,7 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 			}
 			ctx.StatusCode(iris.StatusOK)
 			if p_application.Application.Debug {
+				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
 					Succeed:      false,
 					ErrorMessage: errorMessage,
@@ -219,6 +221,7 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 			errorInfoStruct := err.(p_error.ErrorInfo)
 			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage))
 			if p_application.Application.Debug {
+				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
 					Succeed:      false,
 					ErrorMessage: errorInfoStruct.ErrorMessage,
