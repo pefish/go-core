@@ -11,7 +11,6 @@ import (
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
-	"reflect"
 	"runtime/debug"
 	"time"
 )
@@ -142,28 +141,14 @@ wrap api处理器
 func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) func(ctx iris.Context) {
 	this.register()
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
-		map_ := map[string]interface{}{}
 		result := func_(apiContext)
 		if result != nil {
-			if reflect.TypeOf(result).Kind() == reflect.Slice && reflect.ValueOf(result).Len() == 0 {
-				map_[`data`] = []interface{}{}
-			} else {
-				map_[`data`] = result
-			}
-			apiContext.Ctx.JSON(map_)
-		}
-	})
-}
-
-func (this *ApiChannelBuilderClass) WrapJsonWithTodo(func_ api_session.ApiHandlerType) func(ctx iris.Context) {
-	this.register()
-	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
-		map_ := map[string]interface{}{}
-		result := func_(apiContext)
-		if result != nil {
-			map_[`data`] = result
-			map_[`todo`] = true
-			apiContext.Ctx.JSON(map_)
+			_, err := apiContext.Ctx.JSON(ApiResult{
+				ErrorMessage: nil,
+				ErrorCode:    0,
+				Data:         result,
+			})
+			p_logger.Logger.Error(err)
 		}
 	})
 }

@@ -20,10 +20,6 @@ import (
 	"time"
 )
 
-var (
-	jwtHeaderName = `Json-Web-Token`
-)
-
 type BaseServiceClass struct {
 	Name              string                                        // 服务名
 	Description       string                                        // 服务描述
@@ -249,7 +245,7 @@ func (this *BaseServiceClass) buildRoutes() {
 					if len(slice_) < 2 {
 						p_error.ThrowInternal(`jwt_auth config error`)
 					}
-					apiChannelBuilder = apiChannelBuilder.JwtAuth(jwtHeaderName, slice_[1])
+					apiChannelBuilder = apiChannelBuilder.JwtAuth(p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`)), slice_[1])
 				} else if slice_[0] == `rate_limit` {
 					if len(slice_) < 2 {
 						p_error.ThrowInternal(`rate_limit config error`)
