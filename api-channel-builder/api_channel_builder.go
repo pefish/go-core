@@ -143,7 +143,6 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 	this.register()
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
 		map_ := map[string]interface{}{}
-		map_[`succeed`] = true
 		result := func_(apiContext)
 		if result != nil {
 			if reflect.TypeOf(result).Kind() == reflect.Slice && reflect.ValueOf(result).Len() == 0 {
@@ -160,7 +159,6 @@ func (this *ApiChannelBuilderClass) WrapJsonWithTodo(func_ api_session.ApiHandle
 	this.register()
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
 		map_ := map[string]interface{}{}
-		map_[`succeed`] = true
 		result := func_(apiContext)
 		if result != nil {
 			map_[`data`] = result
@@ -178,10 +176,9 @@ func (this *ApiChannelBuilderClass) Wrap(func_ api_session.ApiHandlerType) func(
 }
 
 type ApiResult struct {
-	ErrorMessage string      `json:"error_message"`
-	ErrorCode    uint64       `json:"error_code"`
+	ErrorMessage *string     `json:"msg"`
+	ErrorCode    uint64      `json:"code"`
 	Data         interface{} `json:"data"`
-	Succeed      bool        `json:"succeed"`
 }
 
 func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
@@ -203,16 +200,15 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 			if p_application.Application.Debug {
 				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
-					Succeed:      false,
-					ErrorMessage: errorMessage,
-					ErrorCode:    1000,
+					ErrorMessage: &errorMessage,
+					ErrorCode:    1,
 					Data:         nil,
 				}
 			} else {
 				apiResult = ApiResult{
-					Succeed:   false,
-					ErrorCode: 1000,
-					Data:      nil,
+					ErrorMessage: nil,
+					ErrorCode:    1,
+					Data:         nil,
 				}
 			}
 			ctx.JSON(apiResult)
@@ -223,16 +219,15 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 			if p_application.Application.Debug {
 				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
-					Succeed:      false,
-					ErrorMessage: errorInfoStruct.ErrorMessage,
+					ErrorMessage: &errorInfoStruct.ErrorMessage,
 					ErrorCode:    errorInfoStruct.ErrorCode,
 					Data:         errorInfoStruct.Data,
 				}
 			} else {
 				apiResult = ApiResult{
-					Succeed:   false,
-					ErrorCode: errorInfoStruct.ErrorCode,
-					Data:      errorInfoStruct.Data,
+					ErrorMessage: nil,
+					ErrorCode:    errorInfoStruct.ErrorCode,
+					Data:         errorInfoStruct.Data,
 				}
 			}
 			ctx.JSON(apiResult)

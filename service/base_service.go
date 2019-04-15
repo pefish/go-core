@@ -91,10 +91,11 @@ func (this *BaseServiceClass) ExactOpt(name string) interface{} {
 
 func (this *BaseServiceClass) RequestWithErr(apiName string, args ...interface{}) (interface{}, error) {
 	body := this.RequestRawMap(apiName, args...)
-	if !body[`succeed`].(bool) {
+	code := body[`code`].(uint64)
+	if code != 0 {
 		errorMessage := p_error.INTERNAL_ERROR
-		if body[`error_message`] != nil {
-			errorMessage = body[`error_message`].(string)
+		if body[`msg`] != nil {
+			errorMessage = body[`msg`].(string)
 		}
 		return body, errors.New(errorMessage)
 	}
@@ -145,12 +146,13 @@ args：args[0]是参数，可以是struct或者map；args[1]是ApiSessionClass�
 */
 func (this *BaseServiceClass) Request(apiName string, args ...interface{}) (data interface{}) {
 	body := this.RequestRawMap(apiName, args...)
-	if !body[`succeed`].(bool) {
+	code := body[`code`].(uint64)
+	if code != 0 {
 		errorMessage := p_error.INTERNAL_ERROR
-		if body[`error_message`] != nil {
-			errorMessage = body[`error_message`].(string)
+		if body[`msg`] != nil {
+			errorMessage = body[`msg`].(string)
 		}
-		p_error.ThrowErrorWithData(errorMessage, p_reflect.Reflect.ToUint64(body[`error_code`]), body[`data`], nil)
+		p_error.ThrowErrorWithData(errorMessage, code, body[`data`], nil)
 	}
 	data = body[`data`]
 	return

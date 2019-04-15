@@ -168,22 +168,17 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 	definitions[`Failed`] = Yaml_Definition{
 		Type: `object`,
 		Properties: map[string]Yaml_Property{
-			`succeed`: {
-				Type:        this.getType(`bool`),
-				Example:     `false`,
-				Description: `表示请求是否成功`,
-			},
-			`error_code`: {
+			`code`: {
 				Type:        this.getType(`int64`),
 				Example:     `2000`,
 				Description: `错误码`,
 			},
-			`error_message`: {
+			`msg`: {
 				Type:        this.getType(`string`),
 				Example:     `jwt verify error`,
 				Description: `错误原因（开发者看的）`,
 			},
-			`show_message`: {
+			`show_msg`: {
 				Type:        this.getType(`string`),
 				Example:     `登录失败`,
 				Description: `错误原因（用户看的）`,
@@ -331,11 +326,6 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		definitions[succeedDefinitionName] = Yaml_Definition{
 			Type: `object`,
 			Properties: map[string]Yaml_Property{
-				`succeed`: {
-					Type:        this.getType(`bool`),
-					Example:     `true`,
-					Description: `表示请求是否成功`,
-				},
 				`data`: succeedData,
 			},
 		}

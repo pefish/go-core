@@ -104,7 +104,7 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 			p_format.Format.MapStringToStruct(dest, this.Ctx.URLParams())
 		} else if this.Ctx.Method() == `POST` {
 			if err := this.Ctx.ReadJSON(dest); err != nil {
-				p_error.ThrowError(`parse params error`, 0, err)
+				p_error.ThrowInternalError(`parse params error`, err)
 			}
 		} else {
 			p_error.ThrowInternal(`scan params not support`)
@@ -115,7 +115,7 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 			p_format.Format.MapStringToStruct(dest, this.Ctx.URLParams()) // +号和%都有特殊含义，+会被替换成空格
 		} else if this.Ctx.Method() == `POST` {
 			if err := this.Ctx.ReadJSON(dest); err != nil {
-				p_error.ThrowError(`parse params error`, 0, err)
+				p_error.ThrowInternalError(`parse params error`, err)
 			}
 		} else {
 			p_error.ThrowInternal(`scan params not support`)
