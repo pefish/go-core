@@ -148,7 +148,9 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 				ErrorCode:    0,
 				Data:         result,
 			})
-			p_logger.Logger.Error(err)
+			if err != nil {
+				p_logger.Logger.Error(err)
+			}
 		}
 	})
 }
