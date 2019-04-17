@@ -127,6 +127,7 @@ github.com/pefish/go-random v0.0.1 h1:q+TjKcRSzEKhigpBTTl+sCBJz81oBtTdD4zn1/eORh
 github.com/pefish/go-random v0.0.1/go.mod h1:7qo6qbo04YJ2qJU9fotXY5b58yjg142RlpXOA6i+Wys=
 github.com/pefish/go-reflect v0.0.1 h1:5IyuKC2ChCFuJee1gl4dQkDfsrHRUR6knfwuz8xbhks=
 github.com/pefish/go-reflect v0.0.1/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
+github.com/pefish/go-reflect v0.0.2/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-slice v0.0.1 h1:al0FykGL/yHmDzO1MBXVqDyxTd/0256S/CXz6/hU83Y=
 github.com/pefish/go-slice v0.0.1/go.mod h1:DGp15ObvqIv9vMjxxQt9RXJc52QtkZGg0gcfMv1KsR0=
 github.com/pefish/go-string v0.0.1 h1:tNeMhx1/1TJ5d1NNiSVCM+5WVoAqhwo61ElDJh26d9E=
