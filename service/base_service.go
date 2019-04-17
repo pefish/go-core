@@ -196,6 +196,14 @@ func (this *BaseServiceClass) Run() {
 	if err != nil {
 		panic(err)
 	}
+	this.printRoutes()
+}
+
+func (this *BaseServiceClass) printRoutes() {
+	p_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.Path))
+	for _, route := range this.Routes {
+		p_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, route.Path, route.Description))
+	}
 }
 
 func (this *BaseServiceClass) buildRoutes() {
