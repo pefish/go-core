@@ -192,11 +192,11 @@ func (this *BaseServiceClass) Run() {
 	irisConfig.RemoteAddrHeaders = map[string]bool{
 		`X-Forwarded-For`: true,
 	}
+	this.printRoutes()
 	err := this.App.Run(iris.Addr(this.Host+`:`+this.Port), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}
-	this.printRoutes()
 }
 
 func (this *BaseServiceClass) printRoutes() {
