@@ -120,7 +120,7 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 		}
 	}
 	if this.Routes[apiName] == nil {
-		p_error.Throw(`api request 404`, p_error.CODE_ERROR)
+		p_error.Throw(`api request 404`, p_error.INTERNAL_ERROR_CODE)
 	}
 	method := this.Routes[apiName].Method
 	fullUrl := this.GetRequestUrl(apiName)
@@ -130,7 +130,7 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 	} else if method == `POST` {
 		body = p_http.Http.PostForMap(fullUrl, params, headers)
 	} else {
-		p_error.Throw(`request not support method`, p_error.CODE_ERROR)
+		p_error.Throw(`request not support method`, p_error.INTERNAL_ERROR_CODE)
 	}
 	return body
 }

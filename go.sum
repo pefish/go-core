@@ -112,8 +112,8 @@ github.com/pefish/go-decimal v0.0.3 h1:NVuoXWQG/3NLaV2PNosYGRCnDAOtb60XWzURtFYmY
 github.com/pefish/go-decimal v0.0.3/go.mod h1:eiKzFEcRMuvCAlN3CenqGJGeEaua0XAbYaaETOPQXa4=
 github.com/pefish/go-error v0.0.7 h1:26/VtQqDx1WLVHJfT7FO5XYVE5LoIPn9q8f9S1f1BMQ=
 github.com/pefish/go-error v0.0.7/go.mod h1:FwyKENxmF+Lr2/mChu1WKdodx5hCwKXK347wiz8BPvI=
-github.com/pefish/go-error v0.1.1 h1:F73Zx9wXne9sO8ldqT5FoPGa0OFPqBHerACErezDnbs=
-github.com/pefish/go-error v0.1.1/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
+github.com/pefish/go-error v0.1.2 h1:pkLD7gbL5Oo/ldDPiLN6DknNgsHi0lokr7VVuQTXSBY=
+github.com/pefish/go-error v0.1.2/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-file v0.0.3 h1:WUF+ttJDQboTXGiEwMCilelWdUqwJdvUUNRmmOSTK3I=
 github.com/pefish/go-file v0.0.3/go.mod h1:td7BLXSZvB0PVYXcaM4QGCy5q/1XBCjpQLeSCvE+A2Y=
 github.com/pefish/go-format v0.0.3 h1:giulqUSBdNLrmb/8rNk/cpvooUJD3SZn8YbrNU4XXsY=
