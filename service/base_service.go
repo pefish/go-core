@@ -250,10 +250,10 @@ func (this *BaseServiceClass) buildRoutes() {
 					myValidator.Init()
 					apiChannelBuilder = apiChannelBuilder.ParamValidate(myValidator.Validator)
 				} else if slice_[0] == `jwt_auth` {
-					if len(slice_) < 2 {
+					if len(slice_) < 3 {
 						p_error.ThrowInternal(`jwt_auth config error`)
 					}
-					apiChannelBuilder = apiChannelBuilder.JwtAuth(p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`)), slice_[1])
+					apiChannelBuilder = apiChannelBuilder.JwtAuth(p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`)), slice_[1], slice_[2].(map[string]interface{}))
 				} else if slice_[0] == `rate_limit` {
 					if len(slice_) < 2 {
 						p_error.ThrowInternal(`rate_limit config error`)

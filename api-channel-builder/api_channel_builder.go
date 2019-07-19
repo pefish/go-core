@@ -33,13 +33,19 @@ func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	}
 }
 
-func (this *ApiChannelBuilderClass) JwtAuth(jwtHeaderName string, jwtSecret interface{}) *ApiChannelBuilderClass {
+func (this *ApiChannelBuilderClass) JwtAuth(jwtHeaderName string, jwtPubKey interface{}, opts map[string]interface{}) *ApiChannelBuilderClass {
 	if this.InjectFuncs == nil {
 		this.InjectFuncs = map[string]InjectFuncType{}
 	}
 	this.InjectFuncs[`jwtAuth`] = func(ctx iris.Context, out *api_session.ApiSessionClass) {
+		defer func() {
+			if err := recover(); err != nil {
+				p_error.Throw(`jwt verify error`, p_reflect.Reflect.ToUint64(opts[`error_code`]))
+			}
+		}()
+
 		out.JwtHeaderName = jwtHeaderName
-		verifyResult := p_jwt.Jwt.VerifyJwt(p_reflect.Reflect.ToString(jwtSecret), ctx.GetHeader(jwtHeaderName))
+		verifyResult := p_jwt.Jwt.VerifyJwt(p_reflect.Reflect.ToString(jwtPubKey), ctx.GetHeader(jwtHeaderName))
 		if !verifyResult {
 			p_error.ThrowInternal(`jwt verify error`)
 		}
@@ -48,10 +54,6 @@ func (this *ApiChannelBuilderClass) JwtAuth(jwtHeaderName string, jwtSecret inte
 			p_error.ThrowInternal(`jwt verify error`)
 		}
 
-		//needRightInt := p_format.Format.StringToInt64(needRight)
-		//if needRightInt&p_reflect.Reflect.ToInt64(out.JwtPayload[`right`]) != needRightInt {
-		//	p_error.Throw(`right not enough`, p_error_codes.ERROR_JWT_RIGHT_NOT_ENOUGH)
-		//}
 		userId := p_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
 		out.UserId = &userId
 	}
