@@ -3,29 +3,17 @@ package api_session
 import (
 	"github.com/go-playground/validator"
 	"github.com/kataras/iris"
+	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-format"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-string"
-	"github.com/pefish/go-desensitize"
 	"reflect"
 	"strings"
 )
 
 type ApiHandlerType func(apiContext *ApiSessionClass) interface{}
 
-type Route struct {
-	Description string                 // api描述
-	Path        string                 // api路径
-	Method      string                 // api方法
-	Strategies  [][]interface{}        // api前置处理
-	Params      interface{}            // api参数
-	Return      interface{}            // api返回值
-	Redirect    map[string]interface{} // api重定向
-	Debug       bool                   // api是否mock
-	Controller  ApiHandlerType         // api业务处理器
-	ParamType   string                 // 参数类型。默认 application/json
-}
 
 type ApiSessionClass struct {
 	Ctx iris.Context
@@ -37,7 +25,6 @@ type ApiSessionClass struct {
 	UserId        *uint64
 
 	RouteName string
-	Route     *Route
 
 	Lang       string
 	ClientType string // web、android、ios

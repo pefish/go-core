@@ -1,132 +1,59 @@
 package api_channel_builder
 
 import (
-	"fmt"
-	"github.com/go-playground/validator"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/hero"
-	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-core/util"
-	"github.com/pefish/go-error"
-	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-logger"
-	"github.com/pefish/go-reflect"
-	"github.com/pefish/go-stack"
-	"time"
 )
 
+type ApiResult struct {
+	ErrorMessage *string     `json:"msg"`
+	ErrorCode    uint64      `json:"code"`
+	Data         interface{} `json:"data"`
+}
+
 // 必须是一个输入一个输出，输入必须是iris.Context，输出是任意类型，会成为控制器的输入
-type InjectFuncType func(ctx iris.Context, out *api_session.ApiSessionClass)
+type InjectFunc func(ctx iris.Context, out *api_session.ApiSessionClass, param interface{})
+
+type InjectObject struct {
+	Func  InjectFunc
+	Param interface{}
+}
 
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
-	Hero        *hero.Hero
-	InjectFuncs map[string]InjectFuncType
-	Shares      map[string]interface{} // 所有session的共享数据
+	Hero          *hero.Hero
+	InjectObjects map[string]InjectObject
 }
 
 var ApiChannelBuilder = ApiChannelBuilderClass{}
 
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
-		InjectFuncs: map[string]InjectFuncType{},
-		Shares:      map[string]interface{}{},
+		InjectObjects: map[string]InjectObject{},
 	}
-}
-
-func (this *ApiChannelBuilderClass) JwtAuth(jwtHeaderName string, jwtPubKey interface{}, opts map[string]interface{}) *ApiChannelBuilderClass {
-	if this.InjectFuncs == nil {
-		this.InjectFuncs = map[string]InjectFuncType{}
-	}
-	this.InjectFuncs[`jwtAuth`] = func(ctx iris.Context, out *api_session.ApiSessionClass) {
-		defer func() {
-			if err := recover(); err != nil {
-				p_error.Throw(`jwt verify error`, p_reflect.Reflect.ToUint64(opts[`error_code`]))
-			}
-		}()
-
-		out.JwtHeaderName = jwtHeaderName
-		verifyResult := p_jwt.Jwt.VerifyJwt(p_reflect.Reflect.ToString(jwtPubKey), ctx.GetHeader(jwtHeaderName))
-		if !verifyResult {
-			p_error.ThrowInternal(`jwt verify error`)
-		}
-		out.JwtPayload = p_jwt.Jwt.DecodePayloadOfJwtBody(ctx.GetHeader(jwtHeaderName))
-		if out.JwtPayload[`user_id`] == nil {
-			p_error.ThrowInternal(`jwt verify error`)
-		}
-
-		userId := p_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
-		out.UserId = &userId
-
-		util.UpdateCtxValuesErrorMsg(ctx, `jwtAuth`, userId)
-	}
-	return this
-}
-
-func (this *ApiChannelBuilderClass) RateLimit(duration time.Duration) *ApiChannelBuilderClass {
-	if this.InjectFuncs == nil {
-		this.InjectFuncs = map[string]InjectFuncType{}
-	}
-	this.InjectFuncs[`rateLimit`] = func(ctx iris.Context, out *api_session.ApiSessionClass) {
-		methodPath := fmt.Sprintf(`%s_%s`, ctx.Method(), ctx.Path())
-		key := fmt.Sprintf(`%s_%s`, ctx.RemoteAddr(), methodPath)
-		rateLimitRequestsTemp := this.Shares[`rateLimitRequests`]
-		if rateLimitRequestsTemp == nil {
-			this.Shares[`rateLimitRequests`] = map[string]time.Time{}
-		}
-
-		rateLimitRequests := this.Shares[`rateLimitRequests`].(map[string]time.Time)
-		if !rateLimitRequests[key].IsZero() && time.Now().Sub(rateLimitRequests[key]) < duration {
-			p_error.ThrowInternal(`api ratelimit`)
-		}
-
-		rateLimitRequests[key] = time.Now()
-		this.Shares[`rateLimitRequests`] = rateLimitRequests
-	}
-	return this
-}
-
-func (this *ApiChannelBuilderClass) RouteBaseInfo(routeName string, route *api_session.Route) *ApiChannelBuilderClass {
-	if this.InjectFuncs == nil {
-		this.InjectFuncs = map[string]InjectFuncType{}
-	}
-	this.InjectFuncs[`routeBaseInfo`] = func(ctx iris.Context, out *api_session.ApiSessionClass) {
-		out.RouteName = routeName
-		out.Route = route
-	}
-	return this
-}
-
-func (this *ApiChannelBuilderClass) ParamValidate(validator *validator.Validate) *ApiChannelBuilderClass {
-	if this.InjectFuncs == nil {
-		this.InjectFuncs = map[string]InjectFuncType{}
-	}
-	this.InjectFuncs[`paramValidate`] = func(ctx iris.Context, out *api_session.ApiSessionClass) {
-		out.Validator = validator
-	}
-	return this
 }
 
 /**
 注入前置处理
 */
-func (this *ApiChannelBuilderClass) Inject(key string, func_ func(ctx iris.Context, out *api_session.ApiSessionClass)) *ApiChannelBuilderClass {
-	if this.InjectFuncs == nil {
-		this.InjectFuncs = map[string]InjectFuncType{}
+func (this *ApiChannelBuilderClass) Inject(key string, injectObject InjectObject) *ApiChannelBuilderClass {
+	if this.InjectObjects == nil {
+		this.InjectObjects = map[string]InjectObject{}
 	}
-	this.InjectFuncs[key] = func_
+	this.InjectObjects[key] = injectObject
 	return this
 }
 
 func (this *ApiChannelBuilderClass) register() {
 	this.Hero = hero.New()
-	if this.InjectFuncs != nil && len(this.InjectFuncs) > 0 {
+	if this.InjectObjects != nil && len(this.InjectObjects) > 0 {
 		this.Hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
 			// api入口
 			apiSession := api_session.NewApiSession() // 新建回话
 			apiSession.Ctx = ctx
-			for _, fun := range this.InjectFuncs { // 利用闭包实现注入函数的分发
-				fun(ctx, apiSession)
+			for _, injectObject := range this.InjectObjects { // 利用闭包实现注入函数的分发
+				injectObject.Func(ctx, apiSession, injectObject.Param)
 			}
 			return apiSession
 		})
@@ -165,62 +92,4 @@ func (this *ApiChannelBuilderClass) Wrap(func_ api_session.ApiHandlerType) func(
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
 		func_(apiContext)
 	})
-}
-
-type ApiResult struct {
-	ErrorMessage *string     `json:"msg"`
-	ErrorCode    uint64      `json:"code"`
-	Data         interface{} `json:"data"`
-}
-
-func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
-	if err := recover(); err != nil {
-		lang := ctx.GetHeader(`lang`)
-		if lang == `` {
-			lang = `zh`
-		}
-		var apiResult ApiResult
-		if _, ok := err.(p_error.ErrorInfo); !ok {
-			errorMessage := ``
-			if _, ok := err.(error); !ok {
-				errorMessage = err.(string)
-			} else {
-				errorMessage = err.(error).Error()
-			}
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorMessage + "\n" + ctx.Values().Get(`error_msg`).(string) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
-			ctx.StatusCode(iris.StatusOK)
-			if p_application.Application.Debug {
-				apiResult = ApiResult{
-					ErrorMessage: &errorMessage,
-					ErrorCode:    1,
-					Data:         nil,
-				}
-			} else {
-				apiResult = ApiResult{
-					ErrorMessage: nil,
-					ErrorCode:    1,
-					Data:         nil,
-				}
-			}
-			ctx.JSON(apiResult)
-		} else {
-			ctx.StatusCode(iris.StatusOK)
-			errorInfoStruct := err.(p_error.ErrorInfo)
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage + "\n" + ctx.Values().GetString(`error_msg`) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
-			if p_application.Application.Debug {
-				apiResult = ApiResult{
-					ErrorMessage: &errorInfoStruct.ErrorMessage,
-					ErrorCode:    errorInfoStruct.ErrorCode,
-					Data:         errorInfoStruct.Data,
-				}
-			} else {
-				apiResult = ApiResult{
-					ErrorMessage: nil,
-					ErrorCode:    errorInfoStruct.ErrorCode,
-					Data:         errorInfoStruct.Data,
-				}
-			}
-			ctx.JSON(apiResult)
-		}
-	}
 }

@@ -9,31 +9,49 @@ import (
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-core/middlewares"
-	"github.com/pefish/go-core/validator"
+	"github.com/pefish/go-core/api-strategy"
+	"github.com/pefish/go-core/middleware"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-format"
 	"github.com/pefish/go-http"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
 	"reflect"
-	"time"
+	"strconv"
 )
 
+type StrategyRoute struct {
+	Strategy api_strategy.InterfaceStrategy
+	Param    interface{}
+}
+
+type Route struct {
+	Description string                     // api描述
+	Path        string                     // api路径
+	Method      string                     // api方法
+	Strategies  []StrategyRoute            // api前置处理策略
+	Params      interface{}                // api参数
+	Return      interface{}                // api返回值
+	Redirect    map[string]interface{}     // api重定向
+	Debug       bool                       // api是否mock
+	Controller  api_session.ApiHandlerType // api业务处理器
+	ParamType   string                     // 参数类型。默认 application/json
+}
+
 type BaseServiceClass struct {
-	Name              string                                        // 服务名
-	Description       string                                        // 服务描述
-	Path              string                                        // 服务的基础路径
-	Host              string                                        // 服务监听host
-	Port              string                                        // 服务监听port
-	AccessHost        string                                        // 服务访问host，没有设置的话使用监听host
-	AccessPort        string                                        // 服务访问port，没有设置的话使用监听port
-	Routes            map[string]*api_session.Route                 // 服务的所有路由
-	Middlewires       map[string]api_channel_builder.InjectFuncType // 每个api的前置处理器（框架的）
-	GlobalMiddlewires map[string]context.Handler                    // 每个api的前置处理器（iris的）
-	App               *iris.Application                             // iris实例
-	HealthyCheckFun   func()                                        // health check 控制器
-	Opts              map[string]interface{}                        // 一些可选参数
+	Name              string                                      // 服务名
+	Description       string                                      // 服务描述
+	Path              string                                      // 服务的基础路径
+	Host              string                                      // 服务监听host
+	Port              string                                      // 服务监听port
+	AccessHost        string                                      // 服务访问host，没有设置的话使用监听host
+	AccessPort        string                                      // 服务访问port，没有设置的话使用监听port
+	Routes            map[string]*Route                           // 服务的所有路由
+	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
+	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
+	App               *iris.Application                           // iris实例
+	HealthyCheckFun   func()                                      // health check 控制器
+	Opts              map[string]interface{}                      // 一些可选参数
 }
 
 func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
@@ -45,11 +63,11 @@ func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
 	return this
 }
 
-func (this *BaseServiceClass) Use(key string, func_ api_channel_builder.InjectFuncType) InterfaceService {
+func (this *BaseServiceClass) Use(key string, injectObject api_channel_builder.InjectObject) InterfaceService {
 	if this.Middlewires == nil {
-		this.Middlewires = map[string]api_channel_builder.InjectFuncType{}
+		this.Middlewires = map[string]api_channel_builder.InjectObject{}
 	}
-	this.Middlewires[key] = func_
+	this.Middlewires[key] = injectObject
 	return this
 }
 
@@ -73,7 +91,7 @@ func (this *BaseServiceClass) GetPath() string {
 	return this.Path
 }
 
-func (this *BaseServiceClass) GetRoutes() map[string]*api_session.Route {
+func (this *BaseServiceClass) GetRoutes() map[string]*Route {
 	return this.Routes
 }
 
@@ -217,8 +235,8 @@ func (this *BaseServiceClass) buildRoutes() {
 			Debug:            p_application.Application.Debug,
 		}))
 	}
-	this.App.UseGlobal(middlewares.ErrorHandle)
-	this.App.UseGlobal(middlewares.OptionHandle)
+	this.App.UseGlobal(middleware.ErrorHandle)
+	this.App.UseGlobal(middleware.OptionHandle)
 	for _, fun := range this.GlobalMiddlewires {
 		this.App.UseGlobal(fun)
 	}
@@ -226,40 +244,21 @@ func (this *BaseServiceClass) buildRoutes() {
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
 		// 注入一些预定义函数
-		apiChannelBuilder = apiChannelBuilder.RouteBaseInfo(name, route)
-		apiChannelBuilder.Inject(`header`, func(ctx iris.Context, out *api_session.ApiSessionClass) {
-			lang := ctx.GetHeader(`lang`)
-			if lang == `` {
-				lang = `zh-CN`
-			}
-			out.Lang = lang
-
-			clientType := ctx.GetHeader(`client_type`)
-			if clientType == `` {
-				clientType = `web`
-			}
-			out.ClientType = clientType
+		apiChannelBuilder.Inject(`serviceBaseInfo`, api_channel_builder.InjectObject{
+			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
+			Param: api_strategy.ServiceBaseInfoParam{
+				RouteName: name,
+			},
 		})
-		for key, fun := range this.Middlewires {
-			apiChannelBuilder.Inject(key, fun)
+		for key, injectObject := range this.Middlewires {
+			apiChannelBuilder.Inject(key, injectObject)
 		}
 		if route.Strategies != nil {
-			for _, slice_ := range route.Strategies {
-				if slice_[0] == `param_validate` {
-					myValidator := validator.ValidatorClass{}
-					myValidator.Init()
-					apiChannelBuilder = apiChannelBuilder.ParamValidate(myValidator.Validator)
-				} else if slice_[0] == `jwt_auth` {
-					if len(slice_) < 3 {
-						p_error.ThrowInternal(`jwt_auth config error`)
-					}
-					apiChannelBuilder = apiChannelBuilder.JwtAuth(p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`)), slice_[1], slice_[2].(map[string]interface{}))
-				} else if slice_[0] == `rate_limit` {
-					if len(slice_) < 2 {
-						p_error.ThrowInternal(`rate_limit config error`)
-					}
-					apiChannelBuilder = apiChannelBuilder.RateLimit(slice_[1].(time.Duration))
-				}
+			for index, strategyRoute := range route.Strategies {
+				apiChannelBuilder.Inject(strconv.FormatInt(int64(index), 10), api_channel_builder.InjectObject{
+					Func: strategyRoute.Strategy.Execute,
+					Param: strategyRoute.Param,
+				})
 			}
 		}
 		if route.Controller == nil {

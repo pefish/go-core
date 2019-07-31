@@ -1,9 +1,8 @@
 package service
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
-	"github.com/pefish/go-core/api-session"
 	"github.com/kataras/iris/context"
+	"github.com/pefish/go-core/api-channel-builder"
 )
 
 type InterfaceService interface {
@@ -12,11 +11,11 @@ type InterfaceService interface {
 	// 设置安全检查函数
 	SetHealthyCheck(func_ func()) InterfaceService
 	// 注入处理器
-	Use(key string, func_ api_channel_builder.InjectFuncType) InterfaceService
+	Use(key string, func_ api_channel_builder.InjectObject) InterfaceService
 	// 注入全局处理器
 	UseGlobal(key string, func_ context.Handler) InterfaceService
 	// 获取所有路由
-	GetRoutes() map[string]*api_session.Route
+	GetRoutes() map[string]*Route
 	// 获取端点路径
 	GetPath() string
 	// 获取服务名

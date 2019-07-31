@@ -27,7 +27,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	config.Config.LoadConfig(nil, nil)
+	config.Config.LoadJsonConfig(config.Configuration{})
 
 	mysqlConfig := config.Config.GetMap(`mysql`)
 	global.MysqlHelper = &p_mysql.MysqlClass{}
