@@ -1,13 +1,13 @@
 package api_session
 
 import (
+	"github.com/go-playground/validator"
+	"github.com/kataras/iris"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-format"
 	"github.com/pefish/go-logger"
-	"github.com/pefish/go-slice"
 	"github.com/pefish/go-string"
-	"github.com/go-playground/validator"
-	"github.com/kataras/iris"
+	"github.com/pefish/go-desensitize"
 	"reflect"
 	"strings"
 )
@@ -139,11 +139,5 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 }
 
 func (this *ApiSessionClass) logParams(struct_ interface{}) {
-	map_ := p_format.Format.StructToMap(struct_)
-	for key, _ := range map_ {
-		if p_slice.Slice.IncludesBySliceString([]string{`pass`, `password`, `key`, `api_key`}, key) {
-			map_[key] = `*****`
-		}
-	}
-	p_logger.Logger.Info(map_)
+	p_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(struct_))
 }

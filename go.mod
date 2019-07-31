@@ -37,6 +37,7 @@ require (
 	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pefish/go-application v0.0.2
 	github.com/pefish/go-decimal v0.0.3
+	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.1.2
 	github.com/pefish/go-file v0.0.3
 	github.com/pefish/go-format v0.0.3
@@ -46,7 +47,6 @@ require (
 	github.com/pefish/go-logger v0.0.2
 	github.com/pefish/go-map v0.0.1
 	github.com/pefish/go-reflect v0.0.2
-	github.com/pefish/go-slice v0.0.1
 	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
 	github.com/pefish/go-string v0.0.1
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71

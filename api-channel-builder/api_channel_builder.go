@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-logger"
@@ -56,6 +57,8 @@ func (this *ApiChannelBuilderClass) JwtAuth(jwtHeaderName string, jwtPubKey inte
 
 		userId := p_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
 		out.UserId = &userId
+
+		util.UpdateCtxValuesErrorMsg(ctx, `jwtAuth`, userId)
 	}
 	return this
 }
@@ -184,7 +187,7 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 			} else {
 				errorMessage = err.(error).Error()
 			}
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorMessage + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 3, Count: 7})))
+			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorMessage + "\n" + ctx.Values().Get(`error_msg`).(string) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
 			ctx.StatusCode(iris.StatusOK)
 			if p_application.Application.Debug {
 				apiResult = ApiResult{
@@ -203,7 +206,7 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 		} else {
 			ctx.StatusCode(iris.StatusOK)
 			errorInfoStruct := err.(p_error.ErrorInfo)
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 3, Count: 7})))
+			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage + "\n" + ctx.Values().GetString(`error_msg`) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
 			if p_application.Application.Debug {
 				apiResult = ApiResult{
 					ErrorMessage: &errorInfoStruct.ErrorMessage,

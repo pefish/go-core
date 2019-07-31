@@ -7,14 +7,15 @@ import (
 )
 
 type TestControllerClass struct {
-
 }
 
 var TestController = TestControllerClass{}
 
 type TestParams struct {
 	UserId string `json:"user_id" validate:"required"`
+	Token  string `json:"token"`
 }
+
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
 	testParams := TestParams{}
 	apiSession.ScanParams(&testParams)
