@@ -134,6 +134,8 @@ github.com/pefish/go-reflect v0.0.2 h1:t6G1dW4qUt1fRNSI2pUG6BnuBmYBie6RmbqR5k2+l
 github.com/pefish/go-reflect v0.0.2/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-slice v0.0.1 h1:al0FykGL/yHmDzO1MBXVqDyxTd/0256S/CXz6/hU83Y=
 github.com/pefish/go-slice v0.0.1/go.mod h1:DGp15ObvqIv9vMjxxQt9RXJc52QtkZGg0gcfMv1KsR0=
+github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631 h1:UMl6+3aOeG8TmzsNCbdtofSdHmlFIyD8wL+EWG9boXc=
+github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631/go.mod h1:eQO84KgDz4WuQ9me+DzOrCzCKpmRii2UJ4oiOKtUU/U=
 github.com/pefish/go-string v0.0.1 h1:tNeMhx1/1TJ5d1NNiSVCM+5WVoAqhwo61ElDJh26d9E=
 github.com/pefish/go-string v0.0.1/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
 github.com/pefish/gorequest v0.2.16 h1:emUQhZ5nP9eoQJd5SnOt8GGZ232IOqTgDIjY+5RRs1U=

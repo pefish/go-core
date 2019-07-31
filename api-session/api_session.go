@@ -132,10 +132,6 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 			} else {
 				this.recurValidate(glovalValdator, type_, value_)
 			}
-
-			//if err := this.Validator.Struct(dest); err != nil {
-			//	p_error.ThrowError(err.Error(), p_error_codes.ERROR_PARAM, err)
-			//}
 		}
 	} else {
 		p_error.ThrowInternal(`ScanParams do not support this type`)

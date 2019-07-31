@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestApiContextClass_Test(t *testing.T) {
+func TestApiChannelBuilderClass_CatchError(t *testing.T) {
 
 }

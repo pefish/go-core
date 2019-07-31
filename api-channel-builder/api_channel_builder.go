@@ -11,7 +11,7 @@ import (
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
-	"runtime/debug"
+	"github.com/pefish/go-stack"
 	"time"
 )
 
@@ -178,16 +178,15 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 		}
 		var apiResult ApiResult
 		if _, ok := err.(p_error.ErrorInfo); !ok {
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, err))
 			errorMessage := ``
 			if _, ok := err.(error); !ok {
 				errorMessage = err.(string)
 			} else {
 				errorMessage = err.(error).Error()
 			}
+			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorMessage + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 3, Count: 7})))
 			ctx.StatusCode(iris.StatusOK)
 			if p_application.Application.Debug {
-				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
 					ErrorMessage: &errorMessage,
 					ErrorCode:    1,
@@ -204,9 +203,8 @@ func (this *ApiChannelBuilderClass) CatchError(ctx iris.Context) {
 		} else {
 			ctx.StatusCode(iris.StatusOK)
 			errorInfoStruct := err.(p_error.ErrorInfo)
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage))
+			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 3, Count: 7})))
 			if p_application.Application.Debug {
-				p_logger.Logger.Error(string(debug.Stack()))
 				apiResult = ApiResult{
 					ErrorMessage: &errorInfoStruct.ErrorMessage,
 					ErrorCode:    errorInfoStruct.ErrorCode,

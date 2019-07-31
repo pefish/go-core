@@ -31,7 +31,13 @@ func main() {
 
 	mysqlConfig := config.Config.GetMap(`mysql`)
 	global.MysqlHelper = &p_mysql.MysqlClass{}
-	global.MysqlHelper.Connect(mysqlConfig[`host`].(string), 3306, mysqlConfig[`username`].(string), mysqlConfig[`password`].(string), mysqlConfig[`database`].(string))
+	global.MysqlHelper.ConnectWithConfiguration(p_mysql.Configuration{
+		Host: mysqlConfig[`host`].(string),
+		Port: 3306,
+		Username: mysqlConfig[`username`].(string),
+		Password: mysqlConfig[`password`].(string),
+		Database: mysqlConfig[`database`].(string),
+	})
 
 	service.TestService.Init(map[string]interface{}{
 		`apiControllers`: map[string]api_session.ApiHandlerType{

@@ -1,3 +1,5 @@
+create database test;
+use test;
 CREATE TABLE `test` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT '用户id',
