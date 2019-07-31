@@ -1,11 +1,16 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 )
 
-func TestConfigClass_Test(t *testing.T) {
-
+func TestConfigClass_LoadYamlConfig(t *testing.T) {
+	Config.LoadYamlConfig(Configuration{
+		ConfigFilepath: `/Users/joy/Work/backend/go-core/_example/config/local.yaml`,
+		SecretFilepath: `/Users/joy/Work/backend/go-core/_example/secret/local1.yaml`,
+	})
+	fmt.Println(Config.GetString(`host`))
 }
 
 func TestConfigClass_GetString(t *testing.T) {
