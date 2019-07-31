@@ -36,7 +36,7 @@ func CatchError(ctx iris.Context) {
 			} else {
 				errorMessage = err.(error).Error()
 			}
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorMessage+"\n"+ctx.Values().Get(`error_msg`).(string)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
+			p_logger.Logger.Error(`system_error: ` + errorMessage+"\n"+ctx.Values().Get(`error_msg`).(string)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7}))
 			ctx.StatusCode(iris.StatusOK)
 			if p_application.Application.Debug {
 				apiResult = api_channel_builder.ApiResult{
@@ -55,7 +55,11 @@ func CatchError(ctx iris.Context) {
 		} else {
 			ctx.StatusCode(iris.StatusOK)
 			errorInfoStruct := err.(p_error.ErrorInfo)
-			p_logger.Logger.Error(fmt.Sprintf(`ERROR: %v`, errorInfoStruct.ErrorMessage+"\n"+ctx.Values().GetString(`error_msg`)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7})))
+			errMsg := `error: ` + errorInfoStruct.ErrorMessage
+			if errorInfoStruct.Err != nil {
+				errMsg += "\nsystem_error: " + errorInfoStruct.Err.Error()
+			}
+			p_logger.Logger.Error(errMsg +"\n"+ctx.Values().GetString(`error_msg`)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7}))
 			if p_application.Application.Debug {
 				apiResult = api_channel_builder.ApiResult{
 					ErrorMessage: &errorInfoStruct.ErrorMessage,

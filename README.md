@@ -13,3 +13,6 @@ service接入层 -- controller业务逻辑层 -- dao数据访问层
 ```shell
 go get github.com/pefish/go-core 
 ```
+
+### road map
+    1、自动生成controller模版代码

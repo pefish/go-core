@@ -44,7 +44,6 @@ func (this *ValidatorClass) Init() {
 func (this *ValidatorClass) Test(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	kind := field.Kind()
-	fmt.Println(`field`, field, kind)
 	targetField, targetKind, ok := fl.GetStructFieldOK() // 根据指定的字段名获取那个字段
 	fmt.Println(`targetField`, targetField, targetKind)
 	if !ok || targetKind != kind {
@@ -134,7 +133,6 @@ func (this *ValidatorClass) CheckInjectWithErr(str string) error {
 	}
 	for _, char := range arr {
 		if strings.Contains(str, char) {
-			p_error.ThrowInternal(`inject error`)
 			return errors.New(`inject error`)
 		}
 	}

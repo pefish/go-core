@@ -8,4 +8,6 @@ import (
 
 type InterfaceStrategy interface {
 	Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{})
+	GetName() string
+	SetErrorCode(code uint64)
 }

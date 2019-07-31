@@ -17,7 +17,6 @@ import (
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
 	"reflect"
-	"strconv"
 )
 
 type StrategyRoute struct {
@@ -244,18 +243,24 @@ func (this *BaseServiceClass) buildRoutes() {
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
 		// 注入一些预定义函数
-		apiChannelBuilder.Inject(`serviceBaseInfo`, api_channel_builder.InjectObject{
+		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 			Param: api_strategy.ServiceBaseInfoParam{
 				RouteName: name,
+			},
+		})
+		apiChannelBuilder.Inject(api_strategy.ParamValidateApiStrategy.GetName(), api_channel_builder.InjectObject{
+			Func: api_strategy.ParamValidateApiStrategy.Execute,
+			Param: api_strategy.ParamValidateParam{
+				Param: route.Params,
 			},
 		})
 		for key, injectObject := range this.Middlewires {
 			apiChannelBuilder.Inject(key, injectObject)
 		}
 		if route.Strategies != nil {
-			for index, strategyRoute := range route.Strategies {
-				apiChannelBuilder.Inject(strconv.FormatInt(int64(index), 10), api_channel_builder.InjectObject{
+			for _, strategyRoute := range route.Strategies {
+				apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
 					Func: strategyRoute.Strategy.Execute,
 					Param: strategyRoute.Param,
 				})
@@ -270,8 +275,7 @@ func (this *BaseServiceClass) buildRoutes() {
 					method = route.Method
 				}
 				this.App.AllowMethods(iris.MethodOptions).Handle(method, this.Path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
-					params := map[string]string{}
-					apiContext.ScanParams(&params)
+					params := apiContext.Params
 					service := redirectMap[`service`].(InterfaceService)
 					routeName := redirectMap[`route_name`].(string)
 					if service.GetRoutes()[routeName] == nil && return_ != nil { // 目标服务路由不存在，则返回规定的返回值(自动mock)
