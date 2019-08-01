@@ -11,7 +11,7 @@ type ServiceBaseInfoStrategyClass struct {
 }
 
 var ServiceBaseInfoApiStrategy = ServiceBaseInfoStrategyClass{
-	errorCode: p_error.INTERNAL_ERROR_CODE,
+	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
 type ServiceBaseInfoParam struct {

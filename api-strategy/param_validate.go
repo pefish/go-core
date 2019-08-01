@@ -24,7 +24,7 @@ type ParamValidateParam struct {
 }
 
 var ParamValidateApiStrategy = ParamValidateStrategyClass{
-	errorCode: p_error.INTERNAL_ERROR_CODE,
+	errorCode: go_error.INTERNAL_ERROR_CODE,
 	Validator: validator.ValidatorClass{},
 }
 
@@ -48,7 +48,7 @@ func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue refle
 	if oldTag != `` {
 		result += oldTag
 	} else if len(result) > 0 {
-		result = p_string.String.RemoveLast(result, 1)
+		result = go_string.String.RemoveLast(result, 1)
 	}
 	return result
 }
@@ -79,8 +79,8 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 
 			err := this.Validator.Validator.Var(map_[fieldName], newTag)
 			if err != nil {
-				tempStr := p_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
-				p_error.ThrowErrorWithData(p_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag, this.errorCode, map[string]interface{}{
+				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
+				go_error.ThrowErrorWithData(go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag, this.errorCode, map[string]interface{}{
 					`field`: fieldName,
 				}, err)
 			}
@@ -95,16 +95,16 @@ func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_sessi
 	tempParam := newParam.Param
 
 	if ctx.Method() == `GET` {
-		p_format.Format.MapStringToStruct(&tempParam, ctx.URLParams()) // +号和%都有特殊含义，+会被替换成空格
+		go_format.Format.MapStringToStruct(&tempParam, ctx.URLParams()) // +号和%都有特殊含义，+会被替换成空格
 	} else if ctx.Method() == `POST` {
 		if err := ctx.ReadJSON(&tempParam); err != nil {
-			p_error.ThrowError(`parse params error`, this.errorCode, err)
+			go_error.ThrowError(`parse params error`, this.errorCode, err)
 		}
 	} else {
-		p_error.Throw(`scan params not support`, this.errorCode)
+		go_error.Throw(`scan params not support`, this.errorCode)
 	}
 
-	p_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
+	go_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
 	glovalValdator := []string{`no-sql-inject`}
 	type_ := reflect.TypeOf(newParam.Param)
 	value_ := reflect.ValueOf(newParam.Param)

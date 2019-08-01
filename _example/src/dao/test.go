@@ -17,7 +17,7 @@ func (this *TestDaoClass) GetNameByUid(userId string) string {
 	if notFound := global.MysqlHelper.SelectFirst(&testModel, testModel.GetTableName(),`*`, map[string]interface{}{
 		`user_id`: userId,
 	}); notFound {
-		p_error.Throw(`user not found`, 20000)
+		go_error.Throw(`user not found`, 20000)
 	}
 	return testModel.Name
 }

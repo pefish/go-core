@@ -17,5 +17,5 @@ func (this *TestStrategyClass) GetName() string {
 }
 
 func (this *TestStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
-	p_error.ThrowInternal(`12345test`)
+	go_error.ThrowInternal(`12345test`)
 }

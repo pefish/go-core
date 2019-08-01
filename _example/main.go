@@ -45,6 +45,6 @@ func main() {
 		},
 	})
 	service.TestService.Host = config.Config.GetString(`host`)
-	service.TestService.Port = config.Config.GetString(`port`)
+	service.TestService.Port = config.Config.GetUint64(`port`)
 	service.TestService.Run()
 }

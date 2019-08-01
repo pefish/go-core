@@ -14,7 +14,7 @@ type JwtAuthStrategyClass struct {
 }
 
 var JwtAuthApiStrategy = JwtAuthStrategyClass{
-	errorCode: p_error.INTERNAL_ERROR_CODE,
+	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
 type JwtAuthParam struct {
@@ -34,21 +34,21 @@ func (this *JwtAuthStrategyClass) Execute(ctx iris.Context, out *api_session.Api
 	newParam := param.(JwtAuthParam)
 	defer func() {
 		if err := recover(); err != nil {
-			p_error.Throw(`jwt verify error`, this.errorCode)
+			go_error.Throw(`jwt verify error`, this.errorCode)
 		}
 	}()
 	jwtHeaderName := newParam.JwtHeaderName
 	out.JwtHeaderName = jwtHeaderName
-	verifyResult := p_jwt.Jwt.VerifyJwt(newParam.PubKey, ctx.GetHeader(jwtHeaderName))
+	verifyResult := go_jwt.Jwt.VerifyJwt(newParam.PubKey, ctx.GetHeader(jwtHeaderName))
 	if !verifyResult {
-		p_error.Throw(`jwt verify error`, this.errorCode)
+		go_error.Throw(`jwt verify error`, this.errorCode)
 	}
-	out.JwtPayload = p_jwt.Jwt.DecodePayloadOfJwtBody(ctx.GetHeader(jwtHeaderName))
+	out.JwtPayload = go_jwt.Jwt.DecodePayloadOfJwtBody(ctx.GetHeader(jwtHeaderName))
 	if out.JwtPayload[`user_id`] == nil {
-		p_error.Throw(`jwt verify error`, this.errorCode)
+		go_error.Throw(`jwt verify error`, this.errorCode)
 	}
 
-	userId := p_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
+	userId := go_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
 	out.UserId = &userId
 
 	util.UpdateCtxValuesErrorMsg(ctx, `jwtAuth`, userId)

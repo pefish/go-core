@@ -42,9 +42,9 @@ type BaseServiceClass struct {
 	Description       string                                      // 服务描述
 	Path              string                                      // 服务的基础路径
 	Host              string                                      // 服务监听host
-	Port              string                                      // 服务监听port
+	Port              uint64                                       // 服务监听port
 	AccessHost        string                                      // 服务访问host，没有设置的话使用监听host
-	AccessPort        string                                      // 服务访问port，没有设置的话使用监听port
+	AccessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
 	Routes            map[string]*Route                           // 服务的所有路由
 	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
 	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
@@ -106,7 +106,7 @@ func (this *BaseServiceClass) RequestWithErr(apiName string, args ...interface{}
 	body := this.RequestRawMap(apiName, args...)
 	code := body[`code`].(uint64)
 	if code != 0 {
-		errorMessage := p_error.INTERNAL_ERROR
+		errorMessage := go_error.INTERNAL_ERROR
 		if body[`msg`] != nil {
 			errorMessage = body[`msg`].(string)
 		}
@@ -127,7 +127,7 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 	// header内容转发
 	if len(args) > 1 && args[1] != nil {
 		if apiSession, ok := args[1].(*api_session.ApiSessionClass); ok {
-			jwtHeaderName := p_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`))
+			jwtHeaderName := go_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`))
 			headers = map[string]string{
 				`lang`:            apiSession.Lang,
 				`client_type`:     apiSession.ClientType,
@@ -137,17 +137,17 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 		}
 	}
 	if this.Routes[apiName] == nil {
-		p_error.Throw(`api request 404`, p_error.INTERNAL_ERROR_CODE)
+		go_error.Throw(`api request 404`, go_error.INTERNAL_ERROR_CODE)
 	}
 	method := this.Routes[apiName].Method
 	fullUrl := this.GetRequestUrl(apiName)
 	body := map[string]interface{}{}
 	if method == `GET` {
-		body = p_http.Http.GetWithParamsForMap(fullUrl, params, headers)
+		body = go_http.Http.GetWithParamsForMap(fullUrl, params, headers)
 	} else if method == `POST` {
-		body = p_http.Http.PostForMap(fullUrl, params, headers)
+		body = go_http.Http.PostForMap(fullUrl, params, headers)
 	} else {
-		p_error.Throw(`request not support method`, p_error.INTERNAL_ERROR_CODE)
+		go_error.Throw(`request not support method`, go_error.INTERNAL_ERROR_CODE)
 	}
 	return body
 }
@@ -161,11 +161,11 @@ func (this *BaseServiceClass) Request(apiName string, args ...interface{}) (data
 	body := this.RequestRawMap(apiName, args...)
 	code := body[`code`].(uint64)
 	if code != 0 {
-		errorMessage := p_error.INTERNAL_ERROR
+		errorMessage := go_error.INTERNAL_ERROR
 		if body[`msg`] != nil {
 			errorMessage = body[`msg`].(string)
 		}
-		p_error.ThrowErrorWithData(errorMessage, code, body[`data`], nil)
+		go_error.ThrowErrorWithData(errorMessage, code, body[`data`], nil)
 	}
 	data = body[`data`]
 	return
@@ -176,7 +176,7 @@ func (this *BaseServiceClass) RequestForSlice(apiName string, args ...interface{
 	if requestResult == nil {
 		return []map[string]interface{}{}
 	}
-	return p_format.Format.SliceInterfaceToSliceMapInterface(requestResult.([]interface{}))
+	return go_format.Format.SliceInterfaceToSliceMapInterface(requestResult.([]interface{}))
 }
 
 func (this *BaseServiceClass) RequestForSliceWithScan(dest interface{}, apiName string, args ...interface{}) {
@@ -184,7 +184,7 @@ func (this *BaseServiceClass) RequestForSliceWithScan(dest interface{}, apiName 
 	if requestResult == nil {
 		dest = nil
 	}
-	p_format.Format.SliceToStruct(dest, requestResult)
+	go_format.Format.SliceToStruct(dest, requestResult)
 }
 
 func (this *BaseServiceClass) RequestForMap(apiName string, args ...interface{}) map[string]interface{} {
@@ -200,7 +200,7 @@ func (this *BaseServiceClass) RequestForMapWithScan(dest interface{}, apiName st
 	if requestResult == nil {
 		dest = nil
 	}
-	p_format.Format.MapToStruct(dest, requestResult)
+	go_format.Format.MapToStruct(dest, requestResult)
 }
 
 func (this *BaseServiceClass) Run() {
@@ -210,28 +210,28 @@ func (this *BaseServiceClass) Run() {
 		`X-Forwarded-For`: true,
 	}
 	this.printRoutes()
-	err := this.App.Run(iris.Addr(this.Host+`:`+this.Port), iris.WithConfiguration(irisConfig))
+	err := this.App.Run(iris.Addr(this.Host+`:`+go_reflect.Reflect.ToString(this.Port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}
 }
 
 func (this *BaseServiceClass) printRoutes() {
-	p_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.Path))
+	go_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.Path))
 	for _, route := range this.Routes {
-		p_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, route.Path, route.Description))
+		go_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, route.Path, route.Description))
 	}
 }
 
 func (this *BaseServiceClass) buildRoutes() {
 	this.App = iris.New()
-	if p_application.Application.Debug {
+	if go_application.Application.Debug {
 		this.App.UseGlobal(cors.New(cors.Options{
 			AllowedOrigins:   []string{"*"},
 			AllowCredentials: true,
 			AllowedHeaders:   []string{`*`},
 			AllowedMethods:   []string{`PUT`, `POST`, `GET`, `DELETE`, `OPTIONS`},
-			Debug:            p_application.Application.Debug,
+			Debug:            go_application.Application.Debug,
 		}))
 	}
 	this.App.UseGlobal(middleware.ErrorHandle)
@@ -261,7 +261,7 @@ func (this *BaseServiceClass) buildRoutes() {
 		if route.Strategies != nil {
 			for _, strategyRoute := range route.Strategies {
 				apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
-					Func: strategyRoute.Strategy.Execute,
+					Func:  strategyRoute.Strategy.Execute,
 					Param: strategyRoute.Param,
 				})
 			}
@@ -286,7 +286,7 @@ func (this *BaseServiceClass) buildRoutes() {
 			} else { // 自动mock
 				return_ := this.parseReturn(route.Return)
 				if return_ == nil {
-					p_error.ThrowInternal(`route config error; route name: ` + name)
+					go_error.ThrowInternal(`route config error; route name: ` + name)
 				}
 				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.Path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 					return return_
@@ -300,7 +300,7 @@ func (this *BaseServiceClass) buildRoutes() {
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/healthz`, func(ctx context.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				p_logger.Logger.Error(err)
+				go_logger.Logger.Error(err)
 				ctx.StatusCode(iris.StatusInternalServerError)
 				ctx.Text(`not ok`)
 			}
@@ -310,16 +310,16 @@ func (this *BaseServiceClass) buildRoutes() {
 		}
 
 		ctx.StatusCode(iris.StatusOK)
-		if p_application.Application.Debug {
-			p_logger.Logger.Info(`I am healthy`)
+		if go_application.Application.Debug {
+			go_logger.Logger.Info(`I am healthy`)
 		}
 		ctx.Text(`ok`)
 	})
 
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, func(ctx context.Context) {
 		ctx.StatusCode(iris.StatusNotFound)
-		if p_application.Application.Debug {
-			p_logger.Logger.Info(`api not found`)
+		if go_application.Application.Debug {
+			go_logger.Logger.Info(`api not found`)
 		}
 		ctx.Text(`Not Found`)
 	})
@@ -377,11 +377,11 @@ func (this *BaseServiceClass) parseReturn(return_ interface{}) interface{} {
 				resultTemp = append(resultTemp, tempMap)
 			}
 		} else {
-			p_error.ThrowInternal(`route return error`)
+			go_error.ThrowInternal(`route return error`)
 		}
 		result = resultTemp
 	} else {
-		p_error.ThrowInternal(`route return error`)
+		go_error.ThrowInternal(`route return error`)
 	}
 	return result
 }
@@ -395,7 +395,7 @@ func (this *BaseServiceClass) GetRequestUrl(apiName string) string {
 		host = this.AccessHost
 	}
 	port := this.Port
-	if this.AccessPort != `` {
+	if this.AccessPort != 0 {
 		port = this.AccessPort
 	}
 	return fmt.Sprintf(`http://%s:%s%s%s`, host, port, this.Path, this.Routes[apiName].Path)

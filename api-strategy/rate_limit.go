@@ -13,7 +13,7 @@ type RateLimitStrategyClass struct {
 }
 
 var RateLimitApiStrategy = RateLimitStrategyClass{
-	errorCode: p_error.INTERNAL_ERROR_CODE,
+	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
 type RateLimitParam struct {
@@ -37,7 +37,7 @@ func (this *RateLimitStrategyClass) Execute(ctx iris.Context, out *api_session.A
 		newParam.Db = &map[string]time.Time{}
 	}
 	if !(*newParam.Db)[key].IsZero() && time.Now().Sub((*newParam.Db)[key]) < newParam.Limit {
-		p_error.Throw(`api ratelimit`, this.errorCode)
+		go_error.Throw(`api ratelimit`, this.errorCode)
 	}
 
 	(*newParam.Db)[key] = time.Now()

@@ -5,6 +5,7 @@ import (
 	"github.com/pefish/go-file"
 	"github.com/pefish/go-json"
 	"github.com/pefish/go-map"
+	"github.com/pefish/go-reflect"
 	"gopkg.in/yaml.v2"
 	"os"
 )
@@ -29,7 +30,7 @@ func (this *ConfigClass) LoadYamlConfig(config Configuration) {
 		configFile = config.ConfigFilepath
 	}
 	if configFile != `` {
-		bytes, err := p_file.File.ReadFileWithErr(configFile)
+		bytes, err := go_file.File.ReadFileWithErr(configFile)
 		if err == nil {
 			err = yaml.Unmarshal(bytes, &configMap)
 			if err != nil {
@@ -46,7 +47,7 @@ func (this *ConfigClass) LoadYamlConfig(config Configuration) {
 		secretFile = config.SecretFilepath
 	}
 	if secretFile != `` {
-		bytes, err := p_file.File.ReadFileWithErr(secretFile)
+		bytes, err := go_file.File.ReadFileWithErr(secretFile)
 		if err == nil {
 			err = yaml.Unmarshal(bytes, &secretMap)
 			if err != nil {
@@ -58,7 +59,7 @@ func (this *ConfigClass) LoadYamlConfig(config Configuration) {
 	if configFile == `` && secretFile == `` {
 		panic(errors.New(`unspecified config file and secret file`))
 	}
-	this.configs = p_map.Map.Append(configMap, secretMap)
+	this.configs = go_map.Map.Append(configMap, secretMap)
 }
 
 func (this *ConfigClass) LoadJsonConfig(config Configuration) {
@@ -70,7 +71,7 @@ func (this *ConfigClass) LoadJsonConfig(config Configuration) {
 		configFile = config.ConfigFilepath
 	}
 	if configFile != `` {
-		configMap = p_json.Json.ParseBytes(p_file.File.ReadFile(configFile)).(map[string]interface{})
+		configMap = go_json.Json.ParseBytes(go_file.File.ReadFile(configFile)).(map[string]interface{})
 	}
 
 	secretFile := ``
@@ -81,32 +82,40 @@ func (this *ConfigClass) LoadJsonConfig(config Configuration) {
 		secretFile = config.SecretFilepath
 	}
 	if secretFile != `` {
-		bytes, err := p_file.File.ReadFileWithErr(secretFile)
+		bytes, err := go_file.File.ReadFileWithErr(secretFile)
 		if err == nil {
-			secretMap = p_json.Json.ParseBytes(bytes).(map[string]interface{})
+			secretMap = go_json.Json.ParseBytes(bytes).(map[string]interface{})
 		}
 	}
 
 	if configFile == `` && secretFile == `` {
 		panic(errors.New(`unspecified config file and secret file`))
 	}
-	this.configs = p_map.Map.Append(configMap, secretMap)
+	this.configs = go_map.Map.Append(configMap, secretMap)
 }
 
 func (this *ConfigClass) GetString(str string) string {
-	return this.configs[str].(string)
+	return go_reflect.Reflect.ToString(this.configs[str])
+}
+
+func (this *ConfigClass) GetInt(str string) int {
+	return go_reflect.Reflect.ToInt(this.configs[str])
 }
 
 func (this *ConfigClass) GetInt64(str string) int64 {
-	return int64(this.configs[str].(float64))
+	return go_reflect.Reflect.ToInt64(this.configs[str])
+}
+
+func (this *ConfigClass) GetUint64(str string) uint64 {
+	return go_reflect.Reflect.ToUint64(this.configs[str])
 }
 
 func (this *ConfigClass) GetBool(str string) bool {
-	return this.configs[str].(bool)
+	return go_reflect.Reflect.ToBool(this.configs[str])
 }
 
 func (this *ConfigClass) GetFloat64(str string) float64 {
-	return this.configs[str].(float64)
+	return go_reflect.Reflect.ToFloat64(this.configs[str])
 }
 
 func (this *ConfigClass) GetMap(str string) map[string]interface{} {

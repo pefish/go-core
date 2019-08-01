@@ -37,7 +37,7 @@ func (this *ValidatorClass) Init() {
 	err = this.Validator.RegisterValidation(`disable-inject-check`, this.EmptyFun)
 	err = this.Validator.RegisterValidation(`test`, this.Test)
 	if err != nil {
-		p_error.ThrowInternal(`validator init error`)
+		go_error.ThrowInternal(`validator init error`)
 	}
 }
 
@@ -67,7 +67,7 @@ func (this *ValidatorClass) IsMobile(val interface{}, target interface{}) bool {
 }
 
 func (this *ValidatorClass) ContainAlphabet(val interface{}, target interface{}) bool {
-	str := p_reflect.Reflect.ToString(val)
+	str := go_reflect.Reflect.ToString(val)
 	allAlphabet := `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	for _, charInt := range str {
 		if strings.Contains(allAlphabet, string(charInt)) {
@@ -78,7 +78,7 @@ func (this *ValidatorClass) ContainAlphabet(val interface{}, target interface{})
 }
 
 func (this *ValidatorClass) ContainNumber(val interface{}, target interface{}) bool {
-	str := p_reflect.Reflect.ToString(val)
+	str := go_reflect.Reflect.ToString(val)
 	allNumbers := `0123456789`
 	for _, charInt := range str {
 		if strings.Contains(allNumbers, string(charInt)) {
@@ -89,41 +89,41 @@ func (this *ValidatorClass) ContainNumber(val interface{}, target interface{}) b
 }
 
 func (this *ValidatorClass) StrGte(val interface{}, target interface{}) bool {
-	return p_decimal.Decimal.Start(p_reflect.Reflect.ToString(val)).Gte(target)
+	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Gte(target)
 }
 
 func (this *ValidatorClass) StrLte(val interface{}, target interface{}) bool {
-	return p_decimal.Decimal.Start(p_reflect.Reflect.ToString(val)).Lte(target)
+	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Lte(target)
 }
 
 func (this *ValidatorClass) StrGt(val interface{}, target interface{}) bool {
-	return p_decimal.Decimal.Start(p_reflect.Reflect.ToString(val)).Gt(target)
+	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Gt(target)
 }
 
 func (this *ValidatorClass) StrLt(val interface{}, target interface{}) bool {
-	return p_decimal.Decimal.Start(p_reflect.Reflect.ToString(val)).Lt(target)
+	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Lt(target)
 }
 
 func (this *ValidatorClass) StartWith(val interface{}, target interface{}) bool {
-	return p_string.String.StartWith(p_reflect.Reflect.ToString(val), p_reflect.Reflect.ToString(target))
+	return go_string.String.StartWith(go_reflect.Reflect.ToString(val), go_reflect.Reflect.ToString(target))
 }
 
 func (this *ValidatorClass) EndWith(val interface{}, target interface{}) bool {
-	return p_string.String.EndWith(p_reflect.Reflect.ToString(val), p_reflect.Reflect.ToString(target))
+	return go_string.String.EndWith(go_reflect.Reflect.ToString(val), go_reflect.Reflect.ToString(target))
 }
 
 func (this *ValidatorClass) NoSqlInject(val interface{}, target interface{}) bool {
 	if reflect.TypeOf(val).Kind() != reflect.String {
 		return true
 	}
-	err := this.CheckInjectWithErr(p_reflect.Reflect.ToString(val))
+	err := this.CheckInjectWithErr(go_reflect.Reflect.ToString(val))
 	return err == nil
 }
 
 func (this *ValidatorClass) CheckInject(str string) {
 	err := this.CheckInjectWithErr(str)
 	if err != nil {
-		p_error.ThrowInternal(`inject error`)
+		go_error.ThrowInternal(`inject error`)
 	}
 }
 

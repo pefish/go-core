@@ -244,7 +244,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			} else if route.Method == `GET` {
 				this.recuGetParams(paramsType, properties, &requiredParams, &parameters)
 			} else {
-				p_error.Throw(`method error`, 0)
+				go_error.Throw(`method error`, 0)
 			}
 			definitions[paramsTypeName] = Yaml_Definition{
 				Type:       `object`,

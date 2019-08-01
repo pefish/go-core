@@ -81,7 +81,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 				Data:         result,
 			})
 			if err != nil {
-				p_logger.Logger.Error(err)
+				go_logger.Logger.Error(err)
 			}
 		}
 	})
