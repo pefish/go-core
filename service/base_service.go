@@ -123,12 +123,12 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 		params = map[string]interface{}{}
 	}
 
-	headers := map[string]string{}
+	headers := map[string]interface{}{}
 	// header内容转发
 	if len(args) > 1 && args[1] != nil {
 		if apiSession, ok := args[1].(*api_session.ApiSessionClass); ok {
 			jwtHeaderName := go_reflect.Reflect.ToString(this.ExactOpt(`jwt_header_name`))
-			headers = map[string]string{
+			headers = map[string]interface{}{
 				`lang`:            apiSession.Lang,
 				`client_type`:     apiSession.ClientType,
 				jwtHeaderName:     apiSession.Ctx.GetHeader(jwtHeaderName),
@@ -143,9 +143,17 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 	fullUrl := this.GetRequestUrl(apiName)
 	body := map[string]interface{}{}
 	if method == `GET` {
-		body = go_http.Http.GetWithParamsForMap(fullUrl, params, headers)
+		body = go_http.Http.GetWithParamsForMap(go_http.RequestParam{
+			Url: fullUrl,
+			Params: params,
+			Headers: headers,
+		})
 	} else if method == `POST` {
-		body = go_http.Http.PostForMap(fullUrl, params, headers)
+		body = go_http.Http.PostForMap(go_http.RequestParam{
+			Url: fullUrl,
+			Params: params,
+			Headers: headers,
+		})
 	} else {
 		go_error.Throw(`request not support method`, go_error.INTERNAL_ERROR_CODE)
 	}
