@@ -34,7 +34,6 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 				{
 					Strategy: &api_strategy.RateLimitApiStrategy,
 					Param: api_strategy.RateLimitParam{
-						Db: &rateLimitDb,
 						Limit: 1 * time.Second,
 					},
 				},

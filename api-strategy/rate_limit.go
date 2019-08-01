@@ -10,15 +10,18 @@ import (
 
 type RateLimitStrategyClass struct {
 	errorCode uint64
+	db        *map[string]time.Time // 外部传入的存储api访问频率限制的信息，应当是全局变量
 }
+
+var defaultDb = map[string]time.Time{}
 
 var RateLimitApiStrategy = RateLimitStrategyClass{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
+	db:        &defaultDb,
 }
 
 type RateLimitParam struct {
-	Db    *map[string]time.Time // 外部传入的存储api访问频率限制的信息，应当是全局变量
-	Limit time.Duration         // 限制多少s只能访问一次
+	Limit time.Duration // 限制多少s只能访问一次
 }
 
 func (this *RateLimitStrategyClass) GetName() string {
@@ -33,12 +36,9 @@ func (this *RateLimitStrategyClass) Execute(ctx iris.Context, out *api_session.A
 	newParam := param.(RateLimitParam)
 	methodPath := fmt.Sprintf(`%s_%s`, ctx.Method(), ctx.Path())
 	key := fmt.Sprintf(`%s_%s`, ctx.RemoteAddr(), methodPath)
-	if newParam.Db == nil {
-		newParam.Db = &map[string]time.Time{}
-	}
-	if !(*newParam.Db)[key].IsZero() && time.Now().Sub((*newParam.Db)[key]) < newParam.Limit {
+	if !(*this.db)[key].IsZero() && time.Now().Sub((*this.db)[key]) < newParam.Limit {
 		go_error.Throw(`api ratelimit`, this.errorCode)
 	}
 
-	(*newParam.Db)[key] = time.Now()
+	(*this.db)[key] = time.Now()
 }
