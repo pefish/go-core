@@ -22,6 +22,7 @@ import (
 type StrategyRoute struct {
 	Strategy api_strategy.InterfaceStrategy
 	Param    interface{}
+	Disable  bool
 }
 
 type Route struct {
@@ -42,7 +43,7 @@ type BaseServiceClass struct {
 	Description       string                                      // 服务描述
 	Path              string                                      // 服务的基础路径
 	Host              string                                      // 服务监听host
-	Port              uint64                                       // 服务监听port
+	Port              uint64                                      // 服务监听port
 	AccessHost        string                                      // 服务访问host，没有设置的话使用监听host
 	AccessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
 	Routes            map[string]*Route                           // 服务的所有路由
@@ -144,14 +145,14 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 	body := map[string]interface{}{}
 	if method == `GET` {
 		body = go_http.Http.GetWithParamsForMap(go_http.RequestParam{
-			Url: fullUrl,
-			Params: params,
+			Url:     fullUrl,
+			Params:  params,
 			Headers: headers,
 		})
 	} else if method == `POST` {
 		body = go_http.Http.PostForMap(go_http.RequestParam{
-			Url: fullUrl,
-			Params: params,
+			Url:     fullUrl,
+			Params:  params,
 			Headers: headers,
 		})
 	} else {
@@ -268,10 +269,12 @@ func (this *BaseServiceClass) buildRoutes() {
 		}
 		if route.Strategies != nil {
 			for _, strategyRoute := range route.Strategies {
-				apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
-					Func:  strategyRoute.Strategy.Execute,
-					Param: strategyRoute.Param,
-				})
+				if !strategyRoute.Disable {
+					apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
+						Func:  strategyRoute.Strategy.Execute,
+						Param: strategyRoute.Param,
+					})
+				}
 			}
 		}
 		if route.Controller == nil {
