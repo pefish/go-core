@@ -8,7 +8,7 @@ import (
 )
 
 type ApiResult struct {
-	ErrorMessage *string     `json:"msg"`
+	ErrorMessage string      `json:"msg"`
 	ErrorCode    uint64      `json:"code"`
 	Data         interface{} `json:"data"`
 }
@@ -76,7 +76,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		result := func_(apiContext)
 		if result != nil {
 			_, err := apiContext.Ctx.JSON(ApiResult{
-				ErrorMessage: nil,
+				ErrorMessage: ``,
 				ErrorCode:    0,
 				Data:         result,
 			})

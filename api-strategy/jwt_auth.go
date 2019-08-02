@@ -10,9 +10,10 @@ import (
 )
 
 type JwtAuthStrategyClass struct {
-	errorCode  uint64
-	pubKey     string
-	headerName string
+	errorCode       uint64
+	pubKey          string
+	headerName      string
+	noExpireForever bool
 }
 
 var JwtAuthApiStrategy = JwtAuthStrategyClass{
@@ -20,7 +21,6 @@ var JwtAuthApiStrategy = JwtAuthStrategyClass{
 }
 
 type JwtAuthParam struct {
-
 }
 
 func (this *JwtAuthStrategyClass) GetName() string {
@@ -29,6 +29,10 @@ func (this *JwtAuthStrategyClass) GetName() string {
 
 func (this *JwtAuthStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
+}
+
+func (this *JwtAuthStrategyClass) SetNoExpireForever() {
+	this.noExpireForever = true
 }
 
 func (this *JwtAuthStrategyClass) SetPubKey(pubKey string) {
@@ -46,11 +50,18 @@ func (this *JwtAuthStrategyClass) Execute(ctx iris.Context, out *api_session.Api
 		}
 	}()
 	out.JwtHeaderName = this.headerName
-	verifyResult := go_jwt.Jwt.VerifyJwt(this.pubKey, ctx.GetHeader(this.headerName))
+	jwt := ctx.GetHeader(this.headerName)
+
+	verifyResult := false
+	if this.noExpireForever == true {
+		verifyResult = go_jwt.Jwt.VerifyJwtSkipClaimsValidation(this.pubKey, jwt)
+	} else {
+		verifyResult = go_jwt.Jwt.VerifyJwt(this.pubKey, jwt)
+	}
 	if !verifyResult {
 		go_error.Throw(`jwt verify error`, this.errorCode)
 	}
-	out.JwtPayload = go_jwt.Jwt.DecodePayloadOfJwtBody(ctx.GetHeader(this.headerName))
+	out.JwtPayload = go_jwt.Jwt.DecodePayloadOfJwtBody(jwt)
 	if out.JwtPayload[`user_id`] == nil {
 		go_error.Throw(`jwt verify error`, this.errorCode)
 	}
