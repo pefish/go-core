@@ -40,15 +40,15 @@ func CatchError(ctx iris.Context) {
 			ctx.StatusCode(iris.StatusOK)
 			if go_application.Application.Debug {
 				apiResult = api_channel_builder.ApiResult{
-					ErrorMessage: errorMessage,
-					ErrorCode:    1,
-					Data:         nil,
+					Msg:  errorMessage,
+					Code: 1,
+					Data: nil,
 				}
 			} else {
 				apiResult = api_channel_builder.ApiResult{
-					ErrorMessage: ``,
-					ErrorCode:    1,
-					Data:         nil,
+					Msg:  ``,
+					Code: 1,
+					Data: nil,
 				}
 			}
 			ctx.JSON(apiResult)
@@ -62,15 +62,15 @@ func CatchError(ctx iris.Context) {
 			go_logger.Logger.Error(errMsg +"\n"+ctx.Values().GetString(`error_msg`)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 2, Count: 7}))
 			if go_application.Application.Debug {
 				apiResult = api_channel_builder.ApiResult{
-					ErrorMessage: errorInfoStruct.ErrorMessage,
-					ErrorCode:    errorInfoStruct.ErrorCode,
-					Data:         errorInfoStruct.Data,
+					Msg:  errorInfoStruct.ErrorMessage,
+					Code: errorInfoStruct.ErrorCode,
+					Data: errorInfoStruct.Data,
 				}
 			} else {
 				apiResult = api_channel_builder.ApiResult{
-					ErrorMessage: ``,
-					ErrorCode:    errorInfoStruct.ErrorCode,
-					Data:         errorInfoStruct.Data,
+					Msg:  ``,
+					Code: errorInfoStruct.ErrorCode,
+					Data: errorInfoStruct.Data,
 				}
 			}
 			ctx.JSON(apiResult)

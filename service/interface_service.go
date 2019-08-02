@@ -16,12 +16,28 @@ type InterfaceService interface {
 	UseGlobal(key string, func_ context.Handler) InterfaceService
 	// 获取所有路由
 	GetRoutes() map[string]*Route
+	SetRoutes(routes map[string]*Route)
 	// 获取端点路径
 	GetPath() string
+	SetPath(path string)
 	// 获取服务名
 	GetName() string
+	SetName(name string)
+	// 获取Host
+	GetHost() string
+	SetHost(host string)
+	// 获取Port
+	GetPort() uint64
+	SetPort(port uint64)
+
+	GetAccessHost() string
+	SetAccessHost(accessHost string)
+
+	GetAccessPort() uint64
+	SetAccessPort(accessPort uint64)
 	// 获取服务描述
 	GetDescription() string
+	SetDescription(desc string)
 	// 运行服务
 	Run()
 	// 获取请求uri

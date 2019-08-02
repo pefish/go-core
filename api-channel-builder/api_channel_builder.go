@@ -8,9 +8,9 @@ import (
 )
 
 type ApiResult struct {
-	ErrorMessage string      `json:"msg"`
-	ErrorCode    uint64      `json:"code"`
-	Data         interface{} `json:"data"`
+	Msg  string      `json:"msg"`
+	Code uint64      `json:"code"`
+	Data interface{} `json:"data"`
 }
 
 // 必须是一个输入一个输出，输入必须是iris.Context，输出是任意类型，会成为控制器的输入
@@ -76,9 +76,9 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		result := func_(apiContext)
 		if result != nil {
 			_, err := apiContext.Ctx.JSON(ApiResult{
-				ErrorMessage: ``,
-				ErrorCode:    0,
-				Data:         result,
+				Msg:  ``,
+				Code: 0,
+				Data: result,
 			})
 			if err != nil {
 				go_logger.Logger.Error(err)

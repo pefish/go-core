@@ -197,10 +197,10 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 		// 添加 lang header
 		//parameters = append(parameters, Yaml_Parameter{
-		//	Name: `lang`,
+		//	name: `lang`,
 		//	In: `header`,
 		//	Required: false,
-		//	Description: `客户端语言`,
+		//	description: `客户端语言`,
 		//	Type: this.getType(`string`),
 		//})
 

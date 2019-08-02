@@ -39,19 +39,67 @@ type Route struct {
 }
 
 type BaseServiceClass struct {
-	Name              string                                      // 服务名
-	Description       string                                      // 服务描述
-	Path              string                                      // 服务的基础路径
-	Host              string                                      // 服务监听host
-	Port              uint64                                      // 服务监听port
-	AccessHost        string                                      // 服务访问host，没有设置的话使用监听host
-	AccessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
-	Routes            map[string]*Route                           // 服务的所有路由
+	name              string                                      // 服务名
+	description       string                                      // 服务描述
+	path              string                                      // 服务的基础路径
+	host              string                                      // 服务监听host
+	port              uint64                                      // 服务监听port
+	accessHost        string                                      // 服务访问host，没有设置的话使用监听host
+	accessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
+	routes            map[string]*Route                           // 服务的所有路由
 	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
 	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
 	App               *iris.Application                           // iris实例
 	HealthyCheckFun   func()                                      // health check 控制器
 	Opts              map[string]interface{}                      // 一些可选参数
+}
+
+func (this *BaseServiceClass) SetRoutes(routes map[string]*Route) {
+	this.routes = routes
+}
+
+func (this *BaseServiceClass) SetPath(path string) {
+	this.path = path
+}
+
+func (this *BaseServiceClass) SetName(name string) {
+	this.name = name
+}
+
+func (this *BaseServiceClass) GetHost() string {
+	return this.host
+}
+
+func (this *BaseServiceClass) SetHost(host string) {
+	this.host = host
+}
+
+func (this *BaseServiceClass) GetPort() uint64 {
+	return this.port
+}
+
+func (this *BaseServiceClass) SetPort(port uint64) {
+	this.port = port
+}
+
+func (this *BaseServiceClass) GetAccessHost() string {
+	return this.accessHost
+}
+
+func (this *BaseServiceClass) SetAccessHost(accessHost string) {
+	this.accessHost = accessHost
+}
+
+func (this *BaseServiceClass) GetAccessPort() uint64 {
+	return this.accessPort
+}
+
+func (this *BaseServiceClass) SetAccessPort(accessPort uint64) {
+	this.accessPort = accessPort
+}
+
+func (this *BaseServiceClass) SetDescription(desc string) {
+	this.description = desc
 }
 
 func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
@@ -80,19 +128,19 @@ func (this *BaseServiceClass) UseGlobal(key string, func_ context.Handler) Inter
 }
 
 func (this *BaseServiceClass) GetName() string {
-	return this.Name
+	return this.name
 }
 
 func (this *BaseServiceClass) GetDescription() string {
-	return this.Description
+	return this.description
 }
 
 func (this *BaseServiceClass) GetPath() string {
-	return this.Path
+	return this.path
 }
 
 func (this *BaseServiceClass) GetRoutes() map[string]*Route {
-	return this.Routes
+	return this.routes
 }
 
 func (this *BaseServiceClass) ExactOpt(name string) interface{} {
@@ -137,10 +185,10 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 			}
 		}
 	}
-	if this.Routes[apiName] == nil {
+	if this.routes[apiName] == nil {
 		go_error.Throw(`api request 404`, go_error.INTERNAL_ERROR_CODE)
 	}
-	method := this.Routes[apiName].Method
+	method := this.routes[apiName].Method
 	fullUrl := this.GetRequestUrl(apiName)
 	body := map[string]interface{}{}
 	if method == `GET` {
@@ -219,15 +267,15 @@ func (this *BaseServiceClass) Run() {
 		`X-Forwarded-For`: true,
 	}
 	this.printRoutes()
-	err := this.App.Run(iris.Addr(this.Host+`:`+go_reflect.Reflect.ToString(this.Port)), iris.WithConfiguration(irisConfig))
+	err := this.App.Run(iris.Addr(this.host+`:`+go_reflect.Reflect.ToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}
 }
 
 func (this *BaseServiceClass) printRoutes() {
-	go_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.Path))
-	for _, route := range this.Routes {
+	go_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.path))
+	for _, route := range this.routes {
 		go_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, route.Path, route.Description))
 	}
 }
@@ -285,7 +333,7 @@ func (this *BaseServiceClass) buildRoutes() {
 				if route.Method != `` {
 					method = route.Method
 				}
-				this.App.AllowMethods(iris.MethodOptions).Handle(method, this.Path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+				this.App.AllowMethods(iris.MethodOptions).Handle(method, this.path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 					params := apiContext.Params
 					service := redirectMap[`service`].(InterfaceService)
 					routeName := redirectMap[`route_name`].(string)
@@ -299,12 +347,12 @@ func (this *BaseServiceClass) buildRoutes() {
 				if return_ == nil {
 					go_error.ThrowInternal(`route config error; route name: ` + name)
 				}
-				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.Path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 					return return_
 				}))
 			}
 		} else {
-			this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.Path+route.Path, apiChannelBuilder.WrapJson(route.Controller))
+			this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.path+route.Path, apiChannelBuilder.WrapJson(route.Controller))
 		}
 	}
 
@@ -398,16 +446,16 @@ func (this *BaseServiceClass) parseReturn(return_ interface{}) interface{} {
 }
 
 func (this *BaseServiceClass) GetRequestUrl(apiName string) string {
-	if this.Routes[apiName].Debug == true {
-		return this.Routes[apiName].Path
+	if this.routes[apiName].Debug == true {
+		return this.routes[apiName].Path
 	}
-	host := this.Host
-	if this.AccessHost != `` {
-		host = this.AccessHost
+	host := this.host
+	if this.accessHost != `` {
+		host = this.accessHost
 	}
-	port := this.Port
-	if this.AccessPort != 0 {
-		port = this.AccessPort
+	port := this.port
+	if this.accessPort != 0 {
+		port = this.accessPort
 	}
-	return fmt.Sprintf(`http://%s:%s%s%s`, host, port, this.Path, this.Routes[apiName].Path)
+	return fmt.Sprintf(`http://%s:%s%s%s`, host, port, this.path, this.routes[apiName].Path)
 }

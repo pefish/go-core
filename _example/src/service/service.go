@@ -17,8 +17,8 @@ type TestServiceClass struct {
 var TestService = TestServiceClass{}
 
 func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService {
-	this.Name = `测试服务api`
-	this.Path = `/api/test`
+	this.SetName(`测试服务api`)
+	this.SetPath(`/api/test`)
 	params := map[string]interface{}{}
 	apiControllers := map[string]api_session.ApiHandlerType{}
 	if len(opts) > 0 && opts[0] != nil {
@@ -26,7 +26,7 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 		apiControllers = params[`apiControllers`].(map[string]api_session.ApiHandlerType)
 	}
 	api_strategy.ParamValidateApiStrategy.SetErrorCode(2005)
-	this.Routes = map[string]*service.Route{
+	this.SetRoutes(map[string]*service.Route{
 		`test_api`: {
 			Description: "这是测试路由",
 			Path:        "/v1/test_api",
@@ -41,6 +41,6 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 			Params:     controllers.TestParams{},
 			Controller: apiControllers[`test_api`],
 		},
-	}
+	})
 	return this
 }

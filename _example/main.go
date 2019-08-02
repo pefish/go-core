@@ -43,8 +43,8 @@ func main() {
 		`apiControllers`: map[string]api_session.ApiHandlerType{
 			`test_api`: controllers.TestController.Test,
 		},
-	})
-	service.TestService.Host = config.Config.GetString(`host`)
-	service.TestService.Port = config.Config.GetUint64(`port`)
+	}).SetHealthyCheck(nil)
+	service.TestService.SetHost(config.Config.GetString(`host`))
+	service.TestService.SetPort(config.Config.GetUint64(`port`))
 	service.TestService.Run()
 }
