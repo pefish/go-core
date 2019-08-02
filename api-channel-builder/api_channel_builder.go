@@ -50,7 +50,7 @@ func (this *ApiChannelBuilderClass) register() {
 	if this.InjectObjects != nil && len(this.InjectObjects) > 0 {
 		this.Hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
 			// api入口
-			apiSession := api_session.NewApiSession() // 新建回话
+			apiSession := api_session.NewApiSession() // 新建会话
 			apiSession.Ctx = ctx
 			for _, injectObject := range this.InjectObjects { // 利用闭包实现注入函数的分发
 				injectObject.Func(ctx, apiSession, injectObject.Param)

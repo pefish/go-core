@@ -90,6 +90,9 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 
 func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(ParamValidateParam)
+	if newParam.Param == nil {
+		return
+	}
 	this.Validator.Init()
 
 	tempParam := newParam.Param

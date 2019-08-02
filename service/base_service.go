@@ -26,16 +26,17 @@ type StrategyRoute struct {
 }
 
 type Route struct {
-	Description string                     // api描述
-	Path        string                     // api路径
-	Method      string                     // api方法
-	Strategies  []StrategyRoute            // api前置处理策略
-	Params      interface{}                // api参数
-	Return      interface{}                // api返回值
-	Redirect    map[string]interface{}     // api重定向
-	Debug       bool                       // api是否mock
-	Controller  api_session.ApiHandlerType // api业务处理器
-	ParamType   string                     // 参数类型。默认 application/json
+	Description    string                     // api描述
+	Path           string                     // api路径
+	IgnoreRootPath bool                       // api路径是否忽略根路径
+	Method         string                     // api方法
+	Strategies     []StrategyRoute            // api前置处理策略
+	Params         interface{}                // api参数
+	Return         interface{}                // api返回值
+	Redirect       map[string]interface{}     // api重定向
+	Debug          bool                       // api是否mock
+	Controller     api_session.ApiHandlerType // api业务处理器
+	ParamType      string                     // 参数类型。默认 application/json
 }
 
 type BaseServiceClass struct {
@@ -50,7 +51,6 @@ type BaseServiceClass struct {
 	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
 	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
 	App               *iris.Application                           // iris实例
-	HealthyCheckFun   func()                                      // health check 控制器
 	Opts              map[string]interface{}                      // 一些可选参数
 }
 
@@ -107,7 +107,31 @@ func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
 }
 
 func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
-	this.HealthyCheckFun = func_
+	this.routes[`healthy_check`] = &Route{
+		Description: "健康检查api",
+		Path:        "/healthz",
+		Method:      "ALL",
+		IgnoreRootPath: true,
+		Controller: func(apiContext *api_session.ApiSessionClass) interface{} {
+			defer func() {
+				if err := recover(); err != nil {
+					go_logger.Logger.Error(err)
+					apiContext.Ctx.StatusCode(iris.StatusInternalServerError)
+					apiContext.Ctx.Text(`not ok`)
+				}
+			}()
+			if func_ != nil {
+				func_()
+			}
+
+			apiContext.Ctx.StatusCode(iris.StatusOK)
+			if go_application.Application.Debug {
+				go_logger.Logger.Info(`I am healthy`)
+			}
+			apiContext.Ctx.Text(`ok`)
+			return nil
+		},
+	}
 	return this
 }
 
@@ -274,9 +298,12 @@ func (this *BaseServiceClass) Run() {
 }
 
 func (this *BaseServiceClass) printRoutes() {
-	go_logger.Logger.Info(fmt.Sprintf(`--------------- %s ---------------`, this.path))
 	for _, route := range this.routes {
-		go_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, route.Path, route.Description))
+		apiPath := this.path+route.Path
+		if route.IgnoreRootPath == true {
+			apiPath = route.Path
+		}
+		go_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
 	}
 }
 
@@ -325,15 +352,18 @@ func (this *BaseServiceClass) buildRoutes() {
 				}
 			}
 		}
+		apiPath := this.path+route.Path
+		if route.IgnoreRootPath == true {
+			apiPath = route.Path
+		}
+		if route.Method == `` {
+			route.Method = `ALL`
+		}
 		if route.Controller == nil {
 			if route.Redirect != nil { // 自动转发。不会校验参数
 				redirectMap := route.Redirect
 				return_ := this.parseReturn(route.Return)
-				method := `ALL`
-				if route.Method != `` {
-					method = route.Method
-				}
-				this.App.AllowMethods(iris.MethodOptions).Handle(method, this.path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, apiPath, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 					params := apiContext.Params
 					service := redirectMap[`service`].(InterfaceService)
 					routeName := redirectMap[`route_name`].(string)
@@ -347,33 +377,14 @@ func (this *BaseServiceClass) buildRoutes() {
 				if return_ == nil {
 					go_error.ThrowInternal(`route config error; route name: ` + name)
 				}
-				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.path+route.Path, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+				this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, apiPath, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 					return return_
 				}))
 			}
 		} else {
-			this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, this.path+route.Path, apiChannelBuilder.WrapJson(route.Controller))
+			this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, apiPath, apiChannelBuilder.WrapJson(route.Controller))
 		}
 	}
-
-	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/healthz`, func(ctx context.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				go_logger.Logger.Error(err)
-				ctx.StatusCode(iris.StatusInternalServerError)
-				ctx.Text(`not ok`)
-			}
-		}()
-		if this.HealthyCheckFun != nil {
-			this.HealthyCheckFun()
-		}
-
-		ctx.StatusCode(iris.StatusOK)
-		if go_application.Application.Debug {
-			go_logger.Logger.Info(`I am healthy`)
-		}
-		ctx.Text(`ok`)
-	})
 
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, func(ctx context.Context) {
 		ctx.StatusCode(iris.StatusNotFound)
