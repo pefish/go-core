@@ -10,7 +10,11 @@ func TestConfigClass_LoadYamlConfig(t *testing.T) {
 		ConfigFilepath: `/Users/joy/Work/backend/go-core/_example/config/local.yaml`,
 		SecretFilepath: `/Users/joy/Work/backend/go-core/_example/secret/local1.yaml`,
 	})
-	fmt.Println(Config.GetString(`host`))
+	a := struct {
+		Host string `json:"host"`
+	}{}
+	Config.GetStruct(`mysql`, &a)
+	fmt.Println(a)
 }
 
 func TestConfigClass_GetString(t *testing.T) {

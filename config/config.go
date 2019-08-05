@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"github.com/pefish/go-file"
+	"github.com/pefish/go-format"
 	"github.com/pefish/go-json"
 	"github.com/pefish/go-map"
 	"github.com/pefish/go-reflect"
@@ -123,7 +124,21 @@ func (this *ConfigClass) Get(str string) interface{} {
 }
 
 func (this *ConfigClass) GetMap(str string) map[string]interface{} {
-	return this.configs[str].(map[string]interface{})
+	result := map[string]interface{}{}
+	switch this.configs[str].(type) {
+	case map[interface{}]interface{}:
+		temp := this.configs[str].(map[interface{}]interface{})
+		for k, v := range temp {
+			result[go_reflect.Reflect.ToString(k)] = v
+		}
+	default:
+		result = this.configs[str].(map[string]interface{})
+	}
+	return result
+}
+
+func (this *ConfigClass) GetStruct(str string, s interface{}) {
+	go_format.Format.MapToStruct(s, this.GetMap(str))
 }
 
 func (this *ConfigClass) GetSlice(str string) []interface{} {
