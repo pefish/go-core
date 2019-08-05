@@ -118,6 +118,10 @@ func (this *ConfigClass) GetFloat64(str string) float64 {
 	return go_reflect.Reflect.ToFloat64(this.configs[str])
 }
 
+func (this *ConfigClass) Get(str string) interface{} {
+	return this.configs[str]
+}
+
 func (this *ConfigClass) GetMap(str string) map[string]interface{} {
 	return this.configs[str].(map[string]interface{})
 }
