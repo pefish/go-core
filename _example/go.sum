@@ -159,6 +159,8 @@ github.com/pefish/go-reflect v0.0.2 h1:t6G1dW4qUt1fRNSI2pUG6BnuBmYBie6RmbqR5k2+l
 github.com/pefish/go-reflect v0.0.2/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-reflect v0.0.3 h1:VybCShzI0EbvlcqaebdlqEC/F5fP8beRuNpr/Ia+cr8=
 github.com/pefish/go-reflect v0.0.3/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
+github.com/pefish/go-reflect v0.0.4 h1:qj1TiWIz/xetfKrc40eyXQaIerC1cTKAOZgVXi7V8Qs=
+github.com/pefish/go-reflect v0.0.4/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-slice v0.0.1 h1:al0FykGL/yHmDzO1MBXVqDyxTd/0256S/CXz6/hU83Y=
 github.com/pefish/go-slice v0.0.1/go.mod h1:DGp15ObvqIv9vMjxxQt9RXJc52QtkZGg0gcfMv1KsR0=
 github.com/pefish/go-stack v0.0.0-20190731024638-d950ef6c94bf h1:V9dWEqnXMb4RP7pkKCbdvef5jrmuMor9g3XEm+FPgfY=

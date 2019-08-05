@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/pefish/go-core/api-session"
 )
 
@@ -17,7 +16,6 @@ type TestParams struct {
 
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
 	testParams := TestParams{}
-	fmt.Println(1, apiSession.Params)
 	apiSession.ScanParams(&testParams)
 	return testParams
 }

@@ -44,7 +44,6 @@ func main() {
 			`test_api`: controllers.TestController.Test,
 		},
 	}).SetHealthyCheck(nil)
-	service.TestService.SetHost(config.Config.GetString(`host`))
 	service.TestService.SetPort(config.Config.GetUint64(`port`))
 	service.TestService.Run()
 }
