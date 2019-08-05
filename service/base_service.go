@@ -291,7 +291,11 @@ func (this *BaseServiceClass) Run() {
 		`X-Forwarded-For`: true,
 	}
 	this.printRoutes()
-	err := this.App.Run(iris.Addr(this.host+`:`+go_reflect.Reflect.ToString(this.port)), iris.WithConfiguration(irisConfig))
+	host := this.host
+	if host == `` {
+		host = `0.0.0.0`
+	}
+	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.ToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}

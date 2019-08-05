@@ -12,7 +12,7 @@ type ApiSessionClass struct {
 
 	JwtHeaderName string
 	JwtPayload    map[string]interface{}
-	UserId        *uint64
+	UserId        uint64
 
 	RouteName string
 

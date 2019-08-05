@@ -67,7 +67,7 @@ func (this *JwtAuthStrategyClass) Execute(ctx iris.Context, out *api_session.Api
 	}
 
 	userId := go_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
-	out.UserId = &userId
+	out.UserId = userId
 
 	util.UpdateCtxValuesErrorMsg(ctx, `jwtAuth`, userId)
 }
