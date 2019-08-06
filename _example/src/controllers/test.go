@@ -10,7 +10,7 @@ type TestControllerClass struct {
 var TestController = TestControllerClass{}
 
 type TestParams struct {
-	UserId int64 `json:"user_id" validate:"required"`
+	UserId uint64 `json:"user_id" validate:"required"`
 	Token  string `json:"token" validate:"required,min=2"`
 }
 

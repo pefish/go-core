@@ -6,7 +6,6 @@ import (
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-format"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-string"
 	"reflect"
@@ -67,7 +66,8 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 			if len(globalValidator) != 0 {
 				newTag = this.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
 			}
-			fieldName := typeField.Tag.Get(`json`)
+			jsonTag := typeField.Tag.Get(`json`)
+			fieldName := strings.Split(jsonTag, `,`)[0]
 			if map_[fieldName] == nil { // map_[fieldName] 为nil的话，后面任何检查都不通过，不合理，所以这样处理
 				typeName := typeField.Type.String()
 				if typeName == `string` {
@@ -97,16 +97,30 @@ func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_sessi
 
 	tempParam := newParam.Param
 
-	if ctx.Method() == `GET` {
-		go_format.Format.MapStringToStruct(&tempParam, ctx.URLParams()) // +号和%都有特殊含义，+会被替换成空格
+	if ctx.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
+		tempMap := map[string]interface{}{}
+		for k, v := range ctx.URLParams() {
+			tempMap[k] = v
+		}
+		tempParam = tempMap
 	} else if ctx.Method() == `POST` {
-		if err := ctx.ReadJSON(&tempParam); err != nil {
-			go_error.ThrowError(`parse params error`, this.errorCode, err)
+		requestContentType := ctx.GetHeader(`content-type`)
+		if strings.HasPrefix(requestContentType, `application/json`) {
+			if err := ctx.ReadJSON(&tempParam); err != nil {
+				go_error.ThrowError(`parse params error`, this.errorCode, err)
+			}
+		} else if strings.HasPrefix(requestContentType, `multipart/form-data`) {
+			tempMap := map[string]interface{}{}
+			for k, v := range ctx.FormValues() {
+				tempMap[k] = v[0]
+			}
+			tempParam = tempMap
+		} else {
+			go_error.Throw(`content-type not be supported`, this.errorCode)
 		}
 	} else {
-		go_error.Throw(`scan params not support`, this.errorCode)
+		go_error.Throw(`scan params not be supported`, this.errorCode)
 	}
-
 	go_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
 	glovalValdator := []string{`no-sql-inject`}
 	type_ := reflect.TypeOf(newParam.Param)

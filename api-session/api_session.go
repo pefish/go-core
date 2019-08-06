@@ -1,8 +1,8 @@
 package api_session
 
 import (
-	"encoding/json"
 	"github.com/kataras/iris"
+	"github.com/mitchellh/mapstructure"
 )
 
 type ApiHandlerType func(apiContext *ApiSessionClass) interface{}
@@ -31,11 +31,19 @@ func NewApiSession() *ApiSessionClass {
 }
 
 func (this *ApiSessionClass) ScanParams(dest interface{}) {
-	result, err := json.Marshal(this.Params)
+	config := &mapstructure.DecoderConfig{
+		WeaklyTypedInput: true,
+		TagName:          "json",
+		Result:           &dest,
+	}
+
+	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
 		panic(err)
 	}
-	if err := json.Unmarshal(result, &dest); err != nil {
+
+	err = decoder.Decode(this.Params.(map[string]interface{}))
+	if err != nil {
 		panic(err)
 	}
 }
