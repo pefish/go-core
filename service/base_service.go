@@ -1,18 +1,19 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/middleware"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-format"
 	"github.com/pefish/go-http"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
@@ -257,7 +258,11 @@ func (this *BaseServiceClass) RequestForSlice(apiName string, args ...interface{
 	if requestResult == nil {
 		return []map[string]interface{}{}
 	}
-	return go_format.Format.SliceInterfaceToSliceMapInterface(requestResult.([]interface{}))
+	out := []map[string]interface{}{}
+	for _, val := range requestResult.([]interface{}) {
+		out = append(out, val.(map[string]interface{}))
+	}
+	return out
 }
 
 func (this *BaseServiceClass) RequestForSliceWithScan(dest interface{}, apiName string, args ...interface{}) {
@@ -265,7 +270,11 @@ func (this *BaseServiceClass) RequestForSliceWithScan(dest interface{}, apiName 
 	if requestResult == nil {
 		dest = nil
 	}
-	go_format.Format.SliceToStruct(dest, requestResult)
+	inrec, err := json.Marshal(requestResult)
+	if err != nil {
+		panic(err)
+	}
+	json.Unmarshal(inrec, dest)
 }
 
 func (this *BaseServiceClass) RequestForMap(apiName string, args ...interface{}) map[string]interface{} {
@@ -281,7 +290,21 @@ func (this *BaseServiceClass) RequestForMapWithScan(dest interface{}, apiName st
 	if requestResult == nil {
 		dest = nil
 	}
-	go_format.Format.MapToStruct(dest, requestResult)
+	config := &mapstructure.DecoderConfig{
+		WeaklyTypedInput: true,
+		TagName:          "json",
+		Result:           &dest,
+	}
+
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		panic(err)
+	}
+
+	err = decoder.Decode(requestResult.(map[string]interface{}))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (this *BaseServiceClass) Run() {

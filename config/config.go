@@ -2,8 +2,8 @@ package config
 
 import (
 	"errors"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pefish/go-file"
-	"github.com/pefish/go-format"
 	"github.com/pefish/go-json"
 	"github.com/pefish/go-map"
 	"github.com/pefish/go-reflect"
@@ -138,7 +138,21 @@ func (this *ConfigClass) GetMap(str string) map[string]interface{} {
 }
 
 func (this *ConfigClass) GetStruct(str string, s interface{}) {
-	go_format.Format.MapToStruct(s, this.GetMap(str))
+	config := &mapstructure.DecoderConfig{
+		WeaklyTypedInput: true,
+		TagName:          "json",
+		Result:           &s,
+	}
+
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		panic(err)
+	}
+
+	err = decoder.Decode(this.GetMap(str))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (this *ConfigClass) GetSlice(str string) []interface{} {
