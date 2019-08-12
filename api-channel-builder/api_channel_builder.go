@@ -75,21 +75,17 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
 		result := func_(apiContext)
 		if result != nil {
-			_, err := apiContext.Ctx.JSON(ApiResult{
+			apiResult := ApiResult{
 				Msg:  ``,
 				Code: 0,
 				Data: result,
-			})
+			}
+			_, err := apiContext.Ctx.JSON(apiResult)
 			if err != nil {
 				go_logger.Logger.Error(err)
+				return
 			}
+			go_logger.Logger.DebugF(`api return: %#v`, apiResult)
 		}
-	})
-}
-
-func (this *ApiChannelBuilderClass) Wrap(func_ api_session.ApiHandlerType) func(ctx iris.Context) {
-	this.register()
-	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
-		func_(apiContext)
 	})
 }

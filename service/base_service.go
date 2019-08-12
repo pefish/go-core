@@ -126,9 +126,7 @@ func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
 			}
 
 			apiContext.Ctx.StatusCode(iris.StatusOK)
-			if go_application.Application.Debug {
-				go_logger.Logger.Info(`I am healthy`)
-			}
+			go_logger.Logger.Debug(`I am healthy`)
 			apiContext.Ctx.Text(`ok`)
 			return nil
 		},
@@ -415,9 +413,7 @@ func (this *BaseServiceClass) buildRoutes() {
 
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, func(ctx context.Context) {
 		ctx.StatusCode(iris.StatusNotFound)
-		if go_application.Application.Debug {
-			go_logger.Logger.Info(`api not found`)
-		}
+		go_logger.Logger.Debug(`api not found`)
 		ctx.Text(`Not Found`)
 	})
 }

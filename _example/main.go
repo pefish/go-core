@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pefish/go-config"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-logger"
 	"github.com/pefish/go-mysql"
 	"log"
 	"os"
@@ -23,6 +24,9 @@ func main() {
 	}()
 
 	go_config.Config.LoadJsonConfig(go_config.Configuration{})
+
+	loggerInstance := go_logger.Log4goClass{}
+	go_logger.Logger.Init(&loggerInstance, service.TestService.GetName(), `debug`)
 
 	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.GetMap(`mysql`))
 

@@ -16,9 +16,7 @@ func ErrorHandle(ctx iris.Context) {
 	apiMsg := fmt.Sprintf(`%s %s %s`, ctx.RemoteAddr(), ctx.Path(), ctx.Method())
 	go_logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateCtxValuesErrorMsg(ctx, `apiMsg`, apiMsg)
-	if go_application.Application.Debug {
-		go_logger.Logger.Info(ctx.Request().Header)
-	}
+	go_logger.Logger.Debug(ctx.Request().Header)
 	ctx.Next()
 }
 
