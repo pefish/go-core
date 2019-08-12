@@ -8,8 +8,8 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
-	"test/src/controllers"
-	"test/src/service"
+	"test/controllers"
+	"test/service"
 )
 
 func main() {
@@ -23,16 +23,8 @@ func main() {
 	}()
 
 	go_config.Config.LoadJsonConfig(go_config.Configuration{})
-	fmt.Printf("%#v", go_config.Config.GetAll())
 
-	mysqlConfig := go_config.Config.GetMap(`mysql`)
-	go_mysql.MysqlHelper.ConnectWithConfiguration(go_mysql.Configuration{
-		Host:     mysqlConfig[`host`].(string),
-		Port:     3306,
-		Username: mysqlConfig[`username`].(string),
-		Password: mysqlConfig[`password`].(string),
-		Database: mysqlConfig[`database`].(string),
-	})
+	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.GetMap(`mysql`))
 
 	service.TestService.Init(map[string]interface{}{
 		`apiControllers`: map[string]api_session.ApiHandlerType{

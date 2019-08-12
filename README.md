@@ -6,7 +6,7 @@ golang实现的微服务框架
 
 ### 推荐微服务架构分层
 
-service接入层 -- controller业务逻辑层 -- dao数据访问层
+service接入层 -- controller业务逻辑层 -- model数据访问层
 
 ### install
 

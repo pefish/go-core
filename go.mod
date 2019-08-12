@@ -41,12 +41,10 @@ require (
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.2.0
 	github.com/pefish/go-file v0.1.0
-	github.com/pefish/go-http v0.2.2
-	github.com/pefish/go-json v0.1.0
+	github.com/pefish/go-http v0.2.3
 	github.com/pefish/go-jwt v0.1.1
-	github.com/pefish/go-logger v0.1.1
-	github.com/pefish/go-map v0.1.0
-	github.com/pefish/go-reflect v0.0.4
+	github.com/pefish/go-logger v0.1.2
+	github.com/pefish/go-reflect v0.0.6
 	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
@@ -64,5 +62,4 @@ require (
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
-	gopkg.in/yaml.v2 v2.2.2
 )

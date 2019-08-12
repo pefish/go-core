@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pefish/go-core/swagger"
-	"test/src/service"
+	"test/service"
 )
 
 func main() {
