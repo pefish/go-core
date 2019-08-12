@@ -15,7 +15,5 @@ type TestParams struct {
 }
 
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
-	testParams := TestParams{}
-	apiSession.ScanParams(&testParams)
-	return testParams
+	return apiSession.Params
 }

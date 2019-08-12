@@ -4,7 +4,6 @@ import (
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/service"
-	"test/controllers"
 	"time"
 )
 
@@ -38,7 +37,6 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 					},
 				},
 			},
-			Params:     controllers.TestParams{},
 			Controller: apiControllers[`test_api`],
 		},
 	})

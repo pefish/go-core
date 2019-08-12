@@ -90,19 +90,14 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 
 func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(ParamValidateParam)
-	if newParam.Param == nil {
-		return
-	}
 	this.Validator.Init()
 
-	tempParam := newParam.Param
+	tempParam := map[string]interface{}{}
 
 	if ctx.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
-		tempMap := map[string]interface{}{}
 		for k, v := range ctx.URLParams() {
-			tempMap[k] = v
+			tempParam[k] = v
 		}
-		tempParam = tempMap
 	} else if ctx.Method() == `POST` {
 		requestContentType := ctx.GetHeader(`content-type`)
 		if strings.HasPrefix(requestContentType, `application/json`) {
@@ -110,22 +105,19 @@ func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_sessi
 				go_error.ThrowError(`parse params error`, this.errorCode, err)
 			}
 		} else if strings.HasPrefix(requestContentType, `multipart/form-data`) {
-			tempMap := map[string]interface{}{}
 			for k, v := range ctx.FormValues() {
-				tempMap[k] = v[0]
+				tempParam[k] = v[0]
 			}
-			tempParam = tempMap
 		} else {
 			go_error.Throw(`content-type not be supported`, this.errorCode)
 		}
 	} else {
 		go_error.Throw(`scan params not be supported`, this.errorCode)
 	}
+	out.Params = tempParam
 	go_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
 	glovalValdator := []string{`no-sql-inject`}
-	type_ := reflect.TypeOf(newParam.Param)
-	value_ := reflect.ValueOf(newParam.Param)
-	this.recurValidate(tempParam.(map[string]interface{}), glovalValdator, type_, value_)
-
-	out.Params = tempParam
+	if newParam.Param != nil {
+		this.recurValidate(tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
+	}
 }
