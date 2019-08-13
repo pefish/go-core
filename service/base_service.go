@@ -351,15 +351,15 @@ func (this *BaseServiceClass) buildRoutes() {
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
-		// 注入一些预定义函数
+		// 预定义前置处理器
 		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 			Param: api_strategy.ServiceBaseInfoParam{
 				RouteName: name,
 			},
 		})
-		apiChannelBuilder.Inject(api_strategy.ParamValidateApiStrategy.GetName(), api_channel_builder.InjectObject{
-			Func: api_strategy.ParamValidateApiStrategy.Execute,
+		apiChannelBuilder.Inject(api_strategy.ParamValidateStrategy.GetName(), api_channel_builder.InjectObject{
+			Func: api_strategy.ParamValidateStrategy.Execute,
 			Param: api_strategy.ParamValidateParam{
 				Param: route.Params,
 			},

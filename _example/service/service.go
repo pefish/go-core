@@ -24,7 +24,7 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 		params = opts[0].(map[string]interface{})
 		apiControllers = params[`apiControllers`].(map[string]api_session.ApiHandlerType)
 	}
-	api_strategy.ParamValidateApiStrategy.SetErrorCode(2005)
+	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
 	this.SetRoutes(map[string]*service.Route{
 		`test_api`: {
 			Description: "这是测试路由",

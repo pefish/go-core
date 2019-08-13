@@ -22,7 +22,7 @@ type ParamValidateParam struct {
 	Param interface{}
 }
 
-var ParamValidateApiStrategy = ParamValidateStrategyClass{
+var ParamValidateStrategy = ParamValidateStrategyClass{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
 	Validator: validator.ValidatorClass{},
 }
