@@ -33,6 +33,13 @@ func (this *RateLimitStrategyClass) SetErrorCode(code uint64) {
 }
 
 func (this *RateLimitStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+	defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
+		if code == go_error.INTERNAL_ERROR_CODE {
+			code = this.errorCode
+		}
+		go_error.Throw(msg, code)
+	})
+
 	newParam := param.(RateLimitParam)
 	methodPath := fmt.Sprintf(`%s_%s`, out.Ctx.Method(), out.Ctx.Path())
 	key := fmt.Sprintf(`%s_%s`, out.Ctx.RemoteAddr(), methodPath)

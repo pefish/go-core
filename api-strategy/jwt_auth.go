@@ -54,11 +54,12 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 }
 
 func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
-	defer func() {
-		go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
-			go_error.Throw(msg, code)
-		})
-	}()
+	defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
+		if code == go_error.INTERNAL_ERROR_CODE {
+			code = this.errorCode
+		}
+		go_error.Throw(msg, code)
+	})
 	out.JwtHeaderName = this.headerName
 	jwt := out.Ctx.GetHeader(this.headerName)
 
