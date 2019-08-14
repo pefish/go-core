@@ -2,7 +2,7 @@ package api_strategy
 
 import (
 	"fmt"
-	"github.com/kataras/iris"
+	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
 	"time"
@@ -32,10 +32,10 @@ func (this *RateLimitStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
 }
 
-func (this *RateLimitStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
+func (this *RateLimitStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(RateLimitParam)
-	methodPath := fmt.Sprintf(`%s_%s`, ctx.Method(), ctx.Path())
-	key := fmt.Sprintf(`%s_%s`, ctx.RemoteAddr(), methodPath)
+	methodPath := fmt.Sprintf(`%s_%s`, out.Ctx.Method(), out.Ctx.Path())
+	key := fmt.Sprintf(`%s_%s`, out.Ctx.RemoteAddr(), methodPath)
 	if !(*this.db)[key].IsZero() && time.Now().Sub((*this.db)[key]) < newParam.Limit {
 		go_error.Throw(`api ratelimit`, this.errorCode)
 	}

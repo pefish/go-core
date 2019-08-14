@@ -13,12 +13,38 @@ type ApiResult struct {
 	Data interface{} `json:"data"`
 }
 
+type Route struct {
+	Description    string                     // api描述
+	Path           string                     // api路径
+	IgnoreRootPath bool                       // api路径是否忽略根路径
+	Method         string                     // api方法
+	Strategies     []StrategyRoute            // api前置处理策略
+	Params         interface{}                // api参数
+	Return         interface{}                // api返回值
+	Redirect       map[string]interface{}     // api重定向
+	Debug          bool                       // api是否mock
+	Controller     api_session.ApiHandlerType // api业务处理器
+	ParamType      string                     // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+}
+
+type StrategyRoute struct {
+	Strategy InterfaceStrategy
+	Param    interface{}
+	Disable  bool
+}
+
+type InterfaceStrategy interface {
+	Execute(route *Route, out *api_session.ApiSessionClass, param interface{})
+	GetName() string
+}
+
 // 必须是一个输入一个输出，输入必须是iris.Context，输出是任意类型，会成为控制器的输入
-type InjectFunc func(ctx iris.Context, out *api_session.ApiSessionClass, param interface{})
+type InjectFunc func(route *Route, out *api_session.ApiSessionClass, param interface{})
 
 type InjectObject struct {
-	Func  InjectFunc
-	Param interface{}
+	Func  InjectFunc     // 前置处理器方法
+	Param interface{}    // 前置处理器的预设参数
+	Route *Route // api路由信息
 }
 
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
@@ -53,7 +79,7 @@ func (this *ApiChannelBuilderClass) register() {
 			apiSession := api_session.NewApiSession() // 新建会话
 			apiSession.Ctx = ctx
 			for _, injectObject := range this.InjectObjects { // 利用闭包实现注入函数的分发
-				injectObject.Func(ctx, apiSession, injectObject.Param)
+				injectObject.Func(injectObject.Route, apiSession, injectObject.Param)
 			}
 			return apiSession
 		})

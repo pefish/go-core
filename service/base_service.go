@@ -20,26 +20,6 @@ import (
 	"reflect"
 )
 
-type StrategyRoute struct {
-	Strategy api_strategy.InterfaceStrategy
-	Param    interface{}
-	Disable  bool
-}
-
-type Route struct {
-	Description    string                     // api描述
-	Path           string                     // api路径
-	IgnoreRootPath bool                       // api路径是否忽略根路径
-	Method         string                     // api方法
-	Strategies     []StrategyRoute            // api前置处理策略
-	Params         interface{}                // api参数
-	Return         interface{}                // api返回值
-	Redirect       map[string]interface{}     // api重定向
-	Debug          bool                       // api是否mock
-	Controller     api_session.ApiHandlerType // api业务处理器
-	ParamType      string                     // 参数类型。默认 application/json
-}
-
 type BaseServiceClass struct {
 	name              string                                      // 服务名
 	description       string                                      // 服务描述
@@ -48,14 +28,14 @@ type BaseServiceClass struct {
 	port              uint64                                      // 服务监听port
 	accessHost        string                                      // 服务访问host，没有设置的话使用监听host
 	accessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
-	routes            map[string]*Route                           // 服务的所有路由
+	routes            map[string]*api_channel_builder.Route       // 服务的所有路由
 	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
 	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
 	App               *iris.Application                           // iris实例
 	Opts              map[string]interface{}                      // 一些可选参数
 }
 
-func (this *BaseServiceClass) SetRoutes(routes map[string]*Route) {
+func (this *BaseServiceClass) SetRoutes(routes map[string]*api_channel_builder.Route) {
 	this.routes = routes
 }
 
@@ -108,10 +88,10 @@ func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
 }
 
 func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
-	this.routes[`healthy_check`] = &Route{
-		Description: "健康检查api",
-		Path:        "/healthz",
-		Method:      "ALL",
+	this.routes[`healthy_check`] = &api_channel_builder.Route{
+		Description:    "健康检查api",
+		Path:           "/healthz",
+		Method:         "ALL",
 		IgnoreRootPath: true,
 		Controller: func(apiContext *api_session.ApiSessionClass) interface{} {
 			defer func() {
@@ -162,7 +142,7 @@ func (this *BaseServiceClass) GetPath() string {
 	return this.path
 }
 
-func (this *BaseServiceClass) GetRoutes() map[string]*Route {
+func (this *BaseServiceClass) GetRoutes() map[string]*api_channel_builder.Route {
 	return this.routes
 }
 
@@ -324,7 +304,7 @@ func (this *BaseServiceClass) Run() {
 
 func (this *BaseServiceClass) printRoutes() {
 	for _, route := range this.routes {
-		apiPath := this.path+route.Path
+		apiPath := this.path + route.Path
 		if route.IgnoreRootPath == true {
 			apiPath = route.Path
 		}
@@ -357,14 +337,17 @@ func (this *BaseServiceClass) buildRoutes() {
 			Param: api_strategy.ServiceBaseInfoParam{
 				RouteName: name,
 			},
+			Route: route,
 		})
 		apiChannelBuilder.Inject(api_strategy.ParamValidateStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ParamValidateStrategy.Execute,
 			Param: api_strategy.ParamValidateParam{
 				Param: route.Params,
 			},
+			Route: route,
 		})
 		for key, injectObject := range this.Middlewires {
+			injectObject.Route = route
 			apiChannelBuilder.Inject(key, injectObject)
 		}
 		if route.Strategies != nil {
@@ -373,11 +356,12 @@ func (this *BaseServiceClass) buildRoutes() {
 					apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
 						Func:  strategyRoute.Strategy.Execute,
 						Param: strategyRoute.Param,
+						Route: route,
 					})
 				}
 			}
 		}
-		apiPath := this.path+route.Path
+		apiPath := this.path + route.Path
 		if route.IgnoreRootPath == true {
 			apiPath = route.Path
 		}

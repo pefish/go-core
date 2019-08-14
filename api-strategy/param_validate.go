@@ -1,7 +1,7 @@
 package api_strategy
 
 import (
-	"github.com/kataras/iris"
+	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
@@ -10,6 +10,13 @@ import (
 	"github.com/pefish/go-string"
 	"reflect"
 	"strings"
+)
+
+const (
+	ALL_TYPE       = ``
+	MULTIPART_TYPE = `multipart/form-data`
+	JSON_TYPE      = `application/json`
+	TEXT_TYPE      = `text/plain`
 )
 
 // 默认自带
@@ -88,25 +95,29 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 	}
 }
 
-func (this *ParamValidateStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
+func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(ParamValidateParam)
 	this.Validator.Init()
 
 	tempParam := map[string]interface{}{}
 
-	if ctx.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
-		for k, v := range ctx.URLParams() {
+	if out.Ctx.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
+		for k, v := range out.Ctx.URLParams() {
 			tempParam[k] = v
 		}
-	} else if ctx.Method() == `POST` {
-		requestContentType := ctx.GetHeader(`content-type`)
-		if strings.HasPrefix(requestContentType, `application/json`) {
-			if err := ctx.ReadJSON(&tempParam); err != nil {
-				go_error.ThrowError(`parse params error`, this.errorCode, err)
-			}
-		} else if strings.HasPrefix(requestContentType, `multipart/form-data`) {
-			for k, v := range ctx.FormValues() {
+	} else if out.Ctx.Method() == `POST` {
+		requestContentType := out.Ctx.GetHeader(`content-type`)
+		if route.ParamType != `` && !strings.HasPrefix(requestContentType, route.ParamType) {
+			go_error.Throw(`content-type error`, this.errorCode)
+		}
+
+		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (route.ParamType == MULTIPART_TYPE || route.ParamType == ``) {
+			for k, v := range out.Ctx.FormValues() {
 				tempParam[k] = v[0]
+			}
+		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (route.ParamType == JSON_TYPE || route.ParamType == ``) {
+			if err := out.Ctx.ReadJSON(&tempParam); err != nil {
+				go_error.ThrowError(`parse params error`, this.errorCode, err)
 			}
 		} else {
 			go_error.Throw(`content-type not be supported`, this.errorCode)

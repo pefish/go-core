@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/service"
@@ -25,11 +26,12 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 		apiControllers = params[`apiControllers`].(map[string]api_session.ApiHandlerType)
 	}
 	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
-	this.SetRoutes(map[string]*service.Route{
+	this.SetRoutes(map[string]*api_channel_builder.Route{
 		`test_api`: {
 			Description: "这是测试路由",
 			Path:        "/v1/test_api",
-			Strategies: []service.StrategyRoute{
+			Method:      `POST`,
+			Strategies: []api_channel_builder.StrategyRoute{
 				{
 					Strategy: &api_strategy.RateLimitApiStrategy,
 					Param: api_strategy.RateLimitParam{
@@ -37,6 +39,7 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 					},
 				},
 			},
+			ParamType: api_strategy.ALL_TYPE,
 			Controller: apiControllers[`test_api`],
 		},
 	})

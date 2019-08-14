@@ -1,7 +1,7 @@
 package api_strategy
 
 import (
-	"github.com/kataras/iris"
+	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
@@ -43,14 +43,14 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	this.headerName = headerName
 }
 
-func (this *JwtAuthStrategyClass) Execute(ctx iris.Context, out *api_session.ApiSessionClass, param interface{}) {
+func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
 	defer func() {
 		if err := recover(); err != nil {
 			go_error.Throw(`jwt verify error`, this.errorCode)
 		}
 	}()
 	out.JwtHeaderName = this.headerName
-	jwt := ctx.GetHeader(this.headerName)
+	jwt := out.Ctx.GetHeader(this.headerName)
 
 	verifyResult := false
 	if this.noExpireForever == true {
@@ -69,5 +69,5 @@ func (this *JwtAuthStrategyClass) Execute(ctx iris.Context, out *api_session.Api
 	userId := go_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
 	out.UserId = userId
 
-	util.UpdateCtxValuesErrorMsg(ctx, `jwtAuth`, userId)
+	util.UpdateCtxValuesErrorMsg(out.Ctx, `jwtAuth`, userId)
 }
