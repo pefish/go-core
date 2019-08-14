@@ -195,7 +195,7 @@ func (this *BaseServiceClass) RequestRawMap(apiName string, args ...interface{})
 	fullUrl := this.GetRequestUrl(apiName)
 	body := map[string]interface{}{}
 	if method == `GET` {
-		body = go_http.Http.GetWithParamsForMap(go_http.RequestParam{
+		body = go_http.Http.GetForMap(go_http.RequestParam{
 			Url:     fullUrl,
 			Params:  params,
 			Headers: headers,

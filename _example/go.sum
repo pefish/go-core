@@ -108,6 +108,8 @@ github.com/pefish/go-format v0.1.0 h1:UALs+nD1x82K6COmV468cmblmGDHz8OyUo2R8Nf0Xf
 github.com/pefish/go-format v0.1.0/go.mod h1:UvQCWw/DME71PRF/+RsqtIEB6C9fhX6+iH2TxZc08CM=
 github.com/pefish/go-http v0.2.3 h1:F4GYw3tIXipMzojO4jMoEi8Dwc+DFBumcUROkRWB814=
 github.com/pefish/go-http v0.2.3/go.mod h1:UuERsxHji+RBYMzrqsY2GMSwvAT1MM5L8OHL3DVOkj8=
+github.com/pefish/go-http v0.2.4 h1:PtwndEy82deiYkQFHOh3NyNJICMV46zaoMGf9R0BKWE=
+github.com/pefish/go-http v0.2.4/go.mod h1:UuERsxHji+RBYMzrqsY2GMSwvAT1MM5L8OHL3DVOkj8=
 github.com/pefish/go-json v0.1.0 h1:JgTK9Na6l82lbrADToIhJsMJTMsJ5GU026Qflq1GFjE=
 github.com/pefish/go-json v0.1.0/go.mod h1:eFt9VqWNSG+fPbYgatN+AXvH+dgN4kgknIU3hBESvhc=
 github.com/pefish/go-jwt v0.1.1 h1:nKLMBBImc363g/KLf3Xws3h337m0j/3+1Sn7J8CHMrw=

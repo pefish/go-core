@@ -41,7 +41,7 @@ require (
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.2.0
 	github.com/pefish/go-file v0.1.0
-	github.com/pefish/go-http v0.2.3
+	github.com/pefish/go-http v0.2.4
 	github.com/pefish/go-jwt v0.1.1
 	github.com/pefish/go-logger v0.1.4
 	github.com/pefish/go-reflect v0.0.6
