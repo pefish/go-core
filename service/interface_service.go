@@ -16,7 +16,7 @@ type InterfaceService interface {
 	UseGlobal(key string, func_ context.Handler) InterfaceService
 	// 获取所有路由
 	GetRoutes() map[string]*api_channel_builder.Route
-	SetRoutes(routes map[string]*api_channel_builder.Route)
+	SetRoutes(routes ...map[string]*api_channel_builder.Route)
 	// 获取端点路径
 	GetPath() string
 	SetPath(path string)

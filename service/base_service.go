@@ -35,8 +35,13 @@ type BaseServiceClass struct {
 	Opts              map[string]interface{}                      // 一些可选参数
 }
 
-func (this *BaseServiceClass) SetRoutes(routes map[string]*api_channel_builder.Route) {
-	this.routes = routes
+func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
+	this.routes = map[string]*api_channel_builder.Route{}
+	for _, route := range routes {
+		for k, v := range route {
+			this.routes[k] = v
+		}
+	}
 }
 
 func (this *BaseServiceClass) SetPath(path string) {
