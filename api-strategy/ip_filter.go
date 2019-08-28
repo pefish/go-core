@@ -15,7 +15,7 @@ var IpFilterStrategy = IpFilterStrategyClass{
 }
 
 type IpFilterParam struct {
-	GetValidIp func() []string
+	GetValidIp func(apiSession *api_session.ApiSessionClass) []string
 }
 
 func (this *IpFilterStrategyClass) GetName() string {
@@ -36,7 +36,7 @@ func (this *IpFilterStrategyClass) Execute(route *api_channel_builder.Route, out
 		return
 	}
 	clientIp := out.Ctx.RemoteAddr()
-	allowedIps := newParam.GetValidIp()
+	allowedIps := newParam.GetValidIp(out)
 	for _, ip := range allowedIps {
 		if ip == clientIp {
 			return

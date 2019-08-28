@@ -2,6 +2,7 @@ package route
 
 import (
 	"github.com/pefish/go-core/api-channel-builder"
+	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"test/controllers"
 	"time"
@@ -22,7 +23,7 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			{
 				Strategy: &api_strategy.IpFilterStrategy,
 				Param: api_strategy.IpFilterParam{
-					GetValidIp: func() []string {
+					GetValidIp: func(apiSession *api_session.ApiSessionClass) []string {
 						return []string{`127.0.0.1`}
 					},
 				},
