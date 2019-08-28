@@ -4,6 +4,7 @@ import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-error"
 	"github.com/pefish/go-logger"
 )
 
@@ -36,15 +37,17 @@ type StrategyRoute struct {
 type InterfaceStrategy interface {
 	Execute(route *Route, out *api_session.ApiSessionClass, param interface{})
 	GetName() string
+	GetErrorCode() uint64
 }
 
 // 必须是一个输入一个输出，输入必须是iris.Context，输出是任意类型，会成为控制器的输入
 type InjectFunc func(route *Route, out *api_session.ApiSessionClass, param interface{})
 
 type InjectObject struct {
-	Func  InjectFunc     // 前置处理器方法
-	Param interface{}    // 前置处理器的预设参数
-	Route *Route // api路由信息
+	Func  InjectFunc  // 前置处理器方法
+	Param interface{} // 前置处理器的预设参数
+	Route *Route      // api路由信息
+	This  InterfaceStrategy
 }
 
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
@@ -79,7 +82,15 @@ func (this *ApiChannelBuilderClass) register() {
 			apiSession := api_session.NewApiSession() // 新建会话
 			apiSession.Ctx = ctx
 			for _, injectObject := range this.InjectObjects { // 利用闭包实现注入函数的分发
-				injectObject.Func(injectObject.Route, apiSession, injectObject.Param)
+				func() {
+					defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
+						if code == go_error.INTERNAL_ERROR_CODE {
+							code = injectObject.This.GetErrorCode()
+						}
+						go_error.Throw(msg, code)
+					})
+					injectObject.Func(injectObject.Route, apiSession, injectObject.Param)
+				}()
 			}
 			return apiSession
 		})

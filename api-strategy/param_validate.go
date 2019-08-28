@@ -42,6 +42,10 @@ func (this *ParamValidateStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
 }
 
+func (this *ParamValidateStrategyClass) GetErrorCode() uint64 {
+	return this.errorCode
+}
+
 func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
 	result := ``
 	for _, validatorName := range globalValidator {
@@ -96,13 +100,6 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 }
 
 func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
-	defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
-		if code == go_error.INTERNAL_ERROR_CODE {
-			code = this.errorCode
-		}
-		go_error.Throw(msg, code)
-	})
-
 	newParam := param.(ParamValidateParam)
 	this.Validator.Init()
 

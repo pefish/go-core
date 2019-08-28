@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-error"
 )
 
 type TestControllerClass struct {
@@ -15,5 +16,9 @@ type TestParams struct {
 }
 
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
+
+	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
+		`haha`: 145,
+	})
 	return apiSession.Params
 }

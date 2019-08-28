@@ -19,6 +19,14 @@ var TestRoute = map[string]*api_channel_builder.Route{
 					Limit: 1 * time.Second,
 				},
 			},
+			{
+				Strategy: &api_strategy.IpFilterStrategy,
+				Param: api_strategy.IpFilterParam{
+					GetValidIp: func() []string {
+						return []string{`127.0.0.1`}
+					},
+				},
+			},
 		},
 		ParamType: api_strategy.ALL_TYPE,
 		Controller: controllers.TestController.Test,

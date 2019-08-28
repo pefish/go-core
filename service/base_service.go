@@ -343,6 +343,7 @@ func (this *BaseServiceClass) buildRoutes() {
 				RouteName: name,
 			},
 			Route: route,
+			This:  &api_strategy.ServiceBaseInfoApiStrategy,
 		})
 		apiChannelBuilder.Inject(api_strategy.ParamValidateStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ParamValidateStrategy.Execute,
@@ -350,6 +351,7 @@ func (this *BaseServiceClass) buildRoutes() {
 				Param: route.Params,
 			},
 			Route: route,
+			This:  &api_strategy.ParamValidateStrategy,
 		})
 		for key, injectObject := range this.Middlewires {
 			injectObject.Route = route
@@ -362,6 +364,7 @@ func (this *BaseServiceClass) buildRoutes() {
 						Func:  strategyRoute.Strategy.Execute,
 						Param: strategyRoute.Param,
 						Route: route,
+						This:  strategyRoute.Strategy,
 					})
 				}
 			}

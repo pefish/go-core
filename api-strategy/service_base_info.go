@@ -3,6 +3,7 @@ package api_strategy
 import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-error"
 )
 
 type ServiceBaseInfoStrategyClass struct {
@@ -19,6 +20,10 @@ type ServiceBaseInfoParam struct {
 
 func (this *ServiceBaseInfoStrategyClass) GetName() string {
 	return `serviceBaseInfo`
+}
+
+func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
+	return go_error.INTERNAL_ERROR_CODE
 }
 
 func (this *ServiceBaseInfoStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
