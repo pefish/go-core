@@ -21,7 +21,7 @@ type ApiSessionClass struct {
 
 	Options map[string]interface{}
 
-	Params interface{}
+	Params map[string]interface{}
 }
 
 func NewApiSession() *ApiSessionClass {
@@ -42,7 +42,7 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 		panic(err)
 	}
 
-	err = decoder.Decode(this.Params.(map[string]interface{}))
+	err = decoder.Decode(this.Params)
 	if err != nil {
 		panic(err)
 	}
