@@ -22,7 +22,6 @@ const (
 // 默认自带
 type ParamValidateStrategyClass struct {
 	errorCode uint64
-	Validator validator.ValidatorClass
 }
 
 type ParamValidateParam struct {
@@ -31,7 +30,6 @@ type ParamValidateParam struct {
 
 var ParamValidateStrategy = ParamValidateStrategyClass{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
-	Validator: validator.ValidatorClass{},
 }
 
 func (this *ParamValidateStrategyClass) GetName() string {
@@ -67,14 +65,14 @@ func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue refle
 	return result
 }
 
-func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) {
+func (this *ParamValidateStrategyClass) recurValidate(myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
 		fieldKind := typeFieldType.Kind()
 		fieldValue := value_.Field(i)
 		if fieldKind == reflect.Struct {
-			this.recurValidate(map_, globalValidator, typeFieldType, fieldValue)
+			this.recurValidate(myValidator, map_, globalValidator, typeFieldType, fieldValue)
 		} else {
 			tagVal := typeField.Tag.Get(`validate`)
 			newTag := tagVal
@@ -92,7 +90,7 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 				}
 			}
 
-			err := this.Validator.Validator.Var(map_[fieldName], newTag)
+			err := myValidator.Validator.Var(map_[fieldName], newTag)
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				go_error.ThrowErrorWithData(go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag, this.errorCode, map[string]interface{}{
@@ -105,7 +103,8 @@ func (this *ParamValidateStrategyClass) recurValidate(map_ map[string]interface{
 
 func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(ParamValidateParam)
-	this.Validator.Init()
+	myValidator := validator.ValidatorClass{}
+	myValidator.Init()
 
 	tempParam := map[string]interface{}{}
 
@@ -137,6 +136,6 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 	go_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
 	glovalValdator := []string{`no-sql-inject`}
 	if newParam.Param != nil {
-		this.recurValidate(tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
+		this.recurValidate(myValidator, tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
 	}
 }
