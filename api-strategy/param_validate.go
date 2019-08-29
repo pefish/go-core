@@ -3,6 +3,7 @@ package api_strategy
 import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
@@ -133,7 +134,9 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 		go_error.Throw(`scan params not be supported`, this.errorCode)
 	}
 	out.Params = tempParam
-	go_logger.Logger.Info(go_desensitize.Desensitize.DesensitizeToString(tempParam))
+	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
+	go_logger.Logger.Info(paramsStr)
+	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if newParam.Param != nil {
 		this.recurValidate(myValidator, tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
