@@ -10,15 +10,36 @@ type TestControllerClass struct {
 
 var TestController = TestControllerClass{}
 
-type TestParams struct {
+type TestParam struct {
 	UserId uint64 `json:"user_id" validate:"required"`
-	Token  string `json:"token" validate:"required,min=2"`
+	Token  string `json:"token" validate:"required,min=2" desc:"token desc"`
 }
-
+type TestReturn struct {
+	Test string `json:"test"`
+}
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
 
 	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
 		`haha`: 145,
 	})
-	return apiSession.Params
+	return TestReturn{
+		Test: `111`,
+	}
+}
+
+
+type Test1Param struct {
+	Haha uint64 `json:"haha" validate:"omitempty" desc:"haha desc"`
+}
+type Test1Return struct {
+	Test string `json:"test"`
+}
+func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) interface{} {
+
+	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
+		`haha`: 145,
+	})
+	return Test1Return{
+		Test: `111`,
+	}
 }

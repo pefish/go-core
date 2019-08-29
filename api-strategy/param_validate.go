@@ -38,6 +38,10 @@ func (this *ParamValidateStrategyClass) GetName() string {
 	return `paramValidate`
 }
 
+func (this *ParamValidateStrategyClass) GetDescription() string {
+	return `validate params`
+}
+
 func (this *ParamValidateStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
 }

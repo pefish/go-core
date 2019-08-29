@@ -28,6 +28,10 @@ func (this *RateLimitStrategyClass) GetName() string {
 	return `rateLimit`
 }
 
+func (this *RateLimitStrategyClass) GetDescription() string {
+	return `rate limit`
+}
+
 func (this *RateLimitStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
 }

@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/iris/core/errors"
+	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-file"
+	"github.com/pefish/go-format"
 	"github.com/pefish/yaml"
 	"reflect"
 	"strings"
@@ -92,7 +94,7 @@ type Yaml_Swagger struct {
 	Definitions map[string]Yaml_Definition      `json:"definitions" yaml:"definitions"`
 }
 
-func (this *SwaggerClass) recuGetParams(paramsType reflect.Type, properties map[string]Yaml_Property, requiredParams *[]string, parameters *[]Yaml_Parameter) {
+func (this *SwaggerClass) recuGetParams(paramsType reflect.Type, paramsVal reflect.Value, properties map[string]Yaml_Property, requiredParams *[]string, parameters *[]Yaml_Parameter) {
 	if paramsType.Kind() == reflect.Ptr {
 		paramsType = paramsType.Elem()
 	}
@@ -101,7 +103,7 @@ func (this *SwaggerClass) recuGetParams(paramsType reflect.Type, properties map[
 		realParamName := field.Tag.Get(`json`)
 		properties[realParamName] = Yaml_Property{
 			Type:        this.getType(field.Type.Name()),
-			Example:     field.Tag.Get(`example`),
+			Example:     paramsVal.Interface(),
 			Description: field.Tag.Get(`desc`),
 		}
 		parameter := Yaml_Parameter{
@@ -119,29 +121,48 @@ func (this *SwaggerClass) recuGetParams(paramsType reflect.Type, properties map[
 	}
 }
 
-func (this *SwaggerClass) recuPostParams(paramsType reflect.Type, properties map[string]Yaml_Property, requiredParams *[]string) {
+func (this *SwaggerClass) recuReturn(map_ map[string]interface{}, properties map[string]Yaml_Property) {
+	for k, v := range map_ {
+		if reflect.TypeOf(v).Kind() == reflect.Map {
+			p := map[string]Yaml_Property{}
+			this.recuReturn(v.(map[string]interface{}), p)
+			properties[k] = Yaml_Property{
+				Description: `no desc`,
+				Properties:  p,
+			}
+		} else {
+			properties[k] = Yaml_Property{
+				Example:     v,
+				Description: `no desc`,
+			}
+		}
+	}
+}
+
+func (this *SwaggerClass) recuPostParams(paramsType reflect.Type, paramsVal reflect.Value, properties map[string]Yaml_Property, requiredParams *[]string) {
 	if paramsType.Kind() == reflect.Ptr {
 		paramsType = paramsType.Elem()
 	}
 	for i := 0; i < paramsType.NumField(); i++ {
 		field := paramsType.Field(i)
+		fieldVal := paramsVal.Field(i)
 		if field.Type.String() == `os.File` {
 			realParamName := field.Tag.Get(`json`)
 			properties[realParamName] = Yaml_Property{
 				Type:        `file`,
-				Example:     field.Tag.Get(`example`),
+				Example:     fieldVal.Interface(),
 				Description: field.Tag.Get(`desc`),
 			}
 			if strings.Contains(field.Tag.Get(`validate`), `required`) {
 				*requiredParams = append(*requiredParams, realParamName)
 			}
 		} else if field.Type.Kind() == reflect.Struct {
-			this.recuPostParams(field.Type, properties, requiredParams)
+			this.recuPostParams(field.Type, fieldVal, properties, requiredParams)
 		} else {
 			realParamName := field.Tag.Get(`json`)
 			properties[realParamName] = Yaml_Property{
 				Type:        this.getType(field.Type.Name()),
-				Example:     field.Tag.Get(`example`),
+				Example:     fieldVal.Interface(),
 				Description: field.Tag.Get(`desc`),
 			}
 			if strings.Contains(field.Tag.Get(`validate`), `required`) {
@@ -153,8 +174,16 @@ func (this *SwaggerClass) recuPostParams(paramsType reflect.Type, properties map
 
 func (this *SwaggerClass) getType(typeName string) string {
 	result := ``
-	if typeName == `int64` {
-		result = `integer`
+	if typeName == `int` ||
+		typeName == `int8` ||
+		typeName == `int16` ||
+		typeName == `int32` ||
+		typeName == `int64` ||
+		typeName == `uint8` ||
+		typeName == `uint16` ||
+		typeName == `uint32` ||
+		typeName == `uint64` {
+		result = `number`
 	} else if typeName == `bool` {
 		result = `boolean`
 	} else {
@@ -165,26 +194,6 @@ func (this *SwaggerClass) getType(typeName string) string {
 
 func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_ string) {
 	definitions := map[string]Yaml_Definition{}
-	definitions[`Failed`] = Yaml_Definition{
-		Type: `object`,
-		Properties: map[string]Yaml_Property{
-			`code`: {
-				Type:        this.getType(`int64`),
-				Example:     `2000`,
-				Description: `错误码`,
-			},
-			`msg`: {
-				Type:        this.getType(`string`),
-				Example:     `jwt verify error`,
-				Description: `错误原因（开发者看的）`,
-			},
-			`show_msg`: {
-				Type:        this.getType(`string`),
-				Example:     `登录失败`,
-				Description: `错误原因（用户看的）`,
-			},
-		},
-	}
 
 	paths := map[string]map[string]Yaml_Path{}
 
@@ -195,19 +204,10 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 		parameters := []Yaml_Parameter{}
 
-		// 添加 lang header
-		//parameters = append(parameters, Yaml_Parameter{
-		//	name: `lang`,
-		//	In: `header`,
-		//	Required: false,
-		//	description: `客户端语言`,
-		//	Type: this.getType(`string`),
-		//})
-
 		description := ``
 		if route.Strategies != nil {
 			for _, strategy := range route.Strategies {
-				if strategy[0].(string) == `jwt_auth` {
+				if strategy.Disable == false && strategy.Strategy.GetName() == `jwtAuth` {
 					// 添加 jwt header
 					parameters = append(parameters, Yaml_Parameter{
 						Name:        `Json-Web-Token`,
@@ -217,7 +217,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 						Type:        this.getType(`string`),
 					})
 				}
-				description += strategy[0].(string) + `     `
+				description += strategy.Strategy.GetName() + ": " + strategy.Strategy.GetDescription() + "\n"
 			}
 		}
 
@@ -231,7 +231,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			// 解析 properties
 			properties := map[string]Yaml_Property{}
 			if route.Method == `POST` {
-				this.recuPostParams(paramsType, properties, &requiredParams)
+				this.recuPostParams(paramsType, reflect.ValueOf(route.Params), properties, &requiredParams)
 				parameter := Yaml_Parameter{
 					In:       `body`,
 					Name:     `body`,
@@ -242,7 +242,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 				}
 				parameters = append(parameters, parameter)
 			} else if route.Method == `GET` {
-				this.recuGetParams(paramsType, properties, &requiredParams, &parameters)
+				this.recuGetParams(paramsType, reflect.ValueOf(route.Params), properties, &requiredParams, &parameters)
 			} else {
 				go_error.Throw(`method error`, 0)
 			}
@@ -253,107 +253,40 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			}
 		}
 
-		succeedDefinitionName := fmt.Sprintf(`%sSucceed`, key)
-		succeedData := Yaml_Property{}
-
+		responses := map[string]Yaml_Response{}
 		if route.Return != nil {
-			kind := reflect.TypeOf(route.Return).Kind()
-			if kind == reflect.Map {
-				properties := map[string]Yaml_Property{}
-				for key, val1 := range route.Return.(map[string]map[string]interface{}) {
-					properties[key] = Yaml_Property{
-						Description: val1[`desc`].(string),
-						Example:     val1[`example`],
-					}
-				}
-				succeedData.Properties = properties
-			} else if kind == reflect.Slice {
-				properties := map[string]Yaml_Property{}
-				eleType := reflect.TypeOf(route.Return).Elem()
-				eleKind := eleType.Kind()
-				if eleKind == reflect.Struct {
-					for i := 0; i < eleType.NumField(); i++ {
-						field := eleType.Field(i)
-						realParamName := field.Tag.Get(`json`)
-						properties[realParamName] = Yaml_Property{
-							Example:     field.Tag.Get(`example`),
-							Description: field.Tag.Get(`desc`),
-						}
-					}
-				} else if eleKind == reflect.Map {
-					map_ := route.Return.([]map[string]map[string]interface{})[0]
-					for key, val1 := range map_ {
-						properties[key] = Yaml_Property{
-							Description: val1[`desc`].(string),
-							Example:     val1[`example`],
-						}
-					}
-				}
-				succeedData.Items = map[string]interface{}{
-					`properties`: properties,
-				}
-			} else if kind == reflect.Struct {
-				properties := map[string]Yaml_Property{}
-				paramsType := reflect.TypeOf(route.Return)
-				for i := 0; i < paramsType.NumField(); i++ {
-					field := paramsType.Field(i)
-					fieldType := field.Type
-					fieldKind := fieldType.Kind()
-					if fieldKind == reflect.Struct {
-						for i := 0; i < fieldType.NumField(); i++ {
-							field := fieldType.Field(i)
-							realParamName := field.Tag.Get(`json`)
-							properties[realParamName] = Yaml_Property{
-								Example:     field.Tag.Get(`example`),
-								Description: field.Tag.Get(`desc`),
-							}
-						}
-					} else {
-						realParamName := field.Tag.Get(`json`)
-						properties[realParamName] = Yaml_Property{
-							Example:     field.Tag.Get(`example`),
-							Description: field.Tag.Get(`desc`),
-						}
-					}
-				}
-				succeedData.Properties = properties
+			type_ := reflect.TypeOf(route.Return)
+			returnTypeName := type_.Name()
+			kind := type_.Kind()
+			properties := map[string]Yaml_Property{}
+			if kind == reflect.Struct {
+				this.recuReturn(go_format.Format.StructToMap(route.Return), properties)
+			} else {
+				go_error.ThrowInternal(`return config type error`)
 			}
-		} else {
-			succeedData.Type = this.getType(`object`)
-			succeedData.Example = map[string]interface{}{}
-		}
-		succeedData.Description = `请求收到的内容`
-		definitions[succeedDefinitionName] = Yaml_Definition{
-			Type: `object`,
-			Properties: map[string]Yaml_Property{
-				`data`: succeedData,
-			},
-		}
-
-		responses := map[string]Yaml_Response{
-			`200`: {
+			definitions[key+`_`+returnTypeName] = Yaml_Definition{
+				Type:       `object`,
+				Properties: properties,
+			}
+			responses[`200`] = Yaml_Response{
 				Description: `正确返回`,
 				Schema: map[string]interface{}{
-					`$ref`: fmt.Sprintf(`#/definitions/%s`, succeedDefinitionName),
+					`$ref`: fmt.Sprintf(`#/definitions/%s`, key+`_`+returnTypeName),
 				},
-			},
-			`400`: {
-				Description: `错误返回`,
-				Schema: map[string]interface{}{
-					`$ref`: `#/definitions/Failed`,
-				},
-			},
+			}
 		}
 
-		paramType := `application/json`
-		if route.ParamType != `` {
-			paramType = route.ParamType
+		paramTypes := []string{}
+		if route.ParamType == api_strategy.ALL_TYPE {
+			paramTypes = append(paramTypes, `application/json`, `multipart/form-data`)
+		} else {
+			paramTypes = append(paramTypes, route.ParamType)
 		}
 
 		temp[strings.ToLower(route.Method)] = Yaml_Path{
 			Tags:        []string{this.service.GetName()},
 			Summary:     desc,
-			Consumes:    []string{paramType},
+			Consumes:    paramTypes,
 			Produces:    []string{`application/json`},
 			Parameters:  parameters,
 			Responses:   responses,
@@ -384,10 +317,10 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	if type_ == `yaml` {
 		bytes, _ := yaml.Marshal(&swagger)
-		p_file.File.WriteFile(filename, bytes)
+		go_file.File.WriteFile(filename, bytes)
 	} else if type_ == `json` {
 		bytes, _ := json.Marshal(&swagger)
-		p_file.File.WriteFile(filename, bytes)
+		go_file.File.WriteFile(filename, bytes)
 	} else {
 		panic(errors.New(`type 指定有误`))
 	}

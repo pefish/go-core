@@ -29,6 +29,10 @@ func (this *JwtAuthStrategyClass) GetName() string {
 	return `jwtAuth`
 }
 
+func (this *JwtAuthStrategyClass) GetDescription() string {
+	return `jwt auth`
+}
+
 func (this *JwtAuthStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
 }

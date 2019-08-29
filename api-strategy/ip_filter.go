@@ -19,7 +19,11 @@ type IpFilterParam struct {
 }
 
 func (this *IpFilterStrategyClass) GetName() string {
-	return `ip_filter`
+	return `ipFilter`
+}
+
+func (this *IpFilterStrategyClass) GetDescription() string {
+	return `filter ip`
 }
 
 func (this *IpFilterStrategyClass) SetErrorCode(code uint64) {

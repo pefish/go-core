@@ -37,6 +37,7 @@ type StrategyRoute struct {
 type InterfaceStrategy interface {
 	Execute(route *Route, out *api_session.ApiSessionClass, param interface{})
 	GetName() string
+	GetDescription() string
 	GetErrorCode() uint64
 }
 

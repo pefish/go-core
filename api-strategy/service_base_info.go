@@ -22,6 +22,10 @@ func (this *ServiceBaseInfoStrategyClass) GetName() string {
 	return `serviceBaseInfo`
 }
 
+func (this *ServiceBaseInfoStrategyClass) GetDescription() string {
+	return `get service base info`
+}
+
 func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 	return go_error.INTERNAL_ERROR_CODE
 }

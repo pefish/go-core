@@ -106,6 +106,7 @@ github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIX
 github.com/pefish/go-error v0.2.1/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-error v0.2.2 h1:5TBNKm11Lz4S/LIUQDKh2GpCZxhUjtZVdDp7xF0pl10=
 github.com/pefish/go-error v0.2.2/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
+github.com/pefish/go-file v0.1.0 h1:fInpo+hLKHfAhkZWh63IsCJl/bdko2pZ4hq0AfuARi4=
 github.com/pefish/go-file v0.1.0/go.mod h1:8iLoQZ4UMvslNfHR7+9rrO8tGYpvfIC3DkVV5oq6lxY=
 github.com/pefish/go-format v0.1.0 h1:UALs+nD1x82K6COmV468cmblmGDHz8OyUo2R8Nf0XfI=
 github.com/pefish/go-format v0.1.0/go.mod h1:UvQCWw/DME71PRF/+RsqtIEB6C9fhX6+iH2TxZc08CM=
@@ -139,6 +140,7 @@ github.com/pefish/go-string v0.1.0 h1:44fqR5C5nx2c+mQC9k/k+bRMUuU829T8PswFrcDKc/
 github.com/pefish/go-string v0.1.0/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
 github.com/pefish/log4go v1.0.7 h1:CB0X19K4JMfgiYQxRr+erLQ/UCySOovix6ggAUU8nwo=
 github.com/pefish/log4go v1.0.7/go.mod h1:KL8EqYldvXxpBlUSZgR2H4tjBvVqiWgQtMg56LiZetY=
+github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71 h1:6q36vxPqieHBoxi9S5MbBdcSuaQtdZWZDxWFzSKvihI=
 github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71/go.mod h1:Kq1PFcvI1C/2CH5/EHYJ3GSyKCcsvkEwxDDoGwRsywg=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
