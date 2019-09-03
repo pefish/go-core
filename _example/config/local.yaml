@@ -1,2 +1,6 @@
 host: "localhost"
 port: "3000"
+depositAddressApi:
+  baseUrl: http://localhost:8086
+  getAddressPath: /api/storm-deposit-address/get_address
+  validateAddressPath: /api/storm-deposit-address/validate

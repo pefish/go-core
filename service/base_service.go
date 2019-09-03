@@ -13,6 +13,7 @@ import (
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/middleware"
+	"github.com/pefish/go-core/service-driver"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
 	"github.com/pefish/go-logger"
@@ -301,6 +302,7 @@ func (this *BaseServiceClass) Run() {
 	if host == `` {
 		host = `0.0.0.0`
 	}
+	service_driver.ServiceDriver.Init() // 初始化外接服务驱动
 	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.ToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
