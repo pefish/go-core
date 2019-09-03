@@ -53,14 +53,14 @@ type InjectObject struct {
 
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	Hero          *hero.Hero
-	InjectObjects map[string]InjectObject
+	InjectObjects []InjectObject
 }
 
 var ApiChannelBuilder = ApiChannelBuilderClass{}
 
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
-		InjectObjects: map[string]InjectObject{},
+		InjectObjects: []InjectObject{},
 	}
 }
 
@@ -69,9 +69,9 @@ func NewApiChannelBuilder() *ApiChannelBuilderClass {
 */
 func (this *ApiChannelBuilderClass) Inject(key string, injectObject InjectObject) *ApiChannelBuilderClass {
 	if this.InjectObjects == nil {
-		this.InjectObjects = map[string]InjectObject{}
+		this.InjectObjects = []InjectObject{}
 	}
-	this.InjectObjects[key] = injectObject
+	this.InjectObjects = append(this.InjectObjects, injectObject)
 	return this
 }
 

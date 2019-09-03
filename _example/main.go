@@ -21,7 +21,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	go_config.Config.LoadJsonConfig(go_config.Configuration{})
+	go_config.Config.LoadYamlConfig(go_config.Configuration{})
 
 	loggerInstance := go_logger.Log4goClass{}
 	go_logger.Logger.Init(&loggerInstance, service.TestService.GetName(), `debug`)

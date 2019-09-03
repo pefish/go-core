@@ -69,8 +69,10 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			Haha: 122,
 		},
 		Return: api_channel_builder.ApiResult{
-			Data: controllers.Test1Return{
-				Test: `541451`,
+			Data: []controllers.Test1Return{
+				{
+					Test: `111`,
+				},
 			},
 		},
 	},

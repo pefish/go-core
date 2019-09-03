@@ -95,6 +95,8 @@ github.com/pefish/go-application v0.1.0 h1:xzr+g74pqrwMe1TFTOnBLgSD3nWgFWe7ACGqw
 github.com/pefish/go-application v0.1.0/go.mod h1:bIM667i1fBpkJxZWE0lTbYs/FW4O9YgnW5gj4sy33ko=
 github.com/pefish/go-config v0.0.2 h1:Y/pnAsZN4HRajsMlUY+GZiA4Z3XS0J2effZDioFBAKw=
 github.com/pefish/go-config v0.0.2/go.mod h1:DKVvZlwB0pfrLvcJEmyCqaDAq3CLyhx7K16rxCz7sGo=
+github.com/pefish/go-config v0.0.3 h1:GBRwWcWXNOaVPdGmoChHqU5+7ymB3XQ1via9pwL1bqA=
+github.com/pefish/go-config v0.0.3/go.mod h1:DKVvZlwB0pfrLvcJEmyCqaDAq3CLyhx7K16rxCz7sGo=
 github.com/pefish/go-core v0.2.16 h1:+cFMOVsAmF6Ma6DiZuA+HR6z7QRqbXPWCBOhabmB/tw=
 github.com/pefish/go-core v0.2.16/go.mod h1:d/AXju7Sr1R55hcqyhDh5xIDnzCaaSqDNDyjhMBH5sg=
 github.com/pefish/go-decimal v0.1.0 h1:NrZP1YBLMGW4vZQAVNVmMhQnUsPt+zYysxqucEP1fbY=
