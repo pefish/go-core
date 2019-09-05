@@ -12,11 +12,11 @@ import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
+	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/middleware"
 	"github.com/pefish/go-core/service-driver"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
-	"github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
 	"reflect"
 )
@@ -102,7 +102,7 @@ func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
 		Controller: func(apiContext *api_session.ApiSessionClass) interface{} {
 			defer func() {
 				if err := recover(); err != nil {
-					go_logger.Logger.Error(err)
+					logger.Logger.Error(err)
 					apiContext.Ctx.StatusCode(iris.StatusInternalServerError)
 					apiContext.Ctx.Text(`not ok`)
 				}
@@ -112,7 +112,7 @@ func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
 			}
 
 			apiContext.Ctx.StatusCode(iris.StatusOK)
-			go_logger.Logger.Debug(`I am healthy`)
+			logger.Logger.Debug(`I am healthy`)
 			apiContext.Ctx.Text(`ok`)
 			return nil
 		},
@@ -315,7 +315,7 @@ func (this *BaseServiceClass) printRoutes() {
 		if route.IgnoreRootPath == true {
 			apiPath = route.Path
 		}
-		go_logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
+		logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
 	}
 }
 
@@ -407,7 +407,7 @@ func (this *BaseServiceClass) buildRoutes() {
 
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, func(ctx context.Context) {
 		ctx.StatusCode(iris.StatusNotFound)
-		go_logger.Logger.Debug(`api not found`)
+		logger.Logger.Debug(`api not found`)
 		ctx.Text(`Not Found`)
 	})
 }

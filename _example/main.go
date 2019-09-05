@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/pefish/go-config"
+	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-mysql"
 	"log"
@@ -24,7 +25,12 @@ func main() {
 	go_config.Config.LoadYamlConfig(go_config.Configuration{})
 
 	loggerInstance := go_logger.Log4goClass{}
-	go_logger.Logger.Init(&loggerInstance, service.TestService.GetName(), `debug`)
+	go_logger.Logger.InitWithLogger(&loggerInstance, service.TestService.GetName(), `debug`)
+
+	coreLogger := go_logger.LoggerClass{}
+	coreLogger.InitWithLogger(&loggerInstance, `core`, `debug`)
+	logger.Logger = &coreLogger
+	fmt.Printf(`%#v`, coreLogger)
 
 	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.GetMap(`mysql`))
 

@@ -37,13 +37,14 @@ require (
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pefish/go-application v0.1.0
-	github.com/pefish/go-decimal v0.1.0
+	github.com/pefish/go-decimal v0.1.3
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.2.2
 	github.com/pefish/go-file v0.1.0
+	github.com/pefish/go-format v0.1.0
 	github.com/pefish/go-http v0.2.4
 	github.com/pefish/go-jwt v0.1.3
-	github.com/pefish/go-logger v0.1.4
+	github.com/pefish/go-logger v0.1.8
 	github.com/pefish/go-reflect v0.0.6
 	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
 	github.com/pefish/go-string v0.1.0

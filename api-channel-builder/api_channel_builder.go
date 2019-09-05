@@ -4,8 +4,8 @@ import (
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-logger"
 )
 
 type ApiResult struct {
@@ -120,10 +120,10 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			}
 			_, err := apiContext.Ctx.JSON(apiResult)
 			if err != nil {
-				go_logger.Logger.Error(err)
+				logger.Logger.Error(err)
 				return
 			}
-			go_logger.Logger.DebugF(`api return: %#v`, apiResult)
+			logger.Logger.DebugF(`api return: %#v`, apiResult)
 		}
 	})
 }
