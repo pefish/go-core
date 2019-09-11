@@ -129,7 +129,7 @@ func (this *ValidatorClass) CheckInject(str string) {
 
 func (this *ValidatorClass) CheckInjectWithErr(str string) error {
 	arr := []string{
-		`=`, `{`, `}`, `,`, `;`, `|`, `>`, `<`, `"`, `[`, `]`, `\`, `/`, `?`, `%`, `1 = 1`, `1=1`, `1 =1`, `1= 1`,
+		`=`, `{`, `}`, `;`, `|`, `>`, `<`, `"`, `[`, `]`, `\`, `/`, `?`, `%`, `1 = 1`, `1=1`, `1 =1`, `1= 1`,
 	}
 	for _, char := range arr {
 		if strings.Contains(str, char) {

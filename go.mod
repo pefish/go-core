@@ -44,8 +44,8 @@ require (
 	github.com/pefish/go-format v0.1.0
 	github.com/pefish/go-http v0.2.4
 	github.com/pefish/go-jwt v0.1.3
-	github.com/pefish/go-logger v0.1.8
-	github.com/pefish/go-reflect v0.0.6
+	github.com/pefish/go-logger v0.1.9
+	github.com/pefish/go-reflect v0.0.7
 	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
