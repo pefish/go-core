@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/kataras/iris/context"
 	"github.com/pefish/go-core/api-channel-builder"
 )
 
@@ -12,8 +11,6 @@ type InterfaceService interface {
 	SetHealthyCheck(func_ func()) InterfaceService
 	// 注入处理器
 	Use(key string, func_ api_channel_builder.InjectObject) InterfaceService
-	// 注入全局处理器
-	UseGlobal(key string, func_ context.Handler) InterfaceService
 	// 获取所有路由
 	GetRoutes() map[string]*api_channel_builder.Route
 	SetRoutes(routes ...map[string]*api_channel_builder.Route)

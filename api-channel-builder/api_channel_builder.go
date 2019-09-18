@@ -1,11 +1,15 @@
 package api_channel_builder
 
 import (
+	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/hero"
+	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/logger"
+	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
+	"github.com/pefish/go-stack"
 )
 
 type ApiResult struct {
@@ -56,8 +60,6 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	InjectObjects []InjectObject
 }
 
-var ApiChannelBuilder = ApiChannelBuilderClass{}
-
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
 		InjectObjects: []InjectObject{},
@@ -68,49 +70,44 @@ func NewApiChannelBuilder() *ApiChannelBuilderClass {
 注入前置处理
 */
 func (this *ApiChannelBuilderClass) Inject(key string, injectObject InjectObject) *ApiChannelBuilderClass {
-	if this.InjectObjects == nil {
-		this.InjectObjects = []InjectObject{}
-	}
 	this.InjectObjects = append(this.InjectObjects, injectObject)
 	return this
-}
-
-func (this *ApiChannelBuilderClass) register() {
-	this.Hero = hero.New()
-	if this.InjectObjects != nil && len(this.InjectObjects) > 0 {
-		this.Hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
-			// api入口
-			apiSession := api_session.NewApiSession() // 新建会话
-			apiSession.Ctx = ctx
-			for _, injectObject := range this.InjectObjects { // 利用闭包实现注入函数的分发
-				func() {
-					defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
-						if code == go_error.INTERNAL_ERROR_CODE {
-							code = injectObject.This.GetErrorCode()
-						}
-						go_error.Throw(msg, code)
-					})
-					injectObject.Func(injectObject.Route, apiSession, injectObject.Param)
-				}()
-			}
-			return apiSession
-		})
-	} else {
-		this.Hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
-			// api入口
-			apiSession := api_session.NewApiSession()
-			apiSession.Ctx = ctx
-			return apiSession
-		})
-	}
 }
 
 /**
 wrap api处理器
 */
 func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) func(ctx iris.Context) {
-	this.register()
+	this.Hero = hero.New()
+	this.Hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
+		// api入口
+		apiSession := api_session.NewApiSession() // 新建会话
+		apiSession.Ctx = ctx
+		return apiSession
+	})
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
+		defer CatchError(apiContext.Ctx)
+		apiMsg := fmt.Sprintf(`%s %s %s`, apiContext.Ctx.RemoteAddr(), apiContext.Ctx.Path(), apiContext.Ctx.Method())
+		logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
+		util.UpdateCtxValuesErrorMsg(apiContext.Ctx, `apiMsg`, apiMsg)
+		logger.Logger.Debug(apiContext.Ctx.Request().Header)
+
+		if apiContext.Ctx.Method() == `OPTIONS` {
+			apiContext.Ctx.StatusCode(200)
+			return
+		}
+
+		for _, injectObject := range this.InjectObjects {
+			func() {
+				defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
+					if code == go_error.INTERNAL_ERROR_CODE {
+						code = injectObject.This.GetErrorCode()
+					}
+					go_error.Throw(msg, code)
+				})
+				injectObject.Func(injectObject.Route, apiContext, injectObject.Param)
+			}()
+		}
 		result := func_(apiContext)
 		if result != nil {
 			apiResult := ApiResult{
@@ -127,3 +124,57 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		}
 	})
 }
+
+
+func CatchError(ctx iris.Context) {
+	if err := recover(); err != nil {
+		var apiResult ApiResult
+		if _, ok := err.(go_error.ErrorInfo); !ok {
+			errorMessage := ``
+			if _, ok := err.(error); !ok {
+				errorMessage = err.(string)
+			} else {
+				errorMessage = err.(error).Error()
+			}
+			logger.Logger.Error(`system_error: ` + errorMessage+"\n"+ctx.Values().Get(`error_msg`).(string)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
+			ctx.StatusCode(iris.StatusOK)
+			if go_application.Application.Debug {
+				apiResult = ApiResult{
+					Msg:  errorMessage,
+					Code: 1,
+					Data: nil,
+				}
+			} else {
+				apiResult = ApiResult{
+					Msg:  ``,
+					Code: 1,
+					Data: nil,
+				}
+			}
+			ctx.JSON(apiResult)
+		} else {
+			ctx.StatusCode(iris.StatusOK)
+			errorInfoStruct := err.(go_error.ErrorInfo)
+			errMsg := `error: ` + errorInfoStruct.ErrorMessage
+			if errorInfoStruct.Err != nil {
+				errMsg += "\nsystem_error: " + errorInfoStruct.Err.Error()
+			}
+			logger.Logger.Error(errMsg +"\n"+ctx.Values().GetString(`error_msg`)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
+			if go_application.Application.Debug {
+				apiResult = ApiResult{
+					Msg:  errorInfoStruct.ErrorMessage,
+					Code: errorInfoStruct.ErrorCode,
+					Data: errorInfoStruct.Data,
+				}
+			} else {
+				apiResult = ApiResult{
+					Msg:  ``,
+					Code: errorInfoStruct.ErrorCode,
+					Data: errorInfoStruct.Data,
+				}
+			}
+			ctx.JSON(apiResult)
+		}
+	}
+}
+

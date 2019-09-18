@@ -21,6 +21,7 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 	api_strategy.RateLimitApiStrategy.SetErrorCode(2006)
 	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
 	api_strategy.IpFilterStrategy.SetErrorCode(2007)
+	api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
 	this.SetRoutes(route.TestRoute)
 	return this
 }

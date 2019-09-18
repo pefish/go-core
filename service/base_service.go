@@ -4,16 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/context"
 	"github.com/mitchellh/mapstructure"
-	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/logger"
-	"github.com/pefish/go-core/middleware"
 	"github.com/pefish/go-core/service-driver"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
@@ -31,7 +28,6 @@ type BaseServiceClass struct {
 	accessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
 	routes            map[string]*api_channel_builder.Route       // 服务的所有路由
 	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
-	GlobalMiddlewires map[string]context.Handler                  // 每个api的前置处理器（iris的）
 	App               *iris.Application                           // iris实例
 	Opts              map[string]interface{}                      // 一些可选参数
 }
@@ -125,14 +121,6 @@ func (this *BaseServiceClass) Use(key string, injectObject api_channel_builder.I
 		this.Middlewires = map[string]api_channel_builder.InjectObject{}
 	}
 	this.Middlewires[key] = injectObject
-	return this
-}
-
-func (this *BaseServiceClass) UseGlobal(key string, func_ context.Handler) InterfaceService {
-	if this.GlobalMiddlewires == nil {
-		this.GlobalMiddlewires = map[string]context.Handler{}
-	}
-	this.GlobalMiddlewires[key] = func_
 	return this
 }
 
@@ -321,24 +309,15 @@ func (this *BaseServiceClass) printRoutes() {
 
 func (this *BaseServiceClass) buildRoutes() {
 	this.App = iris.New()
-	if go_application.Application.Debug {
-		this.App.UseGlobal(cors.New(cors.Options{
-			AllowedOrigins:   []string{"*"},
-			AllowCredentials: true,
-			AllowedHeaders:   []string{`*`},
-			AllowedMethods:   []string{`PUT`, `POST`, `GET`, `DELETE`, `OPTIONS`},
-			Debug:            go_application.Application.Debug,
-		}))
-	}
-	this.App.UseGlobal(middleware.ErrorHandle)
-	this.App.UseGlobal(middleware.OptionHandle)
-	for _, fun := range this.GlobalMiddlewires {
-		this.App.UseGlobal(fun)
-	}
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
 		// 预定义前置处理器
+		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
+			Func: api_strategy.CorsApiStrategy.Execute,
+			Route: route,
+			This:  &api_strategy.CorsApiStrategy,
+		})
 		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 			Param: api_strategy.ServiceBaseInfoParam{

@@ -22,7 +22,10 @@ func main() {
 		os.Exit(0)
 	}()
 
-	go_config.Config.LoadYamlConfig(go_config.Configuration{})
+	go_config.Config.LoadYamlConfig(go_config.Configuration{
+		ConfigEnvName: `GO_CONFIG`,
+		SecretEnvName: `GO_SECRET`,
+	})
 
 	loggerInstance := go_logger.Log4goClass{}
 	go_logger.Logger.InitWithLogger(&loggerInstance, service.TestService.GetName(), `debug`)
