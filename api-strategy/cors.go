@@ -54,7 +54,7 @@ func (this *CorsStrategyClass) Execute(route *api_channel_builder.Route, out *ap
 
 	out.Ctx.Header("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")
 
-	if origin == "" || !this.isOriginAllowed(origin) {
+	if origin != "" && !this.isOriginAllowed(origin) {
 		go_error.ThrowInternal(`origin is not be allowed`)
 	}
 
