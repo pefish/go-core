@@ -19,7 +19,6 @@ require (
 	github.com/iris-contrib/formBinder v0.0.0-20171010160137-ad9fb86c356f // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible // indirect
 	github.com/iris-contrib/httpexpect v0.0.0-20180314041918-ebe99fcebbce // indirect
-	github.com/iris-contrib/middleware v0.0.0-20181021162728-8bd5d51b3c2e
 	github.com/json-iterator/go v1.1.5 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/kataras/golog v0.0.0-20180321173939-03be10146386 // indirect
@@ -39,7 +38,7 @@ require (
 	github.com/pefish/go-application v0.1.0
 	github.com/pefish/go-decimal v0.1.3
 	github.com/pefish/go-desensitize v0.0.4
-	github.com/pefish/go-error v0.2.2
+	github.com/pefish/go-error v0.3.3
 	github.com/pefish/go-file v0.1.0
 	github.com/pefish/go-format v0.1.0
 	github.com/pefish/go-http v0.2.4

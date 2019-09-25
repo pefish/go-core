@@ -13,9 +13,10 @@ import (
 )
 
 type ApiResult struct {
-	Msg  string      `json:"msg"`
-	Code uint64      `json:"code"`
-	Data interface{} `json:"data"`
+	Msg         string      `json:"msg"`
+	InternalMsg string      `json:"internal_msg"`
+	Code        uint64      `json:"code"`
+	Data        interface{} `json:"data"`
 }
 
 type Route struct {
@@ -86,7 +87,28 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		return apiSession
 	})
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
-		defer CatchError(apiContext.Ctx)
+		defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}) {
+			var apiResult ApiResult
+			apiContext.Ctx.StatusCode(iris.StatusOK)
+			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
+			logger.Logger.Error(errMsg + "\n" + apiContext.Ctx.Values().GetString(`error_msg`) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
+			if go_application.Application.Debug {
+				apiResult = ApiResult{
+					Msg:         msg,
+					InternalMsg: internalMsg,
+					Code:        code,
+					Data:        data,
+				}
+			} else {
+				apiResult = ApiResult{
+					Msg:         msg,
+					InternalMsg: ``,
+					Code:        code,
+					Data:        data,
+				}
+			}
+			apiContext.Ctx.JSON(apiResult)
+		})
 		apiMsg := fmt.Sprintf(`%s %s %s`, apiContext.Ctx.RemoteAddr(), apiContext.Ctx.Path(), apiContext.Ctx.Method())
 		logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 		util.UpdateCtxValuesErrorMsg(apiContext.Ctx, `apiMsg`, apiMsg)
@@ -99,11 +121,11 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 
 		for _, injectObject := range this.InjectObjects {
 			func() {
-				defer go_error.Recover(func(msg string, code uint64, data interface{}, err interface{}) {
+				defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}) {
 					if code == go_error.INTERNAL_ERROR_CODE {
 						code = injectObject.This.GetErrorCode()
 					}
-					go_error.Throw(msg, code)
+					go_error.ThrowWithDataInternalMsg(msg, internalMsg, code, data)
 				})
 				injectObject.Func(injectObject.Route, apiContext, injectObject.Param)
 			}()
@@ -124,57 +146,3 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		}
 	})
 }
-
-
-func CatchError(ctx iris.Context) {
-	if err := recover(); err != nil {
-		var apiResult ApiResult
-		if _, ok := err.(go_error.ErrorInfo); !ok {
-			errorMessage := ``
-			if _, ok := err.(error); !ok {
-				errorMessage = err.(string)
-			} else {
-				errorMessage = err.(error).Error()
-			}
-			logger.Logger.Error(`system_error: ` + errorMessage+"\n"+ctx.Values().Get(`error_msg`).(string)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
-			ctx.StatusCode(iris.StatusOK)
-			if go_application.Application.Debug {
-				apiResult = ApiResult{
-					Msg:  errorMessage,
-					Code: 1,
-					Data: nil,
-				}
-			} else {
-				apiResult = ApiResult{
-					Msg:  ``,
-					Code: 1,
-					Data: nil,
-				}
-			}
-			ctx.JSON(apiResult)
-		} else {
-			ctx.StatusCode(iris.StatusOK)
-			errorInfoStruct := err.(go_error.ErrorInfo)
-			errMsg := `error: ` + errorInfoStruct.ErrorMessage
-			if errorInfoStruct.Err != nil {
-				errMsg += "\nsystem_error: " + errorInfoStruct.Err.Error()
-			}
-			logger.Logger.Error(errMsg +"\n"+ctx.Values().GetString(`error_msg`)+"\n"+go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
-			if go_application.Application.Debug {
-				apiResult = ApiResult{
-					Msg:  errorInfoStruct.ErrorMessage,
-					Code: errorInfoStruct.ErrorCode,
-					Data: errorInfoStruct.Data,
-				}
-			} else {
-				apiResult = ApiResult{
-					Msg:  ``,
-					Code: errorInfoStruct.ErrorCode,
-					Data: errorInfoStruct.Data,
-				}
-			}
-			ctx.JSON(apiResult)
-		}
-	}
-}
-

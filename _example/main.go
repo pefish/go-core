@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pefish/go-application"
 	"github.com/pefish/go-config"
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-logger"
@@ -22,6 +23,8 @@ func main() {
 		os.Exit(0)
 	}()
 
+
+	go_application.Application.Debug = false
 	go_config.Config.LoadYamlConfig(go_config.Configuration{
 		ConfigEnvName: `GO_CONFIG`,
 		SecretEnvName: `GO_SECRET`,

@@ -53,8 +53,6 @@ github.com/iris-contrib/go.uuid v2.0.0+incompatible h1:XZubAYg61/JwnJNbZilGjf3b3
 github.com/iris-contrib/go.uuid v2.0.0+incompatible/go.mod h1:iz2lgM/1UnEf1kP0L/+fafWORmlnuysV2EMP8MW+qe0=
 github.com/iris-contrib/httpexpect v0.0.0-20180314041918-ebe99fcebbce h1:q8Ka/exfHNgK7izJE+aUOZd7KZXJ7oQbnJWiZakEiMo=
 github.com/iris-contrib/httpexpect v0.0.0-20180314041918-ebe99fcebbce/go.mod h1:VER17o2JZqquOx41avolD/wMGQSFEFBKWmhag9/RQRY=
-github.com/iris-contrib/middleware v0.0.0-20181021162728-8bd5d51b3c2e h1:kj3vB5WsLvahUNG7X6TDRXuYlTNgcZGMFmrd4fmAk6A=
-github.com/iris-contrib/middleware v0.0.0-20181021162728-8bd5d51b3c2e/go.mod h1:lZivVjxn00uQH7vp452Wa2p9GD+2ElkVms944o+f0+Y=
 github.com/json-iterator/go v1.1.5 h1:gL2yXlmiIo4+t+y32d4WGwOjKGYcGOuyrg46vadswDE=
 github.com/json-iterator/go v1.1.5/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/jtolds/gls v4.2.1+incompatible h1:fSuqC+Gmlu6l/ZYAoZzx2pyucC8Xza35fpRVWLVmUEE=
@@ -116,8 +114,8 @@ github.com/pefish/go-desensitize v0.0.4 h1:1HpBlntkLwcPjgFk9ImjfYOeUKJ6zY76PEZ1d
 github.com/pefish/go-desensitize v0.0.4/go.mod h1:QsnbRf4QSy4+asVq9A5Gi61bJDWM1xPqSD9ybJGe6xY=
 github.com/pefish/go-error v0.2.0 h1:WNJX9EpOlfhqc8OX/FuLDcgZ+ccDRXdQbikOiMmF9Q8=
 github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
-github.com/pefish/go-error v0.2.2 h1:5TBNKm11Lz4S/LIUQDKh2GpCZxhUjtZVdDp7xF0pl10=
-github.com/pefish/go-error v0.2.2/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
+github.com/pefish/go-error v0.3.3 h1:PE6rQcUpDxCRY7Bh3Cve+Do70tprQqPMVsVwOoFaPaU=
+github.com/pefish/go-error v0.3.3/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-file v0.1.0 h1:fInpo+hLKHfAhkZWh63IsCJl/bdko2pZ4hq0AfuARi4=
 github.com/pefish/go-file v0.1.0/go.mod h1:8iLoQZ4UMvslNfHR7+9rrO8tGYpvfIC3DkVV5oq6lxY=
 github.com/pefish/go-format v0.1.0 h1:UALs+nD1x82K6COmV468cmblmGDHz8OyUo2R8Nf0XfI=

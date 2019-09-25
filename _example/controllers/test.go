@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
-	"test/util"
 )
 
 type TestControllerClass struct {
@@ -35,10 +34,8 @@ type Test1Return struct {
 	Test string `json:"test"`
 }
 func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) interface{} {
-	util.DepositAddressService.ValidateAddress(`Eth`, `hfghsfghsh`)
-	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
-		`haha`: 145,
-	})
+	//util.DepositAddressService.ValidateAddress(`Eth`, `hfghsfghsh`)
+	go_error.ThrowWithInternalMsg(`haha`, `敏感信息`, 2000)
 	return Test1Return{
 		Test: `111`,
 	}
