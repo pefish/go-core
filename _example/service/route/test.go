@@ -31,13 +31,13 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			},
 		},
 		ParamType:  api_strategy.ALL_TYPE,
-		Controller: controllers.TestController.Test,
-		Params: controllers.TestParam{
+		Controller: controller.TestController.Test,
+		Params: controller.TestParam{
 			UserId: 122,
 			Token:  "fghsfghs",
 		},
 		Return: api_channel_builder.ApiResult{
-			Data: controllers.TestReturn{
+			Data: controller.TestReturn{
 				Test: `hha`,
 			},
 		},
@@ -64,12 +64,12 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			},
 		},
 		ParamType:  api_strategy.ALL_TYPE,
-		Controller: controllers.TestController.Test1,
-		Params: controllers.Test1Param{
+		Controller: controller.TestController.Test1,
+		Params: controller.Test1Param{
 			Haha: 122,
 		},
 		Return: api_channel_builder.ApiResult{
-			Data: []controllers.Test1Return{
+			Data: []controller.Test1Return{
 				{
 					Test: `111`,
 				},

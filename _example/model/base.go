@@ -1,4 +1,4 @@
-package models
+package model
 
 type BaseModel struct {
 	Id        uint64 `db:"id" json:"id"`
