@@ -1,8 +1,11 @@
 package api_strategy
 
 import (
+	"fmt"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/logger"
+	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 )
 
@@ -31,6 +34,11 @@ func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 }
 
 func (this *ServiceBaseInfoStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
+	logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
+	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)
+	logger.Logger.Debug(out.Ctx.Request().Header)
+
 	newParam := param.(ServiceBaseInfoParam)
 	out.RouteName = newParam.RouteName
 

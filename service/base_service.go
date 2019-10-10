@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
@@ -312,10 +311,8 @@ func (this *BaseServiceClass) buildRoutes() {
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
-		// 预定义前置处理器
 		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.CorsApiStrategy.Execute,
-			Route: route,
 			This:  &api_strategy.CorsApiStrategy,
 		})
 		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
@@ -323,7 +320,6 @@ func (this *BaseServiceClass) buildRoutes() {
 			Param: api_strategy.ServiceBaseInfoParam{
 				RouteName: name,
 			},
-			Route: route,
 			This:  &api_strategy.ServiceBaseInfoApiStrategy,
 		})
 		apiChannelBuilder.Inject(api_strategy.ParamValidateStrategy.GetName(), api_channel_builder.InjectObject{
@@ -384,11 +380,25 @@ func (this *BaseServiceClass) buildRoutes() {
 		}
 	}
 
-	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, func(ctx context.Context) {
-		ctx.StatusCode(iris.StatusNotFound)
-		logger.Logger.Debug(`api not found`)
-		ctx.Text(`Not Found`)
+	// 处理未知路由
+	var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
+	apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
+		Func: api_strategy.CorsApiStrategy.Execute,
+		This:  &api_strategy.CorsApiStrategy,
 	})
+	apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
+		Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
+		Param: api_strategy.ServiceBaseInfoParam{
+			RouteName: `*`,
+		},
+		This:  &api_strategy.ServiceBaseInfoApiStrategy,
+	})
+	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+		apiContext.Ctx.StatusCode(iris.StatusNotFound)
+		logger.Logger.Debug(`api not found`)
+		apiContext.Ctx.Text(`Not Found`)
+		return nil
+	}))
 }
 
 func (this *BaseServiceClass) recurStruct(type_ reflect.Type, result map[string]interface{}) {

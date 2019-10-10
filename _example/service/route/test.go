@@ -4,7 +4,7 @@ import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
-	"test/controllers"
+	"test/controller"
 	"time"
 )
 

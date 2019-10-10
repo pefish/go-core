@@ -7,7 +7,6 @@ import (
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/logger"
-	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-stack"
 )
@@ -109,10 +108,6 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			}
 			apiContext.Ctx.JSON(apiResult)
 		})
-		apiMsg := fmt.Sprintf(`%s %s %s`, apiContext.Ctx.RemoteAddr(), apiContext.Ctx.Path(), apiContext.Ctx.Method())
-		logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
-		util.UpdateCtxValuesErrorMsg(apiContext.Ctx, `apiMsg`, apiMsg)
-		logger.Logger.Debug(apiContext.Ctx.Request().Header)
 
 		if apiContext.Ctx.Method() == `OPTIONS` {
 			apiContext.Ctx.StatusCode(200)
