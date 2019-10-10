@@ -14,21 +14,22 @@ import (
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
 	"github.com/pefish/go-reflect"
+	"io/ioutil"
 	"reflect"
 )
 
 type BaseServiceClass struct {
-	name              string                                      // 服务名
-	description       string                                      // 服务描述
-	path              string                                      // 服务的基础路径
-	host              string                                      // 服务监听host
-	port              uint64                                      // 服务监听port
-	accessHost        string                                      // 服务访问host，没有设置的话使用监听host
-	accessPort        uint64                                      // 服务访问port，没有设置的话使用监听port
-	routes            map[string]*api_channel_builder.Route       // 服务的所有路由
-	Middlewires       map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
-	App               *iris.Application                           // iris实例
-	Opts              map[string]interface{}                      // 一些可选参数
+	name        string                                      // 服务名
+	description string                                      // 服务描述
+	path        string                                      // 服务的基础路径
+	host        string                                      // 服务监听host
+	port        uint64                                      // 服务监听port
+	accessHost  string                                      // 服务访问host，没有设置的话使用监听host
+	accessPort  uint64                                      // 服务访问port，没有设置的话使用监听port
+	routes      map[string]*api_channel_builder.Route       // 服务的所有路由
+	Middlewires map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
+	App         *iris.Application                           // iris实例
+	Opts        map[string]interface{}                      // 一些可选参数
 }
 
 func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
@@ -313,14 +314,14 @@ func (this *BaseServiceClass) buildRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
 		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.CorsApiStrategy.Execute,
-			This:  &api_strategy.CorsApiStrategy,
+			This: &api_strategy.CorsApiStrategy,
 		})
 		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 			Param: api_strategy.ServiceBaseInfoParam{
 				RouteName: name,
 			},
-			This:  &api_strategy.ServiceBaseInfoApiStrategy,
+			This: &api_strategy.ServiceBaseInfoApiStrategy,
 		})
 		apiChannelBuilder.Inject(api_strategy.ParamValidateStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ParamValidateStrategy.Execute,
@@ -384,16 +385,18 @@ func (this *BaseServiceClass) buildRoutes() {
 	var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
 	apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 		Func: api_strategy.CorsApiStrategy.Execute,
-		This:  &api_strategy.CorsApiStrategy,
+		This: &api_strategy.CorsApiStrategy,
 	})
 	apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 		Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 		Param: api_strategy.ServiceBaseInfoParam{
 			RouteName: `*`,
 		},
-		This:  &api_strategy.ServiceBaseInfoApiStrategy,
+		This: &api_strategy.ServiceBaseInfoApiStrategy,
 	})
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+		rawData, _ := ioutil.ReadAll(apiContext.Ctx.Request().Body)
+		logger.Logger.DebugF(`Body: %s`, string(rawData))
 		apiContext.Ctx.StatusCode(iris.StatusNotFound)
 		logger.Logger.Debug(`api not found`)
 		apiContext.Ctx.Text(`Not Found`)

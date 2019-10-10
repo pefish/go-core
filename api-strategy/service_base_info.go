@@ -37,7 +37,10 @@ func (this *ServiceBaseInfoStrategyClass) Execute(route *api_channel_builder.Rou
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
 	logger.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)
-	logger.Logger.Debug(out.Ctx.Request().Header)
+	logger.Logger.DebugF(`UrlParams: %#v`, out.Ctx.URLParams())
+	logger.Logger.DebugF(`Headers: %#v`, out.Ctx.Request().Header)
+	//rawData, _ := ioutil.ReadAll(out.Ctx.Request().Body) // body只能被拿一次
+	//logger.Logger.DebugF(`Body: %#v`, rawData)
 
 	newParam := param.(ServiceBaseInfoParam)
 	out.RouteName = newParam.RouteName
