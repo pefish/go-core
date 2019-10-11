@@ -24,5 +24,6 @@ go get github.com/pefish/go-core
 ### 包依赖关系
 ```shell
 service -> api-strategy -> builder -> session
+service -> builder -> session
 ```
 

@@ -3,11 +3,9 @@ package service
 import (
 	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/service"
+	api_strategy2 "test/api-strategy"
 	"test/service/route"
-	"time"
 )
-
-var rateLimitDb = map[string]time.Time{}
 
 type TestServiceClass struct {
 	service.BaseServiceClass
@@ -22,6 +20,9 @@ func (this *TestServiceClass) Init(opts ...interface{}) service.InterfaceService
 	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
 	api_strategy.IpFilterStrategy.SetErrorCode(2007)
 	api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
+	this.AddGlobalStrategy(&api_strategy2.TestApiStrategy, api_strategy2.ApikeyAuthParam{
+		AllowedType: `hsfgh`,
+	})
 	this.SetRoutes(route.TestRoute)
 	return this
 }

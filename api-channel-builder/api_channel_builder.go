@@ -90,7 +90,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			var apiResult ApiResult
 			apiContext.Ctx.StatusCode(iris.StatusOK)
 			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
-			logger.Logger.Error(errMsg + "\n" + apiContext.Ctx.Values().GetString(`error_msg`) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 7}))
+			logger.Logger.Error(errMsg + "\n" + apiContext.Ctx.Values().GetString(`error_msg`) + "\n" + go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 15}))
 			if go_application.Application.Debug {
 				apiResult = ApiResult{
 					Msg:         msg,

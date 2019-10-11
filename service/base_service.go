@@ -19,17 +19,22 @@ import (
 )
 
 type BaseServiceClass struct {
-	name        string                                      // 服务名
-	description string                                      // 服务描述
-	path        string                                      // 服务的基础路径
-	host        string                                      // 服务监听host
-	port        uint64                                      // 服务监听port
-	accessHost  string                                      // 服务访问host，没有设置的话使用监听host
-	accessPort  uint64                                      // 服务访问port，没有设置的话使用监听port
-	routes      map[string]*api_channel_builder.Route       // 服务的所有路由
-	Middlewires map[string]api_channel_builder.InjectObject // 每个api的前置处理器（框架的）
-	App         *iris.Application                           // iris实例
-	Opts        map[string]interface{}                      // 一些可选参数
+	name             string                                // 服务名
+	description      string                                // 服务描述
+	path             string                                // 服务的基础路径
+	host             string                                // 服务监听host
+	port             uint64                                // 服务监听port
+	accessHost       string                                // 服务访问host，没有设置的话使用监听host
+	accessPort       uint64                                // 服务访问port，没有设置的话使用监听port
+	routes           map[string]*api_channel_builder.Route // 服务的所有路由
+	GlobalStrategies []GlobalStrategyStruct                // 全局的也就是每个api的前置处理器
+	App              *iris.Application                     // iris实例
+	Opts             map[string]interface{}                // 一些可选参数
+}
+
+type GlobalStrategyStruct struct {
+	Strategy api_channel_builder.InterfaceStrategy
+	Param    interface{}
 }
 
 func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
@@ -116,11 +121,14 @@ func (this *BaseServiceClass) SetHealthyCheck(func_ func()) InterfaceService {
 	return this
 }
 
-func (this *BaseServiceClass) Use(key string, injectObject api_channel_builder.InjectObject) InterfaceService {
-	if this.Middlewires == nil {
-		this.Middlewires = map[string]api_channel_builder.InjectObject{}
+func (this *BaseServiceClass) AddGlobalStrategy(strategy api_channel_builder.InterfaceStrategy, param interface{}) InterfaceService {
+	if this.GlobalStrategies == nil {
+		this.GlobalStrategies = []GlobalStrategyStruct{}
 	}
-	this.Middlewires[key] = injectObject
+	this.GlobalStrategies = append(this.GlobalStrategies, GlobalStrategyStruct{
+		Strategy: strategy,
+		Param:    param,
+	})
 	return this
 }
 
@@ -331,20 +339,25 @@ func (this *BaseServiceClass) buildRoutes() {
 			Route: route,
 			This:  &api_strategy.ParamValidateStrategy,
 		})
-		for key, injectObject := range this.Middlewires {
-			injectObject.Route = route
-			apiChannelBuilder.Inject(key, injectObject)
+		for _, globalStrategy := range this.GlobalStrategies {
+			apiChannelBuilder.Inject(globalStrategy.Strategy.GetName(), api_channel_builder.InjectObject{
+				Func:  globalStrategy.Strategy.Execute,
+				This:  globalStrategy.Strategy,
+				Param: globalStrategy.Param,
+				Route: route,
+			})
 		}
 		if route.Strategies != nil {
 			for _, strategyRoute := range route.Strategies {
-				if !strategyRoute.Disable {
-					apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
-						Func:  strategyRoute.Strategy.Execute,
-						Param: strategyRoute.Param,
-						Route: route,
-						This:  strategyRoute.Strategy,
-					})
+				if strategyRoute.Disable {
+					continue
 				}
+				apiChannelBuilder.Inject(strategyRoute.Strategy.GetName(), api_channel_builder.InjectObject{
+					Func:  strategyRoute.Strategy.Execute,
+					Param: strategyRoute.Param,
+					Route: route,
+					This:  strategyRoute.Strategy,
+				})
 			}
 		}
 		apiPath := this.path + route.Path

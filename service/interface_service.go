@@ -9,8 +9,8 @@ type InterfaceService interface {
 	Init(opts ...interface{}) InterfaceService
 	// 设置安全检查函数
 	SetHealthyCheck(func_ func()) InterfaceService
-	// 注入处理器
-	Use(key string, func_ api_channel_builder.InjectObject) InterfaceService
+	// 注入全局处理器
+	AddGlobalStrategy(strategy api_channel_builder.InterfaceStrategy, param interface{}) InterfaceService
 	// 获取所有路由
 	GetRoutes() map[string]*api_channel_builder.Route
 	SetRoutes(routes ...map[string]*api_channel_builder.Route)
