@@ -38,7 +38,7 @@ require (
 	github.com/pefish/go-application v0.1.0
 	github.com/pefish/go-decimal v0.1.3
 	github.com/pefish/go-desensitize v0.0.4
-	github.com/pefish/go-error v0.3.3
+	github.com/pefish/go-error v0.3.4
 	github.com/pefish/go-file v0.1.0
 	github.com/pefish/go-format v0.1.0
 	github.com/pefish/go-http v0.2.4
