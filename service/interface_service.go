@@ -8,7 +8,7 @@ type InterfaceService interface {
 	// opts[0]: map[string]interface{}
 	Init(opts ...interface{}) InterfaceService
 	// 设置安全检查函数
-	SetHealthyCheck(func_ func()) InterfaceService
+	SetHealthyCheckFunc(func_ func()) InterfaceService
 	// 注入全局处理器
 	AddGlobalStrategy(strategy api_channel_builder.InterfaceStrategy, param interface{}) InterfaceService
 	// 获取所有路由
@@ -37,14 +37,4 @@ type InterfaceService interface {
 	SetDescription(desc string)
 	// 运行服务
 	Run()
-	// 获取请求uri
-	GetRequestUrl(apiName string) string
-	// 发起请求
-	Request(apiName string, args ...interface{}) interface{}
-	RequestWithErr(apiName string, args ...interface{}) (interface{}, error)
-	RequestRawMap(apiName string, args ...interface{}) map[string]interface{}
-	RequestForMap(apiName string, args ...interface{}) map[string]interface{}
-	RequestForMapWithScan(dest interface{}, apiName string, args ...interface{})
-	RequestForSlice(apiName string, args ...interface{}) []map[string]interface{}
-	RequestForSliceWithScan(dest interface{}, apiName string, args ...interface{})
 }

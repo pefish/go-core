@@ -40,7 +40,7 @@ func main() {
 
 	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.GetMap(`mysql`))
 
-	service.TestService.Init().SetHealthyCheck(nil)
+	service.TestService.Init()
 	service.TestService.SetPort(go_config.Config.GetUint64(`port`))
 	service.TestService.Run()
 }
