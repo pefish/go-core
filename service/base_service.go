@@ -34,9 +34,9 @@ type GlobalStrategyStruct struct {
 
 func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
 	this.routes = map[string]*api_channel_builder.Route{}
-	for _, route := range routes {
+	for n, route := range routes {
 		for k, v := range route {
-			this.routes[k] = v
+			this.routes[go_reflect.Reflect.ToString(n)+`_`+k] = v
 		}
 	}
 }
