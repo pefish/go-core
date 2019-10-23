@@ -127,6 +127,7 @@ func (this *BaseServiceClass) Run() {
 	irisConfig.RemoteAddrHeaders = map[string]bool{
 		`X-Forwarded-For`: true,
 	}
+	irisConfig.DisableBodyConsumptionOnUnmarshal = true // 使Body内容可以反复读
 	this.printRoutes()
 	host := this.host
 	if host == `` {
