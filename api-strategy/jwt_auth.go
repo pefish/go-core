@@ -82,7 +82,7 @@ func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out 
 		go_error.Throw(`jwt verify error, user_id not exist`, this.errorCode)
 	}
 
-	userId := go_reflect.Reflect.ToUint64(out.JwtPayload[`user_id`])
+	userId := go_reflect.Reflect.MustToUint64(out.JwtPayload[`user_id`])
 	out.UserId = userId
 
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `jwtAuth`, userId)

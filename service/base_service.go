@@ -36,7 +36,7 @@ func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builde
 	this.routes = map[string]*api_channel_builder.Route{}
 	for n, route := range routes {
 		for k, v := range route {
-			this.routes[go_reflect.Reflect.ToString(n)+`_`+k] = v
+			this.routes[go_reflect.Reflect.MustToString(n)+`_`+k] = v
 		}
 	}
 }
@@ -134,7 +134,7 @@ func (this *BaseServiceClass) Run() {
 		host = `0.0.0.0`
 	}
 	service_driver.ServiceDriver.Init() // 初始化外接服务驱动
-	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.ToString(this.port)), iris.WithConfiguration(irisConfig))
+	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.MustToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}

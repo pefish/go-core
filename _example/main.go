@@ -24,21 +24,20 @@ func main() {
 	}()
 
 
-	go_application.Application.Debug = false
-	go_config.Config.LoadYamlConfig(go_config.Configuration{
+	go_application.Application.Debug = true
+	go_config.Config.MustLoadYamlConfig(go_config.Configuration{
 		ConfigEnvName: `GO_CONFIG`,
 		SecretEnvName: `GO_SECRET`,
 	})
 
-	loggerInstance := go_logger.Log4goClass{}
-	go_logger.Logger.InitWithLogger(&loggerInstance, service.TestService.GetName(), `debug`)
+	go_logger.Logger.Init(service.TestService.GetName(), `debug`)
 
 	coreLogger := go_logger.LoggerClass{}
-	coreLogger.InitWithLogger(&loggerInstance, `core`, `debug`)
+	coreLogger.Init(`core`, `debug`)
 	logger.Logger = &coreLogger
 	fmt.Printf(`%#v`, coreLogger)
 
-	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.GetMap(`mysql`))
+	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
 
 	service.TestService.Init()
 	service.TestService.SetPort(go_config.Config.GetUint64(`port`))

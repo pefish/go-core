@@ -7,7 +7,6 @@ require (
 	github.com/ajg/form v0.0.0-20160822230020-523a5da1a92f // indirect
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
-	github.com/fatih/structs v1.1.0 // indirect
 	github.com/flosch/pongo2 v0.0.0-20181225140029-79872a7b2769 // indirect
 	github.com/gavv/monotime v0.0.0-20171021193802-6f8212e8d10d // indirect
 	github.com/go-playground/locales v0.12.1 // indirect
@@ -36,15 +35,15 @@ require (
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pefish/go-application v0.1.0
-	github.com/pefish/go-decimal v0.1.3
+	github.com/pefish/go-decimal v0.2.0
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.3.4
 	github.com/pefish/go-file v0.1.0
-	github.com/pefish/go-format v0.1.0
-	github.com/pefish/go-http v0.2.4
+	github.com/pefish/go-format v0.1.1
+	github.com/pefish/go-http v0.4.0
 	github.com/pefish/go-jwt v0.1.3
-	github.com/pefish/go-logger v0.1.9
-	github.com/pefish/go-reflect v0.0.7
+	github.com/pefish/go-logger v0.1.12
+	github.com/pefish/go-reflect v0.1.1
 	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
