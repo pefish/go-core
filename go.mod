@@ -44,7 +44,7 @@ require (
 	github.com/pefish/go-jwt v0.1.3
 	github.com/pefish/go-logger v0.1.12
 	github.com/pefish/go-reflect v0.1.1
-	github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631
+	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect

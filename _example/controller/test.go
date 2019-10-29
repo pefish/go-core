@@ -1,11 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/kataras/iris/core/errors"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
-	"io/ioutil"
 )
 
 type TestControllerClass struct {
@@ -21,9 +19,6 @@ type TestReturn struct {
 	Test string `json:"test"`
 }
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
-	str, _ := ioutil.ReadAll(apiSession.Ctx.Request().Body)
-	fmt.Println(str)
-
 	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
 		`haha`: 145,
 	})

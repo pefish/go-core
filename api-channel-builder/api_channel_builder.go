@@ -98,7 +98,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 				"\n" +
 				apiContext.Ctx.Values().GetString(`error_msg`) +
 				"\n" +
-				go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 15}))
+				go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 
 			if go_application.Application.Debug {
 				apiResult = ApiResult{

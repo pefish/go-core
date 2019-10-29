@@ -146,6 +146,8 @@ github.com/pefish/go-reflect v0.1.1 h1:ga1xuOwahhGbu5qwoYNeiaTFhYr60Epmxp74YGMpf
 github.com/pefish/go-reflect v0.1.1/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631 h1:UMl6+3aOeG8TmzsNCbdtofSdHmlFIyD8wL+EWG9boXc=
 github.com/pefish/go-stack v0.0.0-20190731033419-46e50e826631/go.mod h1:eQO84KgDz4WuQ9me+DzOrCzCKpmRii2UJ4oiOKtUU/U=
+github.com/pefish/go-stack v0.0.1 h1:CJjPZBu2OZB+J0CjojAyfALTpJqkTUgy4oy6e4/RNtw=
+github.com/pefish/go-stack v0.0.1/go.mod h1:eQO84KgDz4WuQ9me+DzOrCzCKpmRii2UJ4oiOKtUU/U=
 github.com/pefish/go-string v0.1.0 h1:44fqR5C5nx2c+mQC9k/k+bRMUuU829T8PswFrcDKc/M=
 github.com/pefish/go-string v0.1.0/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
 github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71/go.mod h1:Kq1PFcvI1C/2CH5/EHYJ3GSyKCcsvkEwxDDoGwRsywg=
