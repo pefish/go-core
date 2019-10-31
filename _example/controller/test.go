@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/kataras/iris/core/errors"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
+	"test/external-service"
 )
 
 type TestControllerClass struct {
@@ -19,6 +21,7 @@ type TestReturn struct {
 	Test string `json:"test"`
 }
 func (this *TestControllerClass) Test(apiSession *api_session.ApiSessionClass) interface{} {
+	fmt.Println(external_service.DepositAddressService.Test(`1`, `22`))
 	go_error.ThrowWithData(`haha`, 2000, map[string]interface{}{
 		`haha`: 145,
 	})

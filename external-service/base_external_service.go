@@ -1,4 +1,4 @@
-package service_driver
+package external_service
 
 import (
 	"encoding/json"
@@ -7,24 +7,16 @@ import (
 	"github.com/pefish/go-http"
 )
 
-type ServiceDriverClass struct {
-	ExternalServices []ExternalServiceInterface
+type BaseExternalServiceClass struct {
+
 }
 
-var ServiceDriver = ServiceDriverClass{}
 
-func (this *ServiceDriverClass) Init() {
-	for _, v := range this.ExternalServices {
-		v.Init(this)
-	}
+func (this *BaseExternalServiceClass) Init(driver *ServiceDriverClass) {
+
 }
 
-func (this *ServiceDriverClass) Register(svc ExternalServiceInterface) bool {
-	this.ExternalServices = append(this.ExternalServices, svc)
-	return true
-}
-
-func (this *ServiceDriverClass) PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
+func (this *BaseExternalServiceClass) PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
 	data := this.PostJson(url, params)
 	inrec, err := json.Marshal(data)
 	if err != nil {
@@ -36,7 +28,7 @@ func (this *ServiceDriverClass) PostJsonForStruct(url string, params map[string]
 	}
 }
 
-func (this *ServiceDriverClass) PostJson(url string, params map[string]interface{}) interface{} {
+func (this *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) interface{} {
 	result := api_channel_builder.ApiResult{}
 	go_http.Http.PostJsonForStruct(go_http.RequestParam{
 		Url:    url,
@@ -48,7 +40,7 @@ func (this *ServiceDriverClass) PostJson(url string, params map[string]interface
 	return result.Data
 }
 
-func (this *ServiceDriverClass) GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
+func (this *BaseExternalServiceClass) GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
 	data := this.GetJson(url, params)
 	inrec, err := json.Marshal(data)
 	if err != nil {
@@ -60,7 +52,7 @@ func (this *ServiceDriverClass) GetJsonForStruct(url string, params map[string]i
 	}
 }
 
-func (this *ServiceDriverClass) GetJson(url string, params map[string]interface{}) interface{} {
+func (this *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) interface{} {
 	result := api_channel_builder.ApiResult{}
 	go_http.Http.GetForStruct(go_http.RequestParam{
 		Url:    url,

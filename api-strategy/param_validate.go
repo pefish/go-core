@@ -135,7 +135,7 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 	}
 	out.Params = tempParam
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.Logger.DebugF(`Params: %s`, paramsStr)
+	logger.LoggerDriver.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if newParam.Param != nil {

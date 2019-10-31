@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-config"
+	"github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/logger"
+	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-logger"
 	"github.com/pefish/go-mysql"
 	"log"
 	"os"
 	"runtime/debug"
-	"test/service"
+	"test/route"
 )
 
 func main() {
@@ -30,16 +32,19 @@ func main() {
 		SecretEnvName: `GO_SECRET`,
 	})
 
-	go_logger.Logger.Init(service.TestService.GetName(), `debug`)
+	service.Service.SetName(`测试服务api`)
 
-	coreLogger := go_logger.LoggerClass{}
-	coreLogger.Init(`core`, `debug`)
-	logger.Logger = &coreLogger
-	fmt.Printf(`%#v`, coreLogger)
+	go_logger.Logger.Init(service.Service.GetName(), `debug`)
+	logger.LoggerDriver.Register(go_logger.Logger)
 
 	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
 
-	service.TestService.Init()
-	service.TestService.SetPort(go_config.Config.GetUint64(`port`))
-	service.TestService.Run()
+	service.Service.SetPath(`/api/test`)
+	api_strategy.RateLimitApiStrategy.SetErrorCode(2006)
+	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
+	api_strategy.IpFilterStrategy.SetErrorCode(2007)
+	api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
+	service.Service.SetRoutes(route.TestRoute)
+	service.Service.SetPort(go_config.Config.GetUint64(`port`))
+	service.Service.Run()
 }

@@ -90,7 +90,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			var apiResult ApiResult
 			apiContext.Ctx.StatusCode(iris.StatusOK)
 			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
-			logger.Logger.Error(
+			logger.LoggerDriver.Error(
 				"err: " +
 				fmt.Sprint(err) +
 				"\n" +
@@ -143,10 +143,10 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			}
 			_, err := apiContext.Ctx.JSON(apiResult)
 			if err != nil {
-				logger.Logger.Error(err)
+				logger.LoggerDriver.Error(err)
 				return
 			}
-			logger.Logger.DebugF(`api return: %#v`, apiResult)
+			logger.LoggerDriver.DebugF(`api return: %#v`, apiResult)
 		}
 	})
 }

@@ -6,6 +6,7 @@ require (
 	github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398 // indirect
 	github.com/ajg/form v0.0.0-20160822230020-523a5da1a92f // indirect
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/flosch/pongo2 v0.0.0-20181225140029-79872a7b2769 // indirect
 	github.com/gavv/monotime v0.0.0-20171021193802-6f8212e8d10d // indirect
@@ -42,7 +43,6 @@ require (
 	github.com/pefish/go-format v0.1.1
 	github.com/pefish/go-http v0.4.0
 	github.com/pefish/go-jwt v0.1.3
-	github.com/pefish/go-logger v0.1.12
 	github.com/pefish/go-reflect v0.1.1
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0

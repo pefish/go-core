@@ -6,14 +6,15 @@ import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
+	"github.com/pefish/go-core/external-service"
 	"github.com/pefish/go-core/logger"
-	"github.com/pefish/go-core/service-driver"
 	"github.com/pefish/go-reflect"
 	"io/ioutil"
-	"reflect"
 )
 
-type BaseServiceClass struct {
+var Service = ServiceClass{}
+
+type ServiceClass struct {
 	name             string                                // 服务名
 	description      string                                // 服务描述
 	path             string                                // 服务的基础路径
@@ -32,7 +33,7 @@ type GlobalStrategyStruct struct {
 	Param    interface{}
 }
 
-func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
+func (this *ServiceClass) SetRoutes(routes ...map[string]*api_channel_builder.Route) {
 	this.routes = map[string]*api_channel_builder.Route{}
 	for n, route := range routes {
 		for k, v := range route {
@@ -41,60 +42,56 @@ func (this *BaseServiceClass) SetRoutes(routes ...map[string]*api_channel_builde
 	}
 }
 
-func (this *BaseServiceClass) SetPath(path string) {
+func (this *ServiceClass) SetPath(path string) {
 	this.path = path
 }
 
-func (this *BaseServiceClass) SetName(name string) {
+func (this *ServiceClass) SetName(name string) {
 	this.name = name
 }
 
-func (this *BaseServiceClass) GetHost() string {
+func (this *ServiceClass) GetHost() string {
 	return this.host
 }
 
-func (this *BaseServiceClass) SetHost(host string) {
+func (this *ServiceClass) SetHost(host string) {
 	this.host = host
 }
 
-func (this *BaseServiceClass) GetPort() uint64 {
+func (this *ServiceClass) GetPort() uint64 {
 	return this.port
 }
 
-func (this *BaseServiceClass) SetPort(port uint64) {
+func (this *ServiceClass) SetPort(port uint64) {
 	this.port = port
 }
 
-func (this *BaseServiceClass) GetAccessHost() string {
+func (this *ServiceClass) GetAccessHost() string {
 	return this.accessHost
 }
 
-func (this *BaseServiceClass) SetAccessHost(accessHost string) {
+func (this *ServiceClass) SetAccessHost(accessHost string) {
 	this.accessHost = accessHost
 }
 
-func (this *BaseServiceClass) GetAccessPort() uint64 {
+func (this *ServiceClass) GetAccessPort() uint64 {
 	return this.accessPort
 }
 
-func (this *BaseServiceClass) SetAccessPort(accessPort uint64) {
+func (this *ServiceClass) SetAccessPort(accessPort uint64) {
 	this.accessPort = accessPort
 }
 
-func (this *BaseServiceClass) SetDescription(desc string) {
+func (this *ServiceClass) SetDescription(desc string) {
 	this.description = desc
 }
 
-func (this *BaseServiceClass) Init(opts ...interface{}) InterfaceService {
-	return this
-}
-
-func (this *BaseServiceClass) SetHealthyCheckFunc(func_ func()) InterfaceService {
+func (this *ServiceClass) SetHealthyCheckFunc(func_ func()) *ServiceClass {
 	this.healthyCheckFunc = func_
 	return this
 }
 
-func (this *BaseServiceClass) AddGlobalStrategy(strategy api_channel_builder.InterfaceStrategy, param interface{}) InterfaceService {
+func (this *ServiceClass) AddGlobalStrategy(strategy api_channel_builder.InterfaceStrategy, param interface{}) *ServiceClass {
 	if this.globalStrategies == nil {
 		this.globalStrategies = []GlobalStrategyStruct{}
 	}
@@ -105,23 +102,23 @@ func (this *BaseServiceClass) AddGlobalStrategy(strategy api_channel_builder.Int
 	return this
 }
 
-func (this *BaseServiceClass) GetName() string {
+func (this *ServiceClass) GetName() string {
 	return this.name
 }
 
-func (this *BaseServiceClass) GetDescription() string {
+func (this *ServiceClass) GetDescription() string {
 	return this.description
 }
 
-func (this *BaseServiceClass) GetPath() string {
+func (this *ServiceClass) GetPath() string {
 	return this.path
 }
 
-func (this *BaseServiceClass) GetRoutes() map[string]*api_channel_builder.Route {
+func (this *ServiceClass) GetRoutes() map[string]*api_channel_builder.Route {
 	return this.routes
 }
 
-func (this *BaseServiceClass) Run() {
+func (this *ServiceClass) Run() {
 	this.buildRoutes()
 	irisConfig := iris.Configuration{}
 	irisConfig.RemoteAddrHeaders = map[string]bool{
@@ -133,24 +130,25 @@ func (this *BaseServiceClass) Run() {
 	if host == `` {
 		host = `0.0.0.0`
 	}
-	service_driver.ServiceDriver.Init() // 初始化外接服务驱动
+	external_service.ServiceDriver.Startup() // 启动外接服务驱动
+	logger.LoggerDriver.Startup()
 	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.MustToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (this *BaseServiceClass) printRoutes() {
+func (this *ServiceClass) printRoutes() {
 	for _, route := range this.routes {
 		apiPath := this.path + route.Path
 		if route.IgnoreRootPath == true {
 			apiPath = route.Path
 		}
-		logger.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
+		logger.LoggerDriver.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
 	}
 }
 
-func (this *BaseServiceClass) buildRoutes() {
+func (this *ServiceClass) buildRoutes() {
 	this.App = iris.New()
 
 	this.routes[`healthy_check`] = &api_channel_builder.Route{
@@ -161,7 +159,7 @@ func (this *BaseServiceClass) buildRoutes() {
 		Controller: func(apiContext *api_session.ApiSessionClass) interface{} {
 			defer func() {
 				if err := recover(); err != nil {
-					logger.Logger.Error(err)
+					logger.LoggerDriver.Error(err)
 					apiContext.Ctx.StatusCode(iris.StatusInternalServerError)
 					apiContext.Ctx.Text(`not ok`)
 				}
@@ -171,7 +169,7 @@ func (this *BaseServiceClass) buildRoutes() {
 			}
 
 			apiContext.Ctx.StatusCode(iris.StatusOK)
-			logger.Logger.Debug(`I am healthy`)
+			logger.LoggerDriver.Debug(`I am healthy`)
 			apiContext.Ctx.Text(`ok`)
 			return nil
 		},
@@ -246,27 +244,10 @@ func (this *BaseServiceClass) buildRoutes() {
 	})
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, apiChannelBuilder.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 		rawData, _ := ioutil.ReadAll(apiContext.Ctx.Request().Body)
-		logger.Logger.DebugF(`Body: %s`, string(rawData))
+		logger.LoggerDriver.DebugF(`Body: %s`, string(rawData))
 		apiContext.Ctx.StatusCode(iris.StatusNotFound)
-		logger.Logger.Debug(`api not found`)
+		logger.LoggerDriver.Debug(`api not found`)
 		apiContext.Ctx.Text(`Not Found`)
 		return nil
 	}))
-}
-
-func (this *BaseServiceClass) recurStruct(type_ reflect.Type, result map[string]interface{}) {
-	for i := 0; i < type_.NumField(); i++ {
-		field := type_.Field(i)
-		fieldType := field.Type
-		if fieldType.Kind() == reflect.Struct {
-			this.recurStruct(fieldType, result)
-		} else {
-			tagName := field.Tag.Get(`example`)
-			if tagName != `` {
-				result[field.Tag.Get(`json`)] = tagName
-			} else {
-				result[field.Tag.Get(`json`)] = nil
-			}
-		}
-	}
 }
