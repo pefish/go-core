@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"github.com/kataras/iris/core/errors"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-error"
 	"test/external-service"
@@ -39,7 +38,7 @@ type Test1Return struct {
 }
 func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) interface{} {
 	//util.DepositAddressService.ValidateAddress(`Eth`, `hfghsfghsh`)
-	go_error.ThrowErrorWithInternalMsg(`haha`, `敏感信息`, 2000, errors.New(`hsgfhsgs`))
+	//go_error.ThrowErrorWithInternalMsg(`haha`, `敏感信息`, 2000, errors.New(`hsgfhsgs`))
 	return Test1Return{
 		Test: `111`,
 	}

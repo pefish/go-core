@@ -58,11 +58,33 @@ type InjectObject struct {
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	Hero          *hero.Hero
 	InjectObjects []InjectObject
+
+	ReturnDataFunc ReturnDataFuncType
 }
+
+type ReturnDataFuncType func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{}
 
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
 		InjectObjects: []InjectObject{},
+		ReturnDataFunc: func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
+			if go_application.Application.Debug {
+				return ApiResult{
+					Msg:         msg,
+					InternalMsg: internalMsg,
+					Code:        code,
+					Data:        data,
+				}
+
+			} else {
+				return ApiResult{
+					Msg:         msg,
+					InternalMsg: ``,
+					Code:        code,
+					Data:        data,
+				}
+			}
+		},
 	}
 }
 
@@ -87,35 +109,19 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 	})
 	return this.Hero.Handler(func(apiContext *api_session.ApiSessionClass) {
 		defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
-			var apiResult ApiResult
 			apiContext.Ctx.StatusCode(iris.StatusOK)
 			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
 			logger.LoggerDriver.Error(
 				"err: " +
-				fmt.Sprint(err) +
-				"\n" +
-				errMsg +
-				"\n" +
-				apiContext.Ctx.Values().GetString(`error_msg`) +
-				"\n" +
-				go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
+					fmt.Sprint(err) +
+					"\n" +
+					errMsg +
+					"\n" +
+					apiContext.Ctx.Values().GetString(`error_msg`) +
+					"\n" +
+					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 
-			if go_application.Application.Debug {
-				apiResult = ApiResult{
-					Msg:         msg,
-					InternalMsg: internalMsg,
-					Code:        code,
-					Data:        data,
-				}
-			} else {
-				apiResult = ApiResult{
-					Msg:         msg,
-					InternalMsg: ``,
-					Code:        code,
-					Data:        data,
-				}
-			}
-			apiContext.Ctx.JSON(apiResult)
+			apiContext.Ctx.JSON(this.ReturnDataFunc(msg, internalMsg, code, data, err))
 		})
 
 		if apiContext.Ctx.Method() == `OPTIONS` {
@@ -142,11 +148,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		}
 		result := func_(apiContext)
 		if result != nil {
-			apiResult := ApiResult{
-				Msg:  ``,
-				Code: 0,
-				Data: result,
-			}
+			apiResult := this.ReturnDataFunc(``, ``, 0, result, nil)
 			_, err := apiContext.Ctx.JSON(apiResult)
 			if err != nil {
 				logger.LoggerDriver.Error(err)

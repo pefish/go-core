@@ -26,6 +26,8 @@ type ServiceClass struct {
 	globalStrategies []GlobalStrategyStruct                // 全局的也就是每个api的前置处理器
 	App              *iris.Application                     // iris实例
 	healthyCheckFunc func()                                // 健康检查函数
+
+	returnDataFunc api_channel_builder.ReturnDataFuncType // 可以自定义返回格式
 }
 
 type GlobalStrategyStruct struct {
@@ -84,6 +86,10 @@ func (this *ServiceClass) SetAccessPort(accessPort uint64) {
 
 func (this *ServiceClass) SetDescription(desc string) {
 	this.description = desc
+}
+
+func (this *ServiceClass) SetReturnDataFunc(returnDataFunc api_channel_builder.ReturnDataFuncType) {
+	this.returnDataFunc = returnDataFunc
 }
 
 func (this *ServiceClass) SetHealthyCheckFunc(func_ func()) *ServiceClass {
@@ -177,6 +183,9 @@ func (this *ServiceClass) buildRoutes() {
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
+		if this.returnDataFunc != nil {
+			apiChannelBuilder.ReturnDataFunc = this.returnDataFunc
+		}
 		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.CorsApiStrategy.Execute,
 			This: &api_strategy.CorsApiStrategy,
@@ -231,6 +240,9 @@ func (this *ServiceClass) buildRoutes() {
 
 	// 处理未知路由
 	var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
+	if this.returnDataFunc != nil {
+		apiChannelBuilder.ReturnDataFunc = this.returnDataFunc
+	}
 	apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 		Func: api_strategy.CorsApiStrategy.Execute,
 		This: &api_strategy.CorsApiStrategy,
