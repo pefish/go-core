@@ -177,6 +177,10 @@ func (this *ServiceClass) buildRoutes() {
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
+		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
+			Func: api_strategy.CorsApiStrategy.Execute,
+			This: &api_strategy.CorsApiStrategy,
+		})
 		apiChannelBuilder.Inject(api_strategy.ServiceBaseInfoApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.ServiceBaseInfoApiStrategy.Execute,
 			Param: api_strategy.ServiceBaseInfoParam{
