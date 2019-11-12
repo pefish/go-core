@@ -47,10 +47,5 @@ func main() {
 	service.Service.SetRoutes(route.TestRoute)
 	service.Service.SetPort(go_config.Config.GetUint64(`port`))
 
-	service.Service.SetReturnDataFunc(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
-		return map[string]interface{}{
-			`haha`: msg,
-		}
-	})
 	service.Service.Run()
 }

@@ -65,6 +65,11 @@ var TestRoute = map[string]*api_channel_builder.Route{
 		},
 		ParamType:  api_strategy.ALL_TYPE,
 		Controller: controller.TestController.Test1,
+		ReturnDataFunc: func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
+			return map[string]interface{}{
+				`haha`: msg,
+			}
+		},
 		Params: controller.Test1Param{
 			Haha: 122,
 		},

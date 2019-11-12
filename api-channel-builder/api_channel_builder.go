@@ -30,6 +30,7 @@ type Route struct {
 	Debug          bool                       // api是否mock
 	Controller     api_session.ApiHandlerType // api业务处理器
 	ParamType      string                     // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+	ReturnDataFunc ReturnDataFuncType         // 每个接口支持自定义返回格式
 }
 
 type StrategyRoute struct {
@@ -64,27 +65,29 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 
 type ReturnDataFuncType func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{}
 
+func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
+	if go_application.Application.Debug {
+		return ApiResult{
+			Msg:         msg,
+			InternalMsg: internalMsg,
+			Code:        code,
+			Data:        data,
+		}
+
+	} else {
+		return ApiResult{
+			Msg:         msg,
+			InternalMsg: ``,
+			Code:        code,
+			Data:        data,
+		}
+	}
+}
+
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
-		InjectObjects: []InjectObject{},
-		ReturnDataFunc: func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
-			if go_application.Application.Debug {
-				return ApiResult{
-					Msg:         msg,
-					InternalMsg: internalMsg,
-					Code:        code,
-					Data:        data,
-				}
-
-			} else {
-				return ApiResult{
-					Msg:         msg,
-					InternalMsg: ``,
-					Code:        code,
-					Data:        data,
-				}
-			}
-		},
+		InjectObjects:  []InjectObject{},
+		ReturnDataFunc: DefaultReturnDataFunc,
 	}
 }
 
