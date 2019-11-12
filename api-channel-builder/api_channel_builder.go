@@ -119,7 +119,13 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		})
 
 		if apiContext.Ctx.Method() == `OPTIONS` {
+			apiContext.Ctx.Header("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")
+			apiContext.Ctx.Header("Access-Control-Allow-Origin", apiContext.Ctx.GetHeader("Origin"))
+			apiContext.Ctx.Header("Access-Control-Allow-Methods", apiContext.Ctx.Method())
+			apiContext.Ctx.Header("Access-Control-Allow-Headers", "*")
+			apiContext.Ctx.Header("Access-Control-Allow-Credentials", "true")
 			apiContext.Ctx.StatusCode(200)
+			apiContext.Ctx.Write([]byte(`ok`))
 			return
 		}
 
