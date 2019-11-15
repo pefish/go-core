@@ -11,7 +11,7 @@ type ApiSessionClass struct {
 	Ctx iris.Context
 
 	JwtHeaderName string
-	JwtPayload    map[string]interface{}
+	JwtBody    map[string]interface{}
 	UserId        uint64
 
 	RouteName string
