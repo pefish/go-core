@@ -17,10 +17,12 @@ type JwtAuthStrategyClass struct {
 	jwtErrorErrorCode   uint64
 	jwtExpiredErrorCode uint64
 	disableUserId       bool
+	errorMsg string
 }
 
 var JwtAuthApiStrategy = JwtAuthStrategyClass{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
+	errorMsg: `Unauthorized`,
 }
 
 type JwtAuthParam struct {
@@ -36,6 +38,10 @@ func (this *JwtAuthStrategyClass) GetDescription() string {
 
 func (this *JwtAuthStrategyClass) SetErrorCode(code uint64) {
 	this.errorCode = code
+}
+
+func (this *JwtAuthStrategyClass) SetErrorMessage(msg string) {
+	this.errorMsg = msg
 }
 
 func (this *JwtAuthStrategyClass) GetErrorCode() uint64 {
@@ -70,23 +76,32 @@ func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out 
 	out.JwtHeaderName = this.headerName
 	jwt := out.Ctx.GetHeader(this.headerName)
 
-	verifyResult := false
 	if this.noCheckExpire == true {
-		verifyResult = go_jwt.Jwt.VerifyJwtSkipClaimsValidation(this.pubKey, jwt)
+		verifyResult, err := go_jwt.Jwt.VerifyJwtSkipClaimsValidation(this.pubKey, jwt)
+		if err != nil {
+			go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.jwtErrorErrorCode)
+		}
 		if !verifyResult {
-			go_error.Throw(`jwt verify error`, this.jwtErrorErrorCode)
+			go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error`, this.jwtErrorErrorCode)
 		}
 	} else {
-		verifyResult = go_jwt.Jwt.VerifyJwt(this.pubKey, jwt)
+		verifyResult, err := go_jwt.Jwt.VerifyJwt(this.pubKey, jwt)
+		if err != nil {
+			go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.jwtErrorErrorCode)
+		}
 		if !verifyResult {
-			go_error.Throw(`jwt verify error or jwt expired`, this.errorCode)
+			go_error.ThrowWithInternalMsg(this.errorMsg,`jwt verify error or jwt expired`, this.errorCode)
 		}
 	}
-	out.JwtBody = go_jwt.Jwt.DecodeBodyOfJwt(jwt)
+	jwtBody, err := go_jwt.Jwt.DecodeBodyOfJwt(jwt)
+	if err != nil {
+		go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.jwtErrorErrorCode)
+	}
+	out.JwtBody = jwtBody
 	if !this.disableUserId {
 		jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
-			go_error.Throw(`jwt verify error, user_id not exist`, this.errorCode)
+			go_error.ThrowWithInternalMsg(this.errorMsg,`jwt verify error, user_id not exist`, this.errorCode)
 		}
 
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
