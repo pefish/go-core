@@ -42,7 +42,7 @@ require (
 	github.com/pefish/go-file v0.1.0
 	github.com/pefish/go-format v0.1.1
 	github.com/pefish/go-http v0.4.0
-	github.com/pefish/go-jwt v0.2.0
+	github.com/pefish/go-jwt v0.2.1
 	github.com/pefish/go-reflect v0.1.1
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0
