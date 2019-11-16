@@ -16,6 +16,7 @@ type JwtAuthStrategyClass struct {
 	noCheckExpire       bool
 	jwtErrorErrorCode   uint64
 	jwtExpiredErrorCode uint64
+	disableUserId       bool
 }
 
 var JwtAuthApiStrategy = JwtAuthStrategyClass{
@@ -53,6 +54,10 @@ func (this *JwtAuthStrategyClass) SetNoCheckExpire() {
 	this.noCheckExpire = true
 }
 
+func (this *JwtAuthStrategyClass) DisableUserId() {
+	this.disableUserId = true
+}
+
 func (this *JwtAuthStrategyClass) SetPubKey(pubKey string) {
 	this.pubKey = pubKey
 }
@@ -78,13 +83,15 @@ func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out 
 		}
 	}
 	out.JwtBody = go_jwt.Jwt.DecodeBodyOfJwt(jwt)
-	jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
-	if jwtPayload[`user_id`] == nil {
-		go_error.Throw(`jwt verify error, user_id not exist`, this.errorCode)
+	if !this.disableUserId {
+		jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
+		if jwtPayload[`user_id`] == nil {
+			go_error.Throw(`jwt verify error, user_id not exist`, this.errorCode)
+		}
+
+		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
+		out.UserId = userId
+
+		util.UpdateCtxValuesErrorMsg(out.Ctx, `jwtAuth`, userId)
 	}
-
-	userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
-	out.UserId = userId
-
-	util.UpdateCtxValuesErrorMsg(out.Ctx, `jwtAuth`, userId)
 }
