@@ -124,6 +124,7 @@ github.com/pefish/go-json v0.1.1 h1:TjrjuVcST8K+j83OeIdJPKalQjIyRJHNda6L9Am2Rik=
 github.com/pefish/go-json v0.1.1/go.mod h1:7plXZcvUPrBT5EdIwXNM9F00TL9ixOG4OJHkAF8TcL8=
 github.com/pefish/go-jwt v0.2.0 h1:r9GFu1Wu6P6aBkrSpfmxpeni2vOCRBfa7ZJKoMUZkLs=
 github.com/pefish/go-jwt v0.2.0/go.mod h1:LCYnb0Ry1p+F2LteRLS4wcA1/NeKJvaogaX3jc84aGA=
+github.com/pefish/go-jwt v0.2.1/go.mod h1:LCYnb0Ry1p+F2LteRLS4wcA1/NeKJvaogaX3jc84aGA=
 github.com/pefish/go-reflect v0.1.1 h1:ga1xuOwahhGbu5qwoYNeiaTFhYr60Epmxp74YGMpfPk=
 github.com/pefish/go-reflect v0.1.1/go.mod h1:lv3gz/Zh2FsqCq8jqzdCgYpoM41AjE90HtknRbkXhjQ=
 github.com/pefish/go-stack v0.0.1 h1:CJjPZBu2OZB+J0CjojAyfALTpJqkTUgy4oy6e4/RNtw=

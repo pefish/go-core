@@ -31,6 +31,7 @@ type Route struct {
 	Controller     api_session.ApiHandlerType // api业务处理器
 	ParamType      string                     // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
 	ReturnDataFunc ReturnDataFuncType         // 每个接口支持自定义返回格式
+	ReturnHookFunc ReturnHookFuncType         // 返回前的处理函数
 }
 
 type StrategyRoute struct {
@@ -60,10 +61,12 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	Hero          *hero.Hero
 	InjectObjects []InjectObject
 
+	ReturnHookFunc ReturnHookFuncType
 	ReturnDataFunc ReturnDataFuncType
 }
 
 type ReturnDataFuncType func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{}
+type ReturnHookFuncType func(data interface{}, apiContext *api_session.ApiSessionClass) interface{}
 
 func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
 	if go_application.Application.Debug {
@@ -151,6 +154,9 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		}
 		result := func_(apiContext)
 		if result != nil {
+			if this.ReturnHookFunc != nil {
+				result = this.ReturnHookFunc(result, apiContext)
+			}
 			apiResult := this.ReturnDataFunc(``, ``, 0, result, nil)
 			_, err := apiContext.Ctx.JSON(apiResult)
 			if err != nil {

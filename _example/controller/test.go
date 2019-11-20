@@ -43,3 +43,10 @@ func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) 
 		Test: `111`,
 	}
 }
+
+func (this *TestControllerClass) Test1ReturnHook(data interface{}, apiSession *api_session.ApiSessionClass) interface{} {
+	a := data.(Test1Return)
+	a.Test = `222`
+	apiSession.Ctx.Header(`haha`, `xixi`)
+	return a
+}

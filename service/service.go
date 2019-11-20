@@ -181,6 +181,9 @@ func (this *ServiceClass) buildRoutes() {
 		if route.ReturnDataFunc != nil {
 			apiChannelBuilder.ReturnDataFunc = route.ReturnDataFunc
 		}
+		if route.ReturnHookFunc != nil {
+			apiChannelBuilder.ReturnHookFunc = route.ReturnHookFunc
+		}
 		apiChannelBuilder.Inject(api_strategy.CorsApiStrategy.GetName(), api_channel_builder.InjectObject{
 			Func: api_strategy.CorsApiStrategy.Execute,
 			This: &api_strategy.CorsApiStrategy,
