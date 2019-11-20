@@ -153,17 +153,21 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			}()
 		}
 		result := func_(apiContext)
-		if result != nil {
-			if this.ReturnHookFunc != nil {
-				result = this.ReturnHookFunc(result, apiContext)
-			}
-			apiResult := this.ReturnDataFunc(``, ``, 0, result, nil)
-			_, err := apiContext.Ctx.JSON(apiResult)
-			if err != nil {
-				logger.LoggerDriver.Error(err)
+		if result == nil {
+			return
+		}
+		if this.ReturnHookFunc != nil {
+			result = this.ReturnHookFunc(result, apiContext)
+			if result == nil {
 				return
 			}
-			logger.LoggerDriver.DebugF(`api return: %#v`, apiResult)
 		}
+		apiResult := this.ReturnDataFunc(``, ``, 0, result, nil)
+		_, err := apiContext.Ctx.JSON(apiResult)
+		if err != nil {
+			logger.LoggerDriver.Error(err)
+			return
+		}
+		logger.LoggerDriver.DebugF(`api return: %#v`, apiResult)
 	})
 }
