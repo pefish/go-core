@@ -30,7 +30,6 @@ type Route struct {
 	Debug          bool                       // api是否mock
 	Controller     api_session.ApiHandlerType // api业务处理器
 	ParamType      string                     // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
-	ReturnDataFunc ReturnDataFuncType         // 每个接口支持自定义返回格式
 	ReturnHookFunc ReturnHookFuncType         // 返回前的处理函数
 }
 
@@ -62,13 +61,11 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	InjectObjects []InjectObject
 
 	ReturnHookFunc ReturnHookFuncType
-	ReturnDataFunc ReturnDataFuncType
 }
 
-type ReturnDataFuncType func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{}
-type ReturnHookFuncType func(data interface{}, apiContext *api_session.ApiSessionClass) interface{}
+type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, msg string, internalMsg string, code uint64, data interface{}) interface{}
 
-func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}, err interface{}) interface{} {
+func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) interface{} {
 	if go_application.Application.Debug {
 		return ApiResult{
 			Msg:         msg,
@@ -90,7 +87,6 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
 		InjectObjects:  []InjectObject{},
-		ReturnDataFunc: DefaultReturnDataFunc,
 	}
 }
 
@@ -126,8 +122,14 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 					apiContext.Ctx.Values().GetString(`error_msg`) +
 					"\n" +
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
-
-			apiContext.Ctx.JSON(this.ReturnDataFunc(msg, internalMsg, code, data, err))
+			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)
+			if this.ReturnHookFunc != nil {
+				apiResult = this.ReturnHookFunc(apiContext, msg, internalMsg, code, data)
+				if apiResult == nil {
+					return
+				}
+			}
+			apiContext.Ctx.JSON(apiResult)
 		})
 
 		if apiContext.Ctx.Method() == `OPTIONS` {
@@ -156,13 +158,13 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		if result == nil {
 			return
 		}
+		apiResult := DefaultReturnDataFunc(``, ``, 0, result)
 		if this.ReturnHookFunc != nil {
-			result = this.ReturnHookFunc(result, apiContext)
-			if result == nil {
+			apiResult = this.ReturnHookFunc(apiContext, ``, ``, 0, result)
+			if apiResult == nil {
 				return
 			}
 		}
-		apiResult := this.ReturnDataFunc(``, ``, 0, result, nil)
 		_, err := apiContext.Ctx.JSON(apiResult)
 		if err != nil {
 			logger.LoggerDriver.Error(err)

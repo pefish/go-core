@@ -19,14 +19,14 @@ type ApiSessionClass struct {
 	Lang       string
 	ClientType string // web、android、ios
 
-	Options map[string]interface{}
+	Datas map[string]interface{}
 
 	Params map[string]interface{}
 }
 
 func NewApiSession() *ApiSessionClass {
 	return &ApiSessionClass{
-		Options: map[string]interface{}{},
+		Datas: map[string]interface{}{},
 	}
 }
 

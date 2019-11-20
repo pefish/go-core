@@ -39,14 +39,18 @@ type Test1Return struct {
 func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) interface{} {
 	//util.DepositAddressService.ValidateAddress(`Eth`, `hfghsfghsh`)
 	//go_error.ThrowErrorWithInternalMsg(`haha`, `敏感信息`, 2000, errors.New(`hsgfhsgs`))
-	return Test1Return{
-		Test: `111`,
-	}
+	//return Test1Return{
+	//	Test: `111`,
+	//}
+	apiSession.Ctx.Write([]byte(`xixi`))
+	return nil
 }
 
-func (this *TestControllerClass) Test1ReturnHook(data interface{}, apiSession *api_session.ApiSessionClass) interface{} {
-	a := data.(Test1Return)
-	a.Test = `222`
+func (this *TestControllerClass) Test1ReturnHook(apiSession *api_session.ApiSessionClass, msg string, internalMsg string, code uint64, data interface{}) interface{} {
+	//a := data.(Test1Return)
+	//a.Test = `222`
 	apiSession.Ctx.Header(`haha`, `xixi`)
-	return a
+	apiSession.Ctx.Write([]byte(`hhah`))
+	return nil
+	//return api_channel_builder.DefaultReturnDataFunc(msg, internalMsg, code, data)
 }

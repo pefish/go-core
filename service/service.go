@@ -178,9 +178,6 @@ func (this *ServiceClass) buildRoutes() {
 
 	for name, route := range this.GetRoutes() {
 		var apiChannelBuilder = api_channel_builder.NewApiChannelBuilder()
-		if route.ReturnDataFunc != nil {
-			apiChannelBuilder.ReturnDataFunc = route.ReturnDataFunc
-		}
 		if route.ReturnHookFunc != nil {
 			apiChannelBuilder.ReturnHookFunc = route.ReturnHookFunc
 		}
