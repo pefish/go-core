@@ -63,11 +63,11 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	ReturnHookFunc ReturnHookFuncType
 }
 
-type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, msg string, internalMsg string, code uint64, data interface{}) interface{}
+type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) interface{}
 
-func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) interface{} {
+func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
-		return ApiResult{
+		return &ApiResult{
 			Msg:         msg,
 			InternalMsg: internalMsg,
 			Code:        code,
@@ -75,7 +75,7 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 		}
 
 	} else {
-		return ApiResult{
+		return &ApiResult{
 			Msg:         msg,
 			InternalMsg: ``,
 			Code:        code,
@@ -124,12 +124,14 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)
 			if this.ReturnHookFunc != nil {
-				apiResult = this.ReturnHookFunc(apiContext, msg, internalMsg, code, data)
-				if apiResult == nil {
+				hookApiResult := this.ReturnHookFunc(apiContext, apiResult)
+				if hookApiResult == nil {
 					return
 				}
+				apiContext.Ctx.JSON(hookApiResult)
+			} else {
+				apiContext.Ctx.JSON(apiResult)
 			}
-			apiContext.Ctx.JSON(apiResult)
 		})
 
 		if apiContext.Ctx.Method() == `OPTIONS` {
@@ -160,16 +162,13 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		}
 		apiResult := DefaultReturnDataFunc(``, ``, 0, result)
 		if this.ReturnHookFunc != nil {
-			apiResult = this.ReturnHookFunc(apiContext, ``, ``, 0, result)
-			if apiResult == nil {
+			hookApiResult := this.ReturnHookFunc(apiContext, apiResult)
+			if hookApiResult == nil {
 				return
 			}
+			apiContext.Ctx.JSON(hookApiResult)
+		} else {
+			apiContext.Ctx.JSON(apiResult)
 		}
-		_, err := apiContext.Ctx.JSON(apiResult)
-		if err != nil {
-			logger.LoggerDriver.Error(err)
-			return
-		}
-		logger.LoggerDriver.DebugF(`api return: %#v`, apiResult)
 	})
 }
