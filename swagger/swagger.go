@@ -15,7 +15,7 @@ import (
 )
 
 type SwaggerClass struct {
-	service service.InterfaceService
+
 }
 
 var swagger *SwaggerClass
@@ -26,11 +26,6 @@ func GetSwaggerInstance() *SwaggerClass {
 	}
 	swagger = &SwaggerClass{}
 	return swagger
-}
-
-func (this *SwaggerClass) SetService(service service.InterfaceService) *SwaggerClass {
-	this.service = service
-	return this
 }
 
 type Yaml_Info struct {
@@ -197,7 +192,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	paths := map[string]map[string]Yaml_Path{}
 
-	for key, route := range this.service.GetRoutes() {
+	for key, route := range service.Service.GetRoutes() {
 		temp := map[string]Yaml_Path{}
 
 		desc := route.Description
@@ -284,7 +279,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		temp[strings.ToLower(route.Method)] = Yaml_Path{
-			Tags:        []string{this.service.GetName()},
+			Tags:        []string{service.Service.GetName()},
 			Summary:     desc,
 			Consumes:    paramTypes,
 			Produces:    []string{`application/json`},
@@ -292,22 +287,22 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			Responses:   responses,
 			Description: description,
 		}
-		paths[this.service.GetPath()+route.Path] = temp
+		paths[service.Service.GetPath()+route.Path] = temp
 	}
 
 	swagger := Yaml_Swagger{
 		`2.0`,
 		Yaml_Info{
-			Title:       this.service.GetName(),
-			Description: this.service.GetDescription(),
+			Title:       service.Service.GetName(),
+			Description: service.Service.GetDescription(),
 			Version:     `1.0.0`,
 		},
 		hostAndPort,
-		this.service.GetPath(),
+		service.Service.GetPath(),
 		[]Yaml_Tag{
 			{
-				Name:        this.service.GetName(),
-				Description: this.service.GetDescription(),
+				Name:        service.Service.GetName(),
+				Description: service.Service.GetDescription(),
 			},
 		},
 		[]string{`http`},
