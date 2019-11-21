@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
@@ -47,12 +48,12 @@ func (this *TestControllerClass) Test1(apiSession *api_session.ApiSessionClass) 
 	//return nil
 }
 
-func (this *TestControllerClass) Test1ReturnHook(apiSession *api_session.ApiSessionClass, apiResult *api_channel_builder.ApiResult) interface{} {
+func (this *TestControllerClass) Test1ReturnHook(apiSession *api_session.ApiSessionClass, apiResult *api_channel_builder.ApiResult) (interface{}, error) {
 	//a := data.(Test1Return)
 	//a.Test = `222`
 	apiSession.Ctx.Header(`haha`, `xixi`)
 	//apiSession.Ctx.Write([]byte(`hhah`))
-	//return nil
-	apiResult.InternalMsg = `tywtryt`
-	return apiResult
+	return nil, errors.New(`haha`)
+	//apiResult.InternalMsg = `tywtryt`
+	//return apiResult, nil
 }
