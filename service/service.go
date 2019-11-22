@@ -126,7 +126,6 @@ func (this *ServiceClass) Run() {
 		`X-Forwarded-For`: true,
 	}
 	irisConfig.DisableBodyConsumptionOnUnmarshal = true // 使ReadJson后Body内容可以反复读
-	this.printRoutes()
 	host := this.host
 	if host == `` {
 		host = `0.0.0.0`
@@ -136,16 +135,6 @@ func (this *ServiceClass) Run() {
 	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.MustToString(this.port)), iris.WithConfiguration(irisConfig))
 	if err != nil {
 		panic(err)
-	}
-}
-
-func (this *ServiceClass) printRoutes() {
-	for _, route := range this.routes {
-		apiPath := this.path + route.Path
-		if route.IgnoreRootPath == true {
-			apiPath = route.Path
-		}
-		logger.LoggerDriver.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
 	}
 }
 
@@ -230,6 +219,7 @@ func (this *ServiceClass) buildRoutes() {
 		}
 		if route.Controller != nil {
 			this.App.AllowMethods(iris.MethodOptions).Handle(route.Method, apiPath, apiChannelBuilder.WrapJson(route.Controller))
+			logger.LoggerDriver.Info(fmt.Sprintf(`--- %s %s %s ---`, route.Method, apiPath, route.Description))
 		}
 	}
 
@@ -254,4 +244,5 @@ func (this *ServiceClass) buildRoutes() {
 		apiContext.Ctx.Text(`Not Found`)
 		return nil
 	}))
+	logger.LoggerDriver.Info(fmt.Sprintf(`--- %s %s %s ---`, `ALL`, `/*`, `404 not found`))
 }
