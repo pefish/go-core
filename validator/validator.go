@@ -21,9 +21,6 @@ var Validator = ValidatorClass{}
 
 func (this *ValidatorClass) Init() {
 	this.Validator = validator.New()
-	this.Validator.RegisterAlias(`is-email`, `email`) // 有bug，对|运算符没用
-	this.Validator.RegisterAlias(`max-length`, `max`)
-	this.Validator.RegisterAlias(`min-length`, `min`)
 	err := this.Validator.RegisterValidation(`is-mobile`, this.Wrap(this.IsMobile))
 	err = this.Validator.RegisterValidation(`contain-alphabet`, this.Wrap(this.ContainAlphabet))
 	err = this.Validator.RegisterValidation(`contain-number`, this.Wrap(this.ContainNumber))
