@@ -10,6 +10,7 @@ import (
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-reflect"
 	"io/ioutil"
+	"runtime"
 )
 
 var Service = ServiceClass{}
@@ -130,6 +131,7 @@ func (this *ServiceClass) Run() {
 	if host == `` {
 		host = `0.0.0.0`
 	}
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	external_service.ServiceDriver.Startup() // 启动外接服务驱动
 	logger.LoggerDriver.Startup()
 	err := this.App.Run(iris.Addr(host+`:`+go_reflect.Reflect.MustToString(this.port)), iris.WithConfiguration(irisConfig))
