@@ -31,7 +31,7 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			},
 		},
 		ParamType:  api_strategy.ALL_TYPE,
-		Controller: controller.TestController.Test,
+		Controller: controller.TestController.PostTest,
 		Params: controller.TestParam{
 			UserId: 122,
 			Token:  "fghsfghs",
@@ -64,7 +64,7 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			},
 		},
 		ParamType:  api_strategy.ALL_TYPE,
-		Controller: controller.TestController.Test1,
+		Controller: controller.TestController.GetTest1,
 		ReturnHookFunc: controller.TestController.Test1ReturnHook,
 		Params: controller.Test1Param{
 			Haha: 122,

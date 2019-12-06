@@ -86,8 +86,16 @@ func (this *ParamValidateStrategyClass) recurValidate(myValidator validator.Vali
 				typeName := typeField.Type.String()
 				if typeName == `string` {
 					map_[fieldName] = ``
+					defaultVal := typeField.Tag.Get(`default`)
+					if defaultVal != `` {
+						map_[fieldName] = defaultVal
+					}
 				} else if strings.Contains(typeName, `int`) || strings.Contains(typeName, `float`) {
 					map_[fieldName] = 0
+					defaultVal := typeField.Tag.Get(`default`)
+					if defaultVal != `` {
+						map_[fieldName] = defaultVal
+					}
 				}
 			}
 
