@@ -11,7 +11,7 @@ type ApiSessionClass struct {
 	Ctx iris.Context
 
 	JwtHeaderName string
-	JwtBody    map[string]interface{}
+	JwtBody       map[string]interface{}
 	UserId        uint64
 
 	RouteName string
@@ -21,7 +21,8 @@ type ApiSessionClass struct {
 
 	Datas map[string]interface{}
 
-	Params map[string]interface{}
+	OriginalParams map[string]interface{} // 客户端传过来的原始参数
+	Params         map[string]interface{} // 经过前置处理器修饰过的参数
 }
 
 func NewApiSession() *ApiSessionClass {
