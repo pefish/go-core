@@ -8,6 +8,7 @@ import (
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
+	"github.com/pefish/go-json"
 	"github.com/pefish/go-string"
 	"reflect"
 	"strings"
@@ -66,14 +67,14 @@ func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue refle
 	return result
 }
 
-func (this *ParamValidateStrategyClass) recurValidate(myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) {
+func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessionClass, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
 		fieldKind := typeFieldType.Kind()
 		fieldValue := value_.Field(i)
 		if fieldKind == reflect.Struct {
-			this.recurValidate(myValidator, map_, globalValidator, typeFieldType, fieldValue)
+			this.recurValidate(out, myValidator, map_, globalValidator, typeFieldType, fieldValue)
 		} else {
 			tagVal := typeField.Tag.Get(`validate`)
 			newTag := tagVal
@@ -89,12 +90,14 @@ func (this *ParamValidateStrategyClass) recurValidate(myValidator validator.Vali
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
+						out.Params[fieldName] = defaultVal
 					}
 				} else if strings.Contains(typeName, `int`) || strings.Contains(typeName, `float`) {
 					map_[fieldName] = 0
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
+						out.Params[fieldName] = defaultVal
 					}
 				}
 			}
@@ -141,12 +144,13 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 	} else {
 		go_error.Throw(`scan params not be supported`, this.errorCode)
 	}
-	out.Params = tempParam
+	// 深拷贝
+	out.Params = go_json.Json.Parse(go_json.Json.Stringify(tempParam)).(map[string]interface{})
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
 	logger.LoggerDriver.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if newParam.Param != nil {
-		this.recurValidate(myValidator, tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
+		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
 	}
 }

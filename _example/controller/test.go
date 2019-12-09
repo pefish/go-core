@@ -32,7 +32,7 @@ func (this *TestControllerClass) PostTest(apiSession *api_session.ApiSessionClas
 
 type Test1Param struct {
 	Haha uint64 `json:"haha" validate:"omitempty" desc:"haha desc" default:"100"`
-	Xixi string `json:"xixi" validate:"omitempty" desc:"xixi desc" default:"xixi"`
+	Xixi string `json:"xixi,omitempty" validate:"omitempty" desc:"xixi desc" default:"100"`
 }
 type Test1Return struct {
 	Test string `json:"test"`
