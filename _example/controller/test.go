@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-error"
 )
 
 type TestControllerClass struct {
@@ -48,12 +49,16 @@ func (this *TestControllerClass) GetTest1(apiSession *api_session.ApiSessionClas
 	//return nil
 }
 
-func (this *TestControllerClass) Test1ReturnHook(apiSession *api_session.ApiSessionClass, apiResult *api_channel_builder.ApiResult) (interface{}, error) {
+func (this *TestControllerClass) Test1ReturnHook(apiSession *api_session.ApiSessionClass, apiResult *api_channel_builder.ApiResult) (interface{}, *go_error.ErrorInfo) {
 	//a := data.(Test1Return)
 	//a.PostTest = `222`
-	apiSession.Ctx.Header(`haha`, `xixi`)
+	//apiSession.Ctx.Header(`haha`, `xixi`)
 	//apiSession.Ctx.Write([]byte(`hhah`))
-	//return nil, errors.New(`haha`)
+	return nil, &go_error.ErrorInfo{
+		ErrorMessage: `haha`,
+		InternalErrorMessage: `xixi`,
+		ErrorCode: 11,
+	}
 	//apiResult.InternalMsg = `tywtryt`
 	return apiResult, nil
 }

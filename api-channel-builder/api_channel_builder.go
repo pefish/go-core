@@ -63,7 +63,7 @@ type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	ReturnHookFunc ReturnHookFuncType
 }
 
-type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) (interface{}, error)
+type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
@@ -126,7 +126,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 			if this.ReturnHookFunc != nil {
 				hookApiResult, err := this.ReturnHookFunc(apiContext, apiResult)
 				if err != nil {
-					apiContext.Ctx.JSON(DefaultReturnDataFunc(`return hook error`, err.Error(), go_error.INTERNAL_ERROR_CODE, nil))
+					apiContext.Ctx.JSON(DefaultReturnDataFunc(err.ErrorMessage, err.InternalErrorMessage, err.ErrorCode, err.Data))
 					return
 				}
 				if hookApiResult == nil {
@@ -168,7 +168,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		if this.ReturnHookFunc != nil {
 			hookApiResult, err := this.ReturnHookFunc(apiContext, apiResult)
 			if err != nil {
-				apiContext.Ctx.JSON(DefaultReturnDataFunc(`return hook error`, err.Error(), go_error.INTERNAL_ERROR_CODE, nil))
+				apiContext.Ctx.JSON(DefaultReturnDataFunc(err.ErrorMessage, err.InternalErrorMessage, err.ErrorCode, err.Data))
 				return
 			}
 			if hookApiResult == nil {

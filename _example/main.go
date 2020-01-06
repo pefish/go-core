@@ -8,7 +8,6 @@ import (
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-logger"
-	"github.com/pefish/go-mysql"
 	"log"
 	"os"
 	"runtime/debug"
@@ -37,7 +36,7 @@ func main() {
 	go_logger.Logger.Init(service.Service.GetName(), `debug`)
 	logger.LoggerDriver.Register(go_logger.Logger)
 
-	go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
+	//go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
 
 	service.Service.SetPath(`/api/test`)
 	api_strategy.RateLimitApiStrategy.SetErrorCode(2006)
