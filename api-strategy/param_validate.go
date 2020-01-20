@@ -145,8 +145,8 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 		go_error.Throw(`scan params not be supported`, this.errorCode)
 	}
 	// 深拷贝
-	out.OriginalParams = go_json.Json.Parse(go_json.Json.Stringify(tempParam)).(map[string]interface{})
-	out.Params = go_json.Json.Parse(go_json.Json.Stringify(tempParam)).(map[string]interface{})
+	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
+	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
 	logger.LoggerDriver.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)

@@ -1,6 +1,7 @@
 package api_strategy
 
 import (
+	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/util"
@@ -66,28 +67,14 @@ func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out 
 	out.JwtHeaderName = this.headerName
 	jwt := out.Ctx.GetHeader(this.headerName)
 
-	if this.noCheckExpire == true {
-		verifyResult, err := go_jwt.Jwt.VerifyJwtSkipClaimsValidation(this.pubKey, jwt)
-		if err != nil {
-			go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.errorCode)
-		}
-		if !verifyResult {
-			go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error`, this.errorCode)
-		}
-	} else {
-		verifyResult, err := go_jwt.Jwt.VerifyJwt(this.pubKey, jwt)
-		if err != nil {
-			go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.errorCode)
-		}
-		if !verifyResult {
-			go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error or jwt expired`, this.errorCode)
-		}
-	}
-	jwtBody, err := go_jwt.Jwt.DecodeBodyOfJwt(jwt)
+	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(this.pubKey, jwt, this.noCheckExpire)
 	if err != nil {
 		go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.errorCode)
 	}
-	out.JwtBody = jwtBody
+	if !verifyResult {
+		go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error or jwt expired`, this.errorCode)
+	}
+	out.JwtBody = token.Claims.(jwt2.MapClaims)
 	if !this.disableUserId {
 		jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
