@@ -12,6 +12,7 @@ import (
 	"os"
 	"runtime/debug"
 	"test/route"
+	//"contrib.go.opencensus.io/exporter/stackdriver"
 )
 
 func main() {
@@ -24,12 +25,28 @@ func main() {
 		os.Exit(0)
 	}()
 
-
 	go_application.Application.Debug = true
 	go_config.Config.MustLoadYamlConfig(go_config.Configuration{
 		ConfigEnvName: `GO_CONFIG`,
 		SecretEnvName: `GO_SECRET`,
 	})
+
+	//sd, err := stackdriver.NewExporter(stackdriver.Options{
+	//	ProjectID: "demo-project-id",
+	//	// MetricPrefix helps uniquely identify your metrics.
+	//	MetricPrefix: "demo-prefix",
+	//	// ReportingInterval sets the frequency of reporting metrics
+	//	// to stackdriver backend.
+	//	ReportingInterval: 60 * time.Second,
+	//})
+	//if err != nil {
+	//	log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
+	//}
+	//// It is imperative to invoke flush before your main function exits
+	//defer sd.Flush()
+	//
+	//// Register it as a trace exporter
+	//trace.RegisterExporter(sd)
 
 	service.Service.SetName(`测试服务api`)
 
