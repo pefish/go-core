@@ -2,8 +2,8 @@ package api_strategy
 
 import (
 	"fmt"
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 	"time"
 )
@@ -40,7 +40,11 @@ func (this *RateLimitStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *RateLimitStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *RateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+
+func (this *RateLimitStrategyClass) Init(param interface{}) {}
+
+func (this *RateLimitStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(RateLimitParam)
 	methodPath := fmt.Sprintf(`%s_%s`, out.Ctx.Method(), out.Ctx.Path())
 	key := fmt.Sprintf(`%s_%s`, out.Ctx.RemoteAddr(), methodPath)

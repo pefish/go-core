@@ -3,8 +3,8 @@ package api_strategy
 import (
 	"bytes"
 	"fmt"
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
@@ -19,10 +19,6 @@ var ServiceBaseInfoApiStrategy = ServiceBaseInfoStrategyClass{
 
 }
 
-type ServiceBaseInfoParam struct {
-	RouteName string
-}
-
 func (this *ServiceBaseInfoStrategyClass) GetName() string {
 	return `serviceBaseInfo`
 }
@@ -35,7 +31,11 @@ func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 	return go_error.INTERNAL_ERROR_CODE
 }
 
-func (this *ServiceBaseInfoStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *ServiceBaseInfoStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+
+func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {}
+
+func (this *ServiceBaseInfoStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
 	logger.LoggerDriver.Debug(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)
@@ -47,9 +47,6 @@ func (this *ServiceBaseInfoStrategyClass) Execute(route *api_channel_builder.Rou
 		out.Ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
 	}
 	logger.LoggerDriver.DebugF(`Body: %s`, string(rawData))
-
-	newParam := param.(ServiceBaseInfoParam)
-	out.RouteName = newParam.RouteName
 
 	lang := out.Ctx.GetHeader(`lang`)
 	if lang == `` {

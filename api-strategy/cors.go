@@ -1,8 +1,8 @@
 package api_strategy
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 	"strings"
 )
@@ -48,8 +48,11 @@ func (this *CorsStrategyClass) isOriginAllowed(origin string) bool {
 	}
 	return false
 }
+func (this *CorsStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
 
-func (this *CorsStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *CorsStrategyClass) Init(param interface{}) {}
+
+func (this *CorsStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	origin := out.Ctx.GetHeader("Origin")
 
 	out.Ctx.Header("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")

@@ -16,7 +16,6 @@ service access layer -- business logic layer -- data access layer
 ### dependencies relationship
 
 ```shell
-service -> api-strategy -> builder -> session
-service -> builder -> session
+api-strategy -> service -> builder -> InterfaceStrategy -> session
 ```
 

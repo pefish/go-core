@@ -2,25 +2,31 @@ package main
 
 import (
 	"fmt"
-	"runtime"
 	"time"
 )
 
 var i = 0
 
 func main() {
-	runtime.GOMAXPROCS(2)
+	a := make(chan bool)
 
 	go func() {
-		for {
-			fmt.Println("i is", i)
-			time.Sleep(time.Second)
+		select {
+		case <-a:
+			fmt.Println(`12345`)
+			break
 		}
 	}()
 
-	for {
-		i += 1
-		time.Sleep(time.Second)
-		//fmt.Println(`1`, i)
-	}
+	go func() {
+		select {
+		case <-a:
+			fmt.Println(`123`)
+			break
+		}
+	}()
+
+	close(a)
+
+	time.Sleep(6 * time.Second)
 }

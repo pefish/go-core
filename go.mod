@@ -1,11 +1,12 @@
 module github.com/pefish/go-core
 
 require (
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.0 // indirect
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.0
 	github.com/Joker/jade v1.0.0 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398 // indirect
 	github.com/ajg/form v0.0.0-20160822230020-523a5da1a92f // indirect
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
@@ -35,8 +36,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
-	github.com/pefish/go-application v0.1.0
-	github.com/pefish/go-config v0.1.4 // indirect
+	github.com/pefish/go-application v0.1.1
 	github.com/pefish/go-decimal v0.2.0
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.3.4
@@ -45,7 +45,6 @@ require (
 	github.com/pefish/go-http v0.4.4
 	github.com/pefish/go-json v0.1.2
 	github.com/pefish/go-jwt v0.3.1
-	github.com/pefish/go-logger v0.1.15 // indirect
 	github.com/pefish/go-reflect v0.1.1
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0
@@ -60,6 +59,7 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
+	go.opencensus.io v0.22.1
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 

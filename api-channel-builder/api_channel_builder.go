@@ -6,68 +6,32 @@ import (
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-stack"
 )
 
-type ApiResult struct {
-	Msg         string      `json:"msg"`
-	InternalMsg string      `json:"internal_msg"`
-	Code        uint64      `json:"code"`
-	Data        interface{} `json:"data"`
-}
-
-type Route struct {
-	Description    string                     // api描述
-	Path           string                     // api路径
-	IgnoreRootPath bool                       // api路径是否忽略根路径
-	Method         string                     // api方法
-	Strategies     []StrategyRoute            // api前置处理策略
-	Params         interface{}                // api参数
-	Return         interface{}                // api返回值
-	Redirect       map[string]interface{}     // api重定向
-	Debug          bool                       // api是否mock
-	Controller     api_session.ApiHandlerType // api业务处理器
-	ParamType      string                     // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
-	ReturnHookFunc ReturnHookFuncType         // 返回前的处理函数
-}
-
-type StrategyRoute struct {
-	Strategy InterfaceStrategy
-	Param    interface{}
-	Disable  bool
-}
-
-type InterfaceStrategy interface {
-	Execute(route *Route, out *api_session.ApiSessionClass, param interface{})
-	GetName() string
-	GetDescription() string
-	GetErrorCode() uint64
-}
-
 // 必须是一个输入一个输出，输入必须是iris.Context，输出是任意类型，会成为控制器的输入
-type InjectFunc func(route *Route, out *api_session.ApiSessionClass, param interface{})
+type InjectFunc func(route *_interface.Route, out *api_session.ApiSessionClass, param interface{})
 
 type InjectObject struct {
-	Func  InjectFunc  // 前置处理器方法
-	Param interface{} // 前置处理器的预设参数
-	Route *Route      // api路由信息
-	This  InterfaceStrategy
+	Func      InjectFunc                   // 前置处理器方法
+	Param     interface{}                  // 前置处理器的预设参数
+	Route     *_interface.Route            // api路由信息
+	This      _interface.InterfaceStrategy // 这个策略本身实例
 }
 
 type ApiChannelBuilderClass struct { // 负责构建通道以及管理api通道
 	Hero          *hero.Hero
 	InjectObjects []InjectObject
 
-	ReturnHookFunc ReturnHookFuncType
+	ReturnHookFunc _interface.ReturnHookFuncType
 }
 
-type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
-
-func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
+func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *_interface.ApiResult {
 	if go_application.Application.Debug {
-		return &ApiResult{
+		return &_interface.ApiResult{
 			Msg:         msg,
 			InternalMsg: internalMsg,
 			Code:        code,
@@ -75,7 +39,7 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 		}
 
 	} else {
-		return &ApiResult{
+		return &_interface.ApiResult{
 			Msg:         msg,
 			InternalMsg: ``,
 			Code:        code,
@@ -86,7 +50,7 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 
 func NewApiChannelBuilder() *ApiChannelBuilderClass {
 	return &ApiChannelBuilderClass{
-		InjectObjects:  []InjectObject{},
+		InjectObjects: []InjectObject{},
 	}
 }
 

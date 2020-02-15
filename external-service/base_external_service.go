@@ -2,7 +2,7 @@ package external_service
 
 import (
 	"encoding/json"
-	"github.com/pefish/go-core/api-channel-builder"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
 )
@@ -29,7 +29,7 @@ func (this *BaseExternalServiceClass) PostJsonForStruct(url string, params map[s
 }
 
 func (this *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) interface{} {
-	result := api_channel_builder.ApiResult{}
+	result := _interface.ApiResult{}
 	go_http.Http.PostJsonForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
@@ -53,7 +53,7 @@ func (this *BaseExternalServiceClass) GetJsonForStruct(url string, params map[st
 }
 
 func (this *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) interface{} {
-	result := api_channel_builder.ApiResult{}
+	result := _interface.ApiResult{}
 	go_http.Http.GetForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,

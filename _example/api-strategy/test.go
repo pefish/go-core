@@ -1,8 +1,8 @@
 package api_strategy
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 )
 
@@ -28,9 +28,9 @@ type ApikeyAuthParam struct {
 	AllowedType string
 }
 
-func (this *TestStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
-	var p ApikeyAuthParam
-	p = param.(ApikeyAuthParam)
+func (this *TestStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+	//var p ApikeyAuthParam
+	//p = param.(ApikeyAuthParam)
 
 	go_error.ThrowInternal(`12345test`)
 }

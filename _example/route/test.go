@@ -1,19 +1,19 @@
 package route
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
+	_interface "github.com/pefish/go-core/interface"
 	"test/controller"
 	"time"
 )
 
-var TestRoute = map[string]*api_channel_builder.Route{
-	`test_api`: {
+var TestRoute = []*_interface.Route{
+	{
 		Description: "这是测试路由",
 		Path:        "/v1/test_api",
 		Method:      `POST`,
-		Strategies: []api_channel_builder.StrategyRoute{
+		Strategies: []_interface.StrategyRoute{
 			{
 				Strategy: &api_strategy.RateLimitApiStrategy,
 				Param: api_strategy.RateLimitParam{
@@ -36,17 +36,17 @@ var TestRoute = map[string]*api_channel_builder.Route{
 			UserId: 122,
 			Token:  "fghsfghs",
 		},
-		Return: api_channel_builder.ApiResult{
+		Return: _interface.ApiResult{
 			Data: controller.TestReturn{
 				Test: `hha`,
 			},
 		},
 	},
-	`test_api1`: {
+	{
 		Description: "这是测试路由",
 		Path:        "/v1/test_api1",
 		Method:      `GET`,
-		Strategies: []api_channel_builder.StrategyRoute{
+		Strategies: []_interface.StrategyRoute{
 			{
 				Strategy: &api_strategy.RateLimitApiStrategy,
 				Param: api_strategy.RateLimitParam{
@@ -69,7 +69,7 @@ var TestRoute = map[string]*api_channel_builder.Route{
 		Params: controller.Test1Param{
 			Haha: 122,
 		},
-		Return: api_channel_builder.ApiResult{
+		Return: _interface.ApiResult{
 			Data: []controller.Test1Return{
 				{
 					Test: `111`,

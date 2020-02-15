@@ -1,8 +1,8 @@
 package api_strategy
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 )
 
@@ -34,7 +34,11 @@ func (this *IpFilterStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *IpFilterStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *IpFilterStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+
+func (this *IpFilterStrategyClass) Init(param interface{}) {}
+
+func (this *IpFilterStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	newParam := param.(IpFilterParam)
 	if newParam.GetValidIp == nil {
 		return

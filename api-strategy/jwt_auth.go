@@ -2,8 +2,8 @@ package api_strategy
 
 import (
 	jwt2 "github.com/dgrijalva/jwt-go"
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
@@ -63,7 +63,11 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	this.headerName = headerName
 }
 
-func (this *JwtAuthStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *JwtAuthStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+
+func (this *JwtAuthStrategyClass) Init(param interface{}) {}
+
+func (this *JwtAuthStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	out.JwtHeaderName = this.headerName
 	jwt := out.Ctx.GetHeader(this.headerName)
 

@@ -1,8 +1,8 @@
 package api_strategy
 
 import (
-	"github.com/pefish/go-core/api-channel-builder"
 	"github.com/pefish/go-core/api-session"
+	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
@@ -24,10 +24,6 @@ const (
 // 默认自带
 type ParamValidateStrategyClass struct {
 	errorCode uint64
-}
-
-type ParamValidateParam struct {
-	Param interface{}
 }
 
 var ParamValidateStrategy = ParamValidateStrategyClass{
@@ -113,8 +109,11 @@ func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessio
 	}
 }
 
-func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route, out *api_session.ApiSessionClass, param interface{}) {
-	newParam := param.(ParamValidateParam)
+func (this *ParamValidateStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+
+func (this *ParamValidateStrategyClass) Init(param interface{}) {}
+
+func (this *ParamValidateStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()
 
@@ -151,7 +150,7 @@ func (this *ParamValidateStrategyClass) Execute(route *api_channel_builder.Route
 	logger.LoggerDriver.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
-	if newParam.Param != nil {
-		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(newParam.Param), reflect.ValueOf(newParam.Param))
+	if route.Params != nil {
+		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(route.Params), reflect.ValueOf(route.Params))
 	}
 }
