@@ -1,18 +1,21 @@
 package main
 
 import (
+	"contrib.go.opencensus.io/exporter/stackdriver"
 	"fmt"
-	"github.com/pefish/go-application"
-	"github.com/pefish/go-config"
-	"github.com/pefish/go-core/api-strategy"
-	"github.com/pefish/go-core/logger"
-	"github.com/pefish/go-core/service"
-	"github.com/pefish/go-logger"
+	"go.opencensus.io/trace"
 	"log"
 	"os"
 	"runtime/debug"
 	"test/route"
-	//"contrib.go.opencensus.io/exporter/stackdriver"
+	"time"
+
+	go_application "github.com/pefish/go-application"
+	go_config "github.com/pefish/go-config"
+	api_strategy "github.com/pefish/go-core/api-strategy"
+	"github.com/pefish/go-core/logger"
+	"github.com/pefish/go-core/service"
+	go_logger "github.com/pefish/go-logger"
 )
 
 func main() {
@@ -31,22 +34,20 @@ func main() {
 		SecretEnvName: `GO_SECRET`,
 	})
 
-	//sd, err := stackdriver.NewExporter(stackdriver.Options{
-	//	ProjectID: "demo-project-id",
-	//	// MetricPrefix helps uniquely identify your metrics.
-	//	MetricPrefix: "demo-prefix",
-	//	// ReportingInterval sets the frequency of reporting metrics
-	//	// to stackdriver backend.
-	//	ReportingInterval: 60 * time.Second,
-	//})
-	//if err != nil {
-	//	log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
-	//}
-	//// It is imperative to invoke flush before your main function exits
-	//defer sd.Flush()
-	//
-	//// Register it as a trace exporter
-	//trace.RegisterExporter(sd)
+
+
+	sd, err := stackdriver.NewExporter(stackdriver.Options{
+		ProjectID: "pefish",
+		MetricPrefix: "test",
+		ReportingInterval: 60 * time.Second,
+	})
+	if err != nil {
+		log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
+	}
+	defer sd.Flush()
+	trace.RegisterExporter(sd)
+
+
 
 	service.Service.SetName(`测试服务api`)
 

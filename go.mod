@@ -1,12 +1,11 @@
 module github.com/pefish/go-core
 
 require (
-	github.com/BurntSushi/toml v0.3.1 // indirect
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.0 // indirect
 	github.com/Joker/jade v1.0.0 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398 // indirect
 	github.com/ajg/form v0.0.0-20160822230020-523a5da1a92f // indirect
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
@@ -37,6 +36,7 @@ require (
 	github.com/onsi/ginkgo v1.7.0 // indirect
 	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pefish/go-application v0.1.0
+	github.com/pefish/go-config v0.1.4 // indirect
 	github.com/pefish/go-decimal v0.2.0
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.3.4
@@ -45,6 +45,7 @@ require (
 	github.com/pefish/go-http v0.4.4
 	github.com/pefish/go-json v0.1.2
 	github.com/pefish/go-jwt v0.3.1
+	github.com/pefish/go-logger v0.1.15 // indirect
 	github.com/pefish/go-reflect v0.1.1
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0
@@ -52,7 +53,6 @@ require (
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v0.0.0-20181112162635-ac52e6811b56 // indirect
@@ -60,8 +60,6 @@ require (
 	github.com/yudai/gojsondiff v1.0.0 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
-	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 

@@ -1,8 +1,8 @@
 module test
 
-replace github.com/pefish/go-core => ../
-
 go 1.13
+
+replace github.com/pefish/go-core => ../
 
 require (
 	github.com/pefish/go-application v0.1.0
