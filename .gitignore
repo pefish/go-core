@@ -3,3 +3,7 @@
 **/.vscode
 
 _example/test
+
+**/secret/local.yaml
+**/secret/dev.yaml
+**/secret/prod.yaml
