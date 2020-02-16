@@ -45,6 +45,9 @@ func (this *RateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated
 func (this *RateLimitStrategyClass) Init(param interface{}) {}
 
 func (this *RateLimitStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+	if param == nil {
+		go_error.Throw(`strategy need param`, this.errorCode)
+	}
 	newParam := param.(RateLimitParam)
 	methodPath := fmt.Sprintf(`%s_%s`, out.Ctx.Method(), out.Ctx.Path())
 	key := fmt.Sprintf(`%s_%s`, out.Ctx.RemoteAddr(), methodPath)

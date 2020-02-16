@@ -39,6 +39,9 @@ func (this *IpFilterStrategyClass) InitAsync(param interface{}, onAppTerminated 
 func (this *IpFilterStrategyClass) Init(param interface{}) {}
 
 func (this *IpFilterStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+	if param == nil {
+		go_error.Throw(`strategy need param`, this.errorCode)
+	}
 	newParam := param.(IpFilterParam)
 	if newParam.GetValidIp == nil {
 		return

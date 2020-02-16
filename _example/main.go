@@ -33,6 +33,7 @@ func main() {
 
 	go_core.Service.SetName(`测试服务api`)
 	go_core.Service.AddGlobalStrategy(&api_strategy.OpenCensusStrategy, api_strategy.OpenCensusStrategyParam{
+		DisableInitAsync: true,
 		StackDriverOption: &stackdriver.Options{
 			ProjectID:    `pefish`,
 			MetricPrefix: `test`,

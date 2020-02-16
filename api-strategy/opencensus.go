@@ -38,11 +38,18 @@ func (this *OpenCensusClass) GetErrorCode() uint64 {
 }
 
 type OpenCensusStrategyParam struct {
+	DisableInitAsync     bool // 是否要异步初始化，默认false
 	StackDriverOption *stackdriver.Options
 }
 
 func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	if param == nil {
+		return
+	}
 	newParam := param.(OpenCensusStrategyParam)
+	if newParam.DisableInitAsync {
+		return  // 没设置参数就不初始化。如果在Google Cloud上运行的话，不需要初始化，也不要授权json文件
+	}
 	if newParam.StackDriverOption == nil {
 		panic(`set StackDriverOption please`)
 	}
