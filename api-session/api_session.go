@@ -3,18 +3,17 @@ package api_session
 import (
 	"github.com/kataras/iris"
 	"github.com/mitchellh/mapstructure"
+	_interface "github.com/pefish/go-core/api-session/interface"
 )
-
-type ApiHandlerType func(apiContext *ApiSessionClass) interface{}
 
 type ApiSessionClass struct {
 	Ctx iris.Context
 
+	Api _interface.InterfaceApi
+
 	JwtHeaderName string
 	JwtBody       map[string]interface{}
 	UserId        uint64
-
-	RouteName string
 
 	Lang       string
 	ClientType string // web、android、ios

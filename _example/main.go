@@ -7,11 +7,14 @@ import (
 	go_config "github.com/pefish/go-config"
 	go_core "github.com/pefish/go-core"
 	api_strategy "github.com/pefish/go-core/api-strategy"
-	"github.com/pefish/go-core/driver"
+	api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
+	external_service "github.com/pefish/go-core/driver/external-service"
+	"github.com/pefish/go-core/driver/logger"
 	go_logger "github.com/pefish/go-logger"
 	"log"
 	"os"
 	"runtime/debug"
+	external_service2 "test/external-service"
 	"test/route"
 )
 
@@ -32,15 +35,21 @@ func main() {
 	})
 
 	go_core.Service.SetName(`测试服务api`)
-	go_core.Service.AddGlobalStrategy(&api_strategy.OpenCensusStrategy, api_strategy.OpenCensusStrategyParam{
-		DisableInitAsync: true,
-		StackDriverOption: &stackdriver.Options{
-			ProjectID:    `pefish`,
-			MetricPrefix: `test`,
-		}})
+	api_strategy2.GlobalApiStrategyDriver.Register(api_strategy2.StrategyData{
+		Strategy: &api_strategy.OpenCensusStrategy,
+		Param: api_strategy.OpenCensusStrategyParam{
+			DisableInitAsync: true,
+			StackDriverOption: &stackdriver.Options{
+				ProjectID:    `pefish`,
+				MetricPrefix: `test`,
+			}},
+		Disable: false,
+	})
 
 	go_logger.Logger.Init(go_core.Service.GetName(), `debug`)
-	driver.LoggerDriver.Register(go_logger.Logger)
+	logger.LoggerDriver.Register(go_logger.Logger)
+
+	external_service.ExternalServiceDriver.Register(`deposit_address`, &external_service2.DepositAddressService)
 
 	//go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
 
@@ -51,8 +60,6 @@ func main() {
 	api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
 	go_core.Service.SetRoutes(route.TestRoute)
 	go_core.Service.SetPort(go_config.Config.GetUint64(`port`))
-
-
 
 	go_core.Service.Run()
 }

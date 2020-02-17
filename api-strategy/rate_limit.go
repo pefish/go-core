@@ -3,7 +3,6 @@ package api_strategy
 import (
 	"fmt"
 	"github.com/pefish/go-core/api-session"
-	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 	"time"
 )
@@ -44,7 +43,7 @@ func (this *RateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated
 
 func (this *RateLimitStrategyClass) Init(param interface{}) {}
 
-func (this *RateLimitStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	if param == nil {
 		go_error.Throw(`strategy need param`, this.errorCode)
 	}

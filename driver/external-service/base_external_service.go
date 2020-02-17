@@ -2,11 +2,13 @@ package external_service
 
 import (
 	"encoding/json"
-	_interface "github.com/pefish/go-core/interface"
+	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
 )
 
+
+// 让外部服务可以通过这个基类调用内部功能
 type BaseExternalServiceClass struct {
 
 }
@@ -29,7 +31,7 @@ func (this *BaseExternalServiceClass) PostJsonForStruct(url string, params map[s
 }
 
 func (this *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) interface{} {
-	result := _interface.ApiResult{}
+	result := api.ApiResult{}
 	go_http.Http.PostJsonForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
@@ -53,7 +55,7 @@ func (this *BaseExternalServiceClass) GetJsonForStruct(url string, params map[st
 }
 
 func (this *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) interface{} {
-	result := _interface.ApiResult{}
+	result := api.ApiResult{}
 	go_http.Http.GetForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,

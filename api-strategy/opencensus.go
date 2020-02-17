@@ -5,7 +5,6 @@ import (
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
-	_interface "github.com/pefish/go-core/interface"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/stats"
@@ -80,7 +79,7 @@ func (this *OpenCensusClass) Init(param interface{}) {
 
 }
 
-func (this *OpenCensusClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
 	var tags addedTags
 	r, traceEnd := startTrace(w, r)

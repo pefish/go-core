@@ -2,7 +2,6 @@ package api_strategy
 
 import (
 	"github.com/pefish/go-core/api-session"
-	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 )
 
@@ -38,7 +37,7 @@ func (this *IpFilterStrategyClass) InitAsync(param interface{}, onAppTerminated 
 
 func (this *IpFilterStrategyClass) Init(param interface{}) {}
 
-func (this *IpFilterStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	if param == nil {
 		go_error.Throw(`strategy need param`, this.errorCode)
 	}

@@ -1,9 +1,9 @@
 package api_strategy
 
 import (
+	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-core/driver"
-	_interface "github.com/pefish/go-core/interface"
+	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
@@ -113,7 +113,11 @@ func (this *ParamValidateStrategyClass) InitAsync(param interface{}, onAppTermin
 
 func (this *ParamValidateStrategyClass) Init(param interface{}) {}
 
-func (this *ParamValidateStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+type ParamValidateStrategyParam struct {
+	Route api.Api
+}
+
+func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()
 
@@ -125,15 +129,15 @@ func (this *ParamValidateStrategyClass) Execute(route *_interface.Route, out *ap
 		}
 	} else if out.Ctx.Method() == `POST` {
 		requestContentType := out.Ctx.GetHeader(`content-type`)
-		if route.ParamType != `` && !strings.HasPrefix(requestContentType, route.ParamType) {
+		if out.Api.GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api.GetParamType()) {
 			go_error.Throw(`content-type error`, this.errorCode)
 		}
 
-		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (route.ParamType == MULTIPART_TYPE || route.ParamType == ``) {
+		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api.GetParamType() == MULTIPART_TYPE || out.Api.GetParamType() == ``) {
 			for k, v := range out.Ctx.FormValues() {
 				tempParam[k] = v[0]
 			}
-		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (route.ParamType == JSON_TYPE || route.ParamType == ``) {
+		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api.GetParamType() == JSON_TYPE || out.Api.GetParamType() == ``) {
 			if err := out.Ctx.ReadJSON(&tempParam); err != nil {
 				go_error.ThrowError(`parse params error`, this.errorCode, err)
 			}
@@ -147,10 +151,10 @@ func (this *ParamValidateStrategyClass) Execute(route *_interface.Route, out *ap
 	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	driver.Logger.DebugF(`Params: %s`, paramsStr)
+	logger.LoggerDriver.Logger.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
-	if route.Params != nil {
-		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(route.Params), reflect.ValueOf(route.Params))
+	if out.Api.GetParams() != nil {
+		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(out.Api.GetParams()), reflect.ValueOf(out.Api.GetParams()))
 	}
 }

@@ -2,7 +2,6 @@ package api_strategy
 
 import (
 	"github.com/pefish/go-core/api-session"
-	_interface "github.com/pefish/go-core/interface"
 	"github.com/pefish/go-error"
 	"strings"
 )
@@ -52,7 +51,7 @@ func (this *CorsStrategyClass) InitAsync(param interface{}, onAppTerminated chan
 
 func (this *CorsStrategyClass) Init(param interface{}) {}
 
-func (this *CorsStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
+func (this *CorsStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	origin := out.Ctx.GetHeader("Origin")
 
 	out.Ctx.Header("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")

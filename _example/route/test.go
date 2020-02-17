@@ -1,19 +1,20 @@
 package route
 
 import (
+	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
-	_interface "github.com/pefish/go-core/interface"
+	api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"test/controller"
 	"time"
 )
 
-var TestRoute = []*_interface.Route{
+var TestRoute = []*api.Api{
 	{
 		Description: "这是测试路由",
 		Path:        "/v1/test_api",
 		Method:      `POST`,
-		Strategies: []_interface.StrategyRoute{
+		Strategies: []api_strategy2.StrategyData{
 			{
 				Strategy: &api_strategy.RateLimitApiStrategy,
 				Param: api_strategy.RateLimitParam{
@@ -36,7 +37,7 @@ var TestRoute = []*_interface.Route{
 			UserId: 122,
 			Token:  "fghsfghs",
 		},
-		Return: _interface.ApiResult{
+		Return: api.ApiResult{
 			Data: controller.TestReturn{
 				Test: `hha`,
 			},
@@ -46,7 +47,7 @@ var TestRoute = []*_interface.Route{
 		Description: "这是测试路由",
 		Path:        "/v1/test_api1",
 		Method:      `GET`,
-		Strategies: []_interface.StrategyRoute{
+		Strategies: []api_strategy2.StrategyData{
 			{
 				Strategy: &api_strategy.RateLimitApiStrategy,
 				Param: api_strategy.RateLimitParam{
@@ -69,7 +70,7 @@ var TestRoute = []*_interface.Route{
 		Params: controller.Test1Param{
 			Haha: 122,
 		},
-		Return: _interface.ApiResult{
+		Return: api.ApiResult{
 			Data: []controller.Test1Return{
 				{
 					Test: `111`,
