@@ -1,7 +1,7 @@
 package external_service
 
 type ExternalServiceInterface interface {
-	Init(driver *ServiceDriverClass)
+	Init(driver *ExternalServiceDriverClass)
 
 	PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{})
 	PostJson(url string, params map[string]interface{}) interface{}

@@ -6,8 +6,8 @@ import (
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver"
 	_interface "github.com/pefish/go-core/interface"
-	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-stack"
 )
@@ -77,7 +77,7 @@ func (this *ApiChannelBuilderClass) WrapJson(func_ api_session.ApiHandlerType) f
 		defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
 			apiContext.Ctx.StatusCode(iris.StatusOK)
 			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
-			logger.LoggerDriver.Error(
+			driver.Logger.Error(
 				"err: " +
 					fmt.Sprint(err) +
 					"\n" +

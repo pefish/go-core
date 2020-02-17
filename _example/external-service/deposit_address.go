@@ -1,9 +1,9 @@
 package external_service
 
-import "github.com/pefish/go-core/external-service"
+import "github.com/pefish/go-core/driver/external-service"
 
 func init() {
-	external_service.ServiceDriver.Register(`deposit_address`, &DepositAddressService)
+	external_service.ExternalServiceDriver.Register(`deposit_address`, &DepositAddressService)
 }
 
 type DepositAddressServiceClass struct {
@@ -14,7 +14,7 @@ type DepositAddressServiceClass struct {
 var DepositAddressService = DepositAddressServiceClass{}
 
 
-func (this *DepositAddressServiceClass) Init(driver *external_service.ServiceDriverClass) {
+func (this *DepositAddressServiceClass) Init(driver *external_service.ExternalServiceDriverClass) {
 	this.baseUrl = `http://baidu.com`
 }
 

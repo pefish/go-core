@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver"
 	_interface "github.com/pefish/go-core/interface"
-	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"io/ioutil"
@@ -37,16 +37,16 @@ func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {}
 
 func (this *ServiceBaseInfoStrategyClass) Execute(route *_interface.Route, out *api_session.ApiSessionClass, param interface{}) {
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
-	logger.LoggerDriver.Debug(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
+	driver.Logger.Debug(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)
-	logger.LoggerDriver.DebugF(`UrlParams: %#v`, out.Ctx.URLParams())
-	logger.LoggerDriver.DebugF(`Headers: %#v`, out.Ctx.Request().Header)
+	driver.Logger.DebugF(`UrlParams: %#v`, out.Ctx.URLParams())
+	driver.Logger.DebugF(`Headers: %#v`, out.Ctx.Request().Header)
 
 	rawData, _ := ioutil.ReadAll(out.Ctx.Request().Body)
 	if out.Ctx.Application().ConfigurationReadOnly().GetDisableBodyConsumptionOnUnmarshal() {
 		out.Ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
 	}
-	logger.LoggerDriver.DebugF(`Body: %s`, string(rawData))
+	driver.Logger.DebugF(`Body: %s`, string(rawData))
 
 	lang := out.Ctx.GetHeader(`lang`)
 	if lang == `` {

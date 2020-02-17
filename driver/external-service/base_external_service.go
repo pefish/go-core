@@ -12,7 +12,7 @@ type BaseExternalServiceClass struct {
 }
 
 
-func (this *BaseExternalServiceClass) Init(driver *ServiceDriverClass) {
+func (this *BaseExternalServiceClass) Init(driver *ExternalServiceDriverClass) {
 
 }
 

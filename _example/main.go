@@ -7,7 +7,7 @@ import (
 	go_config "github.com/pefish/go-config"
 	go_core "github.com/pefish/go-core"
 	api_strategy "github.com/pefish/go-core/api-strategy"
-	"github.com/pefish/go-core/logger"
+	"github.com/pefish/go-core/driver"
 	go_logger "github.com/pefish/go-logger"
 	"log"
 	"os"
@@ -40,7 +40,7 @@ func main() {
 		}})
 
 	go_logger.Logger.Init(go_core.Service.GetName(), `debug`)
-	logger.LoggerDriver.Register(go_logger.Logger)
+	driver.LoggerDriver.Register(go_logger.Logger)
 
 	//go_mysql.MysqlHelper.ConnectWithMap(go_config.Config.MustGetMap(`mysql`))
 

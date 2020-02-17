@@ -2,8 +2,8 @@ package api_strategy
 
 import (
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver"
 	_interface "github.com/pefish/go-core/interface"
-	"github.com/pefish/go-core/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
@@ -147,7 +147,7 @@ func (this *ParamValidateStrategyClass) Execute(route *_interface.Route, out *ap
 	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriver.DebugF(`Params: %s`, paramsStr)
+	driver.Logger.DebugF(`Params: %s`, paramsStr)
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if route.Params != nil {
