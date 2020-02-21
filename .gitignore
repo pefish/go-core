@@ -7,8 +7,10 @@ _example/test
 **/secret/local.yaml
 **/secret/dev.yaml
 **/secret/prod.yaml
+**/secret/credentials.json
 
 **/config/local.yaml
 **/config/dev.yaml
 **/config/prod.yaml
+
 
