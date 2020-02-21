@@ -3,6 +3,7 @@ package api_strategy
 import (
 	"fmt"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"time"
 )
@@ -39,11 +40,18 @@ func (this *RateLimitStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *RateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+func (this *RateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+}
 
-func (this *RateLimitStrategyClass) Init(param interface{}) {}
+func (this *RateLimitStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+}
 
 func (this *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	if param == nil {
 		go_error.Throw(`strategy need param`, this.errorCode)
 	}

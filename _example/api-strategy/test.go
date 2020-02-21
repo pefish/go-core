@@ -2,7 +2,6 @@ package api_strategy
 
 import (
 	"github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 )
 
@@ -17,20 +16,18 @@ func (this *TestStrategyClass) GetName() string {
 }
 
 func (this *TestStrategyClass) GetDescription() string {
-	return `对apikey以及签名进行校验`
+	return `test`
 }
 
 func (this *TestStrategyClass) GetErrorCode() uint64 {
 	return 1000
 }
 
-type ApikeyAuthParam struct {
-	AllowedType string
-}
+func (this *TestStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
 
-func (this *TestStrategyClass) Execute(route *service.Route, out *api_session.ApiSessionClass, param interface{}) {
-	//var p ApikeyAuthParam
-	//p = param.(ApikeyAuthParam)
+func (this *TestStrategyClass) Init(param interface{}) {}
+
+func (this *TestStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 
 	go_error.ThrowInternal(`12345test`)
 }

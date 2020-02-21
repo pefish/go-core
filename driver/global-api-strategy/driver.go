@@ -8,11 +8,11 @@ type StrategyData struct {
 }
 
 type GlobalApiStrategyDriverClass struct {
-	GlobalStrategies map[string]StrategyData
+	GlobalStrategies []StrategyData
 }
 
 var GlobalApiStrategyDriver = GlobalApiStrategyDriverClass{
-	GlobalStrategies: map[string]StrategyData{},
+	GlobalStrategies: []StrategyData{},
 }
 
 func (this *GlobalApiStrategyDriverClass) Startup() {
@@ -20,6 +20,6 @@ func (this *GlobalApiStrategyDriverClass) Startup() {
 }
 
 func (this *GlobalApiStrategyDriverClass) Register(strategyData StrategyData) bool {
-	this.GlobalStrategies[strategyData.Strategy.GetName()] = strategyData
+	this.GlobalStrategies = append(this.GlobalStrategies, strategyData)
 	return true
 }

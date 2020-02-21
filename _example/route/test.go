@@ -5,6 +5,7 @@ import (
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/api-strategy"
 	api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
+	api_strategy3 "test/api-strategy"
 	"test/controller"
 	"time"
 )
@@ -48,6 +49,10 @@ var TestRoute = []*api.Api{
 		Path:        "/v1/test_api1",
 		Method:      `GET`,
 		Strategies: []api_strategy2.StrategyData{
+			{
+				Strategy: &api_strategy3.TestApiStrategy,
+				Disable: true,
+			},
 			{
 				Strategy: &api_strategy.RateLimitApiStrategy,
 				Param: api_strategy.RateLimitParam{

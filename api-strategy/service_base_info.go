@@ -30,11 +30,18 @@ func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 	return go_error.INTERNAL_ERROR_CODE
 }
 
-func (this *ServiceBaseInfoStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+func (this *ServiceBaseInfoStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+}
 
-func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {}
+func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+}
 
 func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
 	logger.LoggerDriver.Logger.Debug(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)

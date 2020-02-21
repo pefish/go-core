@@ -160,7 +160,6 @@ func (this *ServiceClass) buildRoutes() {
 			}
 
 			apiContext.Ctx.StatusCode(iris.StatusOK)
-			logger.LoggerDriver.Logger.Debug(`I am healthy`)
 			apiContext.Ctx.Text(`ok`)
 			return nil
 		},
@@ -168,9 +167,7 @@ func (this *ServiceClass) buildRoutes() {
 
 	for _, apiObject := range this.GetApis() {
 		// 注入全局前置处理器
-		for _, globalStrategyData := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
-			apiObject.Strategies = append(apiObject.Strategies, globalStrategyData)
-		}
+		apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
 		// 得到apiPath
 		apiPath := this.path + apiObject.Path
 		if apiObject.IgnoreRootPath == true {
@@ -191,9 +188,7 @@ func (this *ServiceClass) buildRoutes() {
 
 	// 处理未知路由
 	var apiObject = api.NewApi()
-	for _, globalStrategyData := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
-		apiObject.Strategies = append(apiObject.Strategies, globalStrategyData)
-	}
+	apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, apiObject.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 		rawData, _ := ioutil.ReadAll(apiContext.Ctx.Request().Body)
 		logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))

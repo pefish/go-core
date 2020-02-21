@@ -109,15 +109,22 @@ func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessio
 	}
 }
 
-func (this *ParamValidateStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+func (this *ParamValidateStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+}
 
-func (this *ParamValidateStrategyClass) Init(param interface{}) {}
+func (this *ParamValidateStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+}
 
 type ParamValidateStrategyParam struct {
 	Route api.Api
 }
 
 func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()
 

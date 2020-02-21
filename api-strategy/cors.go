@@ -2,6 +2,7 @@ package api_strategy
 
 import (
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"strings"
 )
@@ -47,11 +48,18 @@ func (this *CorsStrategyClass) isOriginAllowed(origin string) bool {
 	}
 	return false
 }
-func (this *CorsStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+func (this *CorsStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+}
 
-func (this *CorsStrategyClass) Init(param interface{}) {}
+func (this *CorsStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+}
 
 func (this *CorsStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	origin := out.Ctx.GetHeader("Origin")
 
 	out.Ctx.Header("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")

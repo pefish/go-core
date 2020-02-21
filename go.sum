@@ -154,6 +154,7 @@ github.com/pefish/go-application v0.1.0 h1:xzr+g74pqrwMe1TFTOnBLgSD3nWgFWe7ACGqw
 github.com/pefish/go-application v0.1.0/go.mod h1:bIM667i1fBpkJxZWE0lTbYs/FW4O9YgnW5gj4sy33ko=
 github.com/pefish/go-application v0.1.1 h1:ltoPF7Pi8Xief05bRxWTlCxe5miNk+NHzUNjbh8KJTw=
 github.com/pefish/go-application v0.1.1/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
+github.com/pefish/go-application v0.1.2/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-decimal v0.2.0 h1:oRe3Q29YdhS7vswFNcprsMYSmwAiwYqyNjUuEw8OMvQ=
 github.com/pefish/go-decimal v0.2.0/go.mod h1:cA32n7NTQBt7TGv8iE7uHFH/1xhu8RWDaoyYlJHf5CM=
 github.com/pefish/go-desensitize v0.0.4 h1:1HpBlntkLwcPjgFk9ImjfYOeUKJ6zY76PEZ1d6C2obo=

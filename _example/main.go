@@ -28,7 +28,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	go_application.Application.Debug = true
+	go_application.Application.SetEnv(`local`)
 	go_config.Config.MustLoadYamlConfig(go_config.Configuration{
 		ConfigEnvName: `GO_CONFIG`,
 		SecretEnvName: `GO_SECRET`,
@@ -38,15 +38,13 @@ func main() {
 	api_strategy2.GlobalApiStrategyDriver.Register(api_strategy2.StrategyData{
 		Strategy: &api_strategy.OpenCensusStrategy,
 		Param: api_strategy.OpenCensusStrategyParam{
-			DisableInitAsync: true,
 			StackDriverOption: &stackdriver.Options{
 				ProjectID:    `pefish`,
-				MetricPrefix: `test`,
 			}},
 		Disable: false,
 	})
 
-	go_logger.Logger.Init(go_core.Service.GetName(), `debug`)
+	go_logger.Logger = go_logger.NewLogger(go_logger.WithIsDebug(go_application.Application.Debug))
 	logger.LoggerDriver.Register(go_logger.Logger)
 
 	external_service.ExternalServiceDriver.Register(`deposit_address`, &external_service2.DepositAddressService)

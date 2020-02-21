@@ -5,6 +5,7 @@ import (
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver/logger"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/stats"
@@ -37,36 +38,27 @@ func (this *OpenCensusClass) GetErrorCode() uint64 {
 }
 
 type OpenCensusStrategyParam struct {
-	DisableInitAsync     bool // 是否要异步初始化，默认false
 	StackDriverOption *stackdriver.Options
 }
 
 func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
-	if param == nil {
-		return
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+	option := stackdriver.Options{
+		ReportingInterval: 60 * time.Second,
 	}
-	newParam := param.(OpenCensusStrategyParam)
-	if newParam.DisableInitAsync {
-		return  // 没设置参数就不初始化。如果在Google Cloud上运行的话，不需要初始化，也不要授权json文件
+	if param != nil {
+		newParam := param.(OpenCensusStrategyParam)
+		option.ProjectID = newParam.StackDriverOption.ProjectID
 	}
-	if newParam.StackDriverOption == nil {
-		panic(`set StackDriverOption please`)
-	}
-	newParam.StackDriverOption.ReportingInterval = 60 * time.Second
-	sd, err := stackdriver.NewExporter(*newParam.StackDriverOption)
+	sd, err := stackdriver.NewExporter(option)
 	if err != nil {
 		panic(err)
 	}
 	defer sd.Flush()
-
-	err = sd.StartMetricsExporter()
-	if err != nil {
-		panic(err)
-	}
-	defer sd.StopMetricsExporter()
 	trace.RegisterExporter(sd)
 	defer trace.UnregisterExporter(sd)
-	if go_application.Application.Debug {
+	if go_application.Application.Env == `local` {
 		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
 	}
 	select {
@@ -76,10 +68,12 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 }
 
 func (this *OpenCensusClass) Init(param interface{}) {
-
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
 }
 
 func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
 	var tags addedTags
 	r, traceEnd := startTrace(w, r)

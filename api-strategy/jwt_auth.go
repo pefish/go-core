@@ -3,6 +3,7 @@ package api_strategy
 import (
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/pefish/go-core/api-session"
+	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
@@ -62,11 +63,18 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	this.headerName = headerName
 }
 
-func (this *JwtAuthStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
+func (this *JwtAuthStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
+}
 
-func (this *JwtAuthStrategyClass) Init(param interface{}) {}
+func (this *JwtAuthStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+}
 
 func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	out.JwtHeaderName = this.headerName
 	jwt := out.Ctx.GetHeader(this.headerName)
 

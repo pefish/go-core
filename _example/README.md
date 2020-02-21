@@ -14,7 +14,7 @@
 #### 启动
 
 ```shell
-GO_CONFIG=`pwd`/config/local.yaml GO_SECRET=`pwd`/secret/local.yaml go run main.go
+GOOGLE_APPLICATION_CREDENTIALS=`pwd`/secret/credentials.json GO_CONFIG=`pwd`/config/local.yaml GO_SECRET=`pwd`/secret/local.yaml go run main.go
 ```
 
 #### 测试
