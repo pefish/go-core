@@ -114,8 +114,10 @@ func (this *ServiceClass) Run() {
 
 	// 执行各个策略的初始化函数
 	for _, globalStrategy := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
-		globalStrategy.Strategy.Init(globalStrategy.Param)
-		go globalStrategy.Strategy.InitAsync(globalStrategy.Param, go_application.OnTerminated)
+		if !globalStrategy.Disable {
+			globalStrategy.Strategy.Init(globalStrategy.Param)
+			go globalStrategy.Strategy.InitAsync(globalStrategy.Param, go_application.OnTerminated)
+		}
 	}
 
 	this.buildRoutes()

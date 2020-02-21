@@ -58,7 +58,7 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 	defer sd.Flush()
 	trace.RegisterExporter(sd)
 	defer trace.UnregisterExporter(sd)
-	if go_application.Application.Env == `local` {
+	if go_application.Application.Debug {
 		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
 	}
 	select {

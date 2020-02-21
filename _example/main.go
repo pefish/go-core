@@ -41,7 +41,7 @@ func main() {
 			StackDriverOption: &stackdriver.Options{
 				ProjectID:    `pefish`,
 			}},
-		Disable: false,
+		Disable: go_application.Application.Env == `local`,
 	})
 
 	go_logger.Logger = go_logger.NewLogger(go_logger.WithIsDebug(go_application.Application.Debug))
