@@ -51,14 +51,19 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 		newParam := param.(OpenCensusStrategyParam)
 		option.ProjectID = newParam.StackDriverOption.ProjectID
 	}
-	sd, err := stackdriver.NewExporter(option)
+	exporter, err := stackdriver.NewExporter(option)
 	if err != nil {
 		panic(err)
 	}
-	defer sd.Flush()
-	trace.RegisterExporter(sd)
-	defer trace.UnregisterExporter(sd)
-	if go_application.Application.Debug {
+	defer exporter.Flush()
+	err = exporter.StartMetricsExporter()
+	if err != nil {
+		panic(err)
+	}
+	defer exporter.StopMetricsExporter()
+	trace.RegisterExporter(exporter)
+	defer trace.UnregisterExporter(exporter)
+	if go_application.Application.Env == `local` { // 本地调试才打开
 		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
 	}
 	select {
@@ -74,6 +79,11 @@ func (this *OpenCensusClass) Init(param interface{}) {
 
 func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+	defer func() {
+		if err := recover(); err != nil {
+			logger.LoggerDriver.Logger.Error(err)
+		}
+	}()
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
 	var tags addedTags
 	r, traceEnd := startTrace(w, r)
