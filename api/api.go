@@ -140,6 +140,10 @@ func (this *Api) WrapJson(func_ ApiHandlerType) func(ctx iris.Context) {
 				strategyData.Strategy.Execute(apiSession, strategyData.Param)
 			}()
 		}
+		for _, defer_ := range apiSession.Defers {
+			defer defer_()
+		}
+
 		result := func_(apiSession)
 		if result == nil {
 			return

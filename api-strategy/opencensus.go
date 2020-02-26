@@ -87,9 +87,13 @@ func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param int
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
 	var tags addedTags
 	r, traceEnd := startTrace(w, r)
-	defer traceEnd()
+	out.AddDefer(func() {
+		traceEnd()
+	})
 	_, statsEnd := startStats(w, r)
-	defer statsEnd(&tags)
+	out.AddDefer(func() {
+		statsEnd(&tags)
+	})
 }
 
 // -----------------

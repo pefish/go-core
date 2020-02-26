@@ -22,6 +22,8 @@ type ApiSessionClass struct {
 
 	OriginalParams map[string]interface{} // 客户端传过来的原始参数
 	Params         map[string]interface{} // 经过前置处理器修饰过的参数
+
+	Defers []func() // api结束后执行的函数
 }
 
 func NewApiSession() *ApiSessionClass {
@@ -46,4 +48,8 @@ func (this *ApiSessionClass) ScanParams(dest interface{}) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (this *ApiSessionClass) AddDefer(defer_ func()) {
+	this.Defers = append(this.Defers, defer_)
 }
