@@ -20,7 +20,6 @@ import (
 )
 
 type OpenCensusClass struct {
-
 }
 
 var OpenCensusStrategy = OpenCensusClass{}
@@ -39,6 +38,8 @@ func (this *OpenCensusClass) GetErrorCode() uint64 {
 
 type OpenCensusStrategyParam struct {
 	StackDriverOption *stackdriver.Options
+	EnableTrace       bool
+	EnableStats       bool
 }
 
 func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
@@ -47,8 +48,9 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 	option := stackdriver.Options{
 		ReportingInterval: 60 * time.Second,
 	}
+	var newParam OpenCensusStrategyParam
 	if param != nil {
-		newParam := param.(OpenCensusStrategyParam)
+		newParam = param.(OpenCensusStrategyParam)
 		option.ProjectID = newParam.StackDriverOption.ProjectID
 	}
 	exporter, err := stackdriver.NewExporter(option)
@@ -56,11 +58,13 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 		panic(err)
 	}
 	defer exporter.Flush()
-	err = exporter.StartMetricsExporter()
-	if err != nil {
-		panic(err)
+	if newParam.EnableStats {
+		err = exporter.StartMetricsExporter()
+		if err != nil {
+			panic(err)
+		}
+		defer exporter.StopMetricsExporter()
 	}
-	defer exporter.StopMetricsExporter()
 	trace.RegisterExporter(exporter)
 	defer trace.UnregisterExporter(exporter)
 	if go_application.Application.Env == `local` { // 本地调试才打开
@@ -84,16 +88,26 @@ func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param int
 			logger.LoggerDriver.Logger.Error(err)
 		}
 	}()
+	var newParam OpenCensusStrategyParam
+	if param != nil {
+		newParam = param.(OpenCensusStrategyParam)
+	}
+
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
-	var tags addedTags
-	r, traceEnd := startTrace(w, r)
-	out.AddDefer(func() {
-		traceEnd()
-	})
-	_, statsEnd := startStats(w, r)
-	out.AddDefer(func() {
-		statsEnd(&tags)
-	})
+	if newParam.EnableTrace {
+		r1, traceEnd := startTrace(w, r)
+		out.AddDefer(func() {
+			traceEnd()
+		})
+		r = r1
+	}
+	if newParam.EnableStats {
+		var tags addedTags
+		_, statsEnd := startStats(w, r)
+		out.AddDefer(func() {
+			statsEnd(&tags)
+		})
+	}
 }
 
 // -----------------
@@ -446,4 +460,3 @@ func (t *trackingResponseWriter) wrappedResponseWriter() http.ResponseWriter {
 		}{t}
 	}
 }
-
