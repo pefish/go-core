@@ -144,29 +144,6 @@ func (this *ServiceClass) Run() {
 
 func (this *ServiceClass) buildRoutes() {
 	this.App = iris.New()
-	this.apis = append(this.apis, &api.Api{
-		Description:    "健康检查api",
-		Path:           "/healthz",
-		Method:         "ALL",
-		IgnoreRootPath: true,
-		Controller: func(apiContext *api_session.ApiSessionClass) interface{} {
-			defer func() {
-				if err := recover(); err != nil {
-					logger.LoggerDriver.Logger.Error(err)
-					apiContext.Ctx.StatusCode(iris.StatusInternalServerError)
-					apiContext.Ctx.Text(`not ok`)
-				}
-			}()
-			if this.healthyCheckFunc != nil {
-				this.healthyCheckFunc()
-			}
-
-			apiContext.Ctx.StatusCode(iris.StatusOK)
-			apiContext.Ctx.Text(`ok`)
-			return nil
-		},
-	})
-
 	for _, apiObject := range this.GetApis() {
 		// 注入全局前置处理器
 		apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
@@ -188,6 +165,25 @@ func (this *ServiceClass) buildRoutes() {
 		}
 	}
 
+	// healthz
+	var healthApiObject = api.NewApi()
+	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/healthz`, healthApiObject.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
+		defer func() {
+			if err := recover(); err != nil {
+				logger.LoggerDriver.Logger.Error(err)
+				apiContext.Ctx.StatusCode(iris.StatusInternalServerError)
+				apiContext.Ctx.Text(`not ok`)
+			}
+		}()
+		if this.healthyCheckFunc != nil {
+			this.healthyCheckFunc()
+		}
+
+		apiContext.Ctx.StatusCode(iris.StatusOK)
+		apiContext.Ctx.Text(`ok`)
+		return nil
+	}))
+	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, `ALL`, `/healthz`, `健康检查api`))
 	// 处理未知路由
 	var apiObject = api.NewApi()
 	apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
