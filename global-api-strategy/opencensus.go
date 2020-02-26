@@ -84,8 +84,8 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 func (this *OpenCensusClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
-	if param != nil {
-		go_error.Throw(`param must be set`, this.GetErrorCode())
+	if param == nil {
+		go_error.Throw(`OpenCensusStrategyParam must be set`, this.GetErrorCode())
 	}
 }
 
