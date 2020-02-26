@@ -34,16 +34,6 @@ func (this *IpFilterStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *IpFilterStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
-}
-
-func (this *IpFilterStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
-}
-
 func (this *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	if param == nil {

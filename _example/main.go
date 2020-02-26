@@ -7,9 +7,10 @@ import (
 	go_config "github.com/pefish/go-config"
 	go_core "github.com/pefish/go-core"
 	api_strategy "github.com/pefish/go-core/api-strategy"
-	api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	external_service "github.com/pefish/go-core/driver/external-service"
+	api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
+	"github.com/pefish/go-core/global-api-strategy"
 	go_logger "github.com/pefish/go-logger"
 	"log"
 	"os"
@@ -35,9 +36,9 @@ func main() {
 	})
 
 	go_core.Service.SetName(`测试服务api`)
-	api_strategy2.GlobalApiStrategyDriver.Register(api_strategy2.StrategyData{
-		Strategy: &api_strategy.OpenCensusStrategy,
-		Param: api_strategy.OpenCensusStrategyParam{
+	api_strategy2.GlobalApiStrategyDriver.Register(api_strategy2.GlobalStrategyData{
+		Strategy: &global_api_strategy.OpenCensusStrategy,
+		Param: global_api_strategy.OpenCensusStrategyParam{
 			StackDriverOption: &stackdriver.Options{
 				ProjectID:    `pefish`,
 			}},
@@ -53,9 +54,9 @@ func main() {
 
 	go_core.Service.SetPath(`/api/test`)
 	api_strategy.RateLimitApiStrategy.SetErrorCode(2006)
-	api_strategy.ParamValidateStrategy.SetErrorCode(2005)
+	global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)
 	api_strategy.IpFilterStrategy.SetErrorCode(2007)
-	api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
+	global_api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
 	go_core.Service.SetRoutes(route.TestRoute)
 	go_core.Service.SetPort(go_config.Config.GetUint64(`port`))
 

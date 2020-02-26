@@ -63,16 +63,6 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	this.headerName = headerName
 }
 
-func (this *JwtAuthStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
-}
-
-func (this *JwtAuthStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
-}
-
 func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	out.JwtHeaderName = this.headerName

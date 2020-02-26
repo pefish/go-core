@@ -1,4 +1,4 @@
-package api_strategy
+package global_api_strategy
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/driver/logger"
+	go_error "github.com/pefish/go-error"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
 	"go.opencensus.io/stats"
@@ -20,6 +21,7 @@ import (
 )
 
 type OpenCensusClass struct {
+	errorCode uint64
 }
 
 var OpenCensusStrategy = OpenCensusClass{}
@@ -32,8 +34,12 @@ func (this *OpenCensusClass) GetDescription() string {
 	return `OpenCensus`
 }
 
+func (this *OpenCensusClass) SetErrorCode(code uint64) {
+	this.errorCode = code
+}
+
 func (this *OpenCensusClass) GetErrorCode() uint64 {
-	return 1000
+	return this.errorCode
 }
 
 type OpenCensusStrategyParam struct {
@@ -48,9 +54,8 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 	option := stackdriver.Options{
 		ReportingInterval: 60 * time.Second,
 	}
-	var newParam OpenCensusStrategyParam
-	if param != nil {
-		newParam = param.(OpenCensusStrategyParam)
+	newParam := param.(OpenCensusStrategyParam)
+	if newParam.StackDriverOption != nil {
 		option.ProjectID = newParam.StackDriverOption.ProjectID
 	}
 	exporter, err := stackdriver.NewExporter(option)
@@ -79,6 +84,9 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 func (this *OpenCensusClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+	if param != nil {
+		go_error.Throw(`param must be set`, this.GetErrorCode())
+	}
 }
 
 func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
@@ -88,11 +96,7 @@ func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param int
 			logger.LoggerDriver.Logger.Error(err)
 		}
 	}()
-	var newParam OpenCensusStrategyParam
-	if param != nil {
-		newParam = param.(OpenCensusStrategyParam)
-	}
-
+	newParam := param.(OpenCensusStrategyParam)
 	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
 	if newParam.EnableTrace {
 		r1, traceEnd := startTrace(w, r)

@@ -23,10 +23,6 @@ func (this *TestStrategyClass) GetErrorCode() uint64 {
 	return 1000
 }
 
-func (this *TestStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {}
-
-func (this *TestStrategyClass) Init(param interface{}) {}
-
 func (this *TestStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 
 	go_error.ThrowInternal(`12345test`)

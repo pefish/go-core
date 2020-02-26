@@ -6,24 +6,25 @@ import (
 	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	api_session "github.com/pefish/go-core/api-session"
-	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
+	api_strategy2 "github.com/pefish/go-core/api-strategy"
+	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-stack"
 )
 
 type Api struct {
-	hero           *hero.Hero
-	Description    string                      // api描述
-	Path           string                      // api路径
-	IgnoreRootPath bool                        // api路径是否忽略根路径
-	Method         string                      // api方法
-	Strategies     []api_strategy.StrategyData // api前置处理策略
-	Params         interface{}                 // api参数
-	Return         interface{}                 // api返回值
-	Controller     ApiHandlerType              // api业务处理器
-	ParamType      string                      // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
-	ReturnHookFunc ReturnHookFuncType          // 返回前的处理函数
+	hero             *hero.Hero
+	Description      string                            // api描述
+	Path             string                            // api路径
+	IgnoreRootPath   bool                              // api路径是否忽略根路径
+	Method           string                            // api方法
+	Strategies       []api_strategy2.StrategyData      // api前置处理策略,不包含全局策略
+	Params           interface{}                       // api参数
+	Return           interface{}                       // api返回值
+	Controller       ApiHandlerType                    // api业务处理器
+	ParamType        string                            // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+	ReturnHookFunc   ReturnHookFuncType                // 返回前的处理函数
 }
 
 func (this *Api) GetDescription() string {
@@ -70,7 +71,7 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 
 func NewApi() *Api {
 	return &Api{
-		Strategies: []api_strategy.StrategyData{},
+		Strategies: []api_strategy2.StrategyData{},
 	}
 }
 
@@ -124,6 +125,21 @@ func (this *Api) WrapJson(func_ ApiHandlerType) func(ctx iris.Context) {
 			apiSession.Ctx.StatusCode(200)
 			apiSession.Ctx.Write([]byte(`ok`))
 			return
+		}
+
+		for _, strategyData := range global_api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
+			if strategyData.Disable {
+				continue
+			}
+			func() {
+				defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
+					if code == go_error.INTERNAL_ERROR_CODE {
+						code = strategyData.Strategy.GetErrorCode()
+					}
+					go_error.ThrowErrorWithDataInternalMsg(msg, internalMsg, code, data, err)
+				})
+				strategyData.Strategy.Execute(apiSession, strategyData.Param)
+			}()
 		}
 
 		for _, strategyData := range this.Strategies {

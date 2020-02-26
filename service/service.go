@@ -112,7 +112,7 @@ func (this *ServiceClass) Run() {
 	logger.LoggerDriver.Startup()                    // 启动日志驱动
 	api_strategy.GlobalApiStrategyDriver.Startup()   // 启动外接全局前置处理器驱动
 
-	// 执行各个策略的初始化函数
+	// 执行各个全局策略的初始化函数
 	for _, globalStrategy := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
 		if !globalStrategy.Disable {
 			globalStrategy.Strategy.Init(globalStrategy.Param)
@@ -145,8 +145,6 @@ func (this *ServiceClass) Run() {
 func (this *ServiceClass) buildRoutes() {
 	this.App = iris.New()
 	for _, apiObject := range this.GetApis() {
-		// 注入全局前置处理器
-		apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
 		// 得到apiPath
 		apiPath := this.path + apiObject.Path
 		if apiObject.IgnoreRootPath == true {
@@ -186,7 +184,6 @@ func (this *ServiceClass) buildRoutes() {
 	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, `ALL`, `/healthz`, `健康检查api`))
 	// 处理未知路由
 	var apiObject = api.NewApi()
-	apiObject.Strategies = append(api_strategy.GlobalApiStrategyDriver.GlobalStrategies, apiObject.Strategies...)
 	this.App.AllowMethods(iris.MethodOptions).Handle(``, `/*`, apiObject.WrapJson(func(apiContext *api_session.ApiSessionClass) interface{} {
 		rawData, _ := ioutil.ReadAll(apiContext.Ctx.Request().Body)
 		logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))

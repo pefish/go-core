@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kataras/iris/core/errors"
-	"github.com/pefish/go-core/api-strategy"
+	"github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-file"
@@ -272,7 +272,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		paramTypes := []string{}
-		if route.ParamType == api_strategy.ALL_TYPE {
+		if route.ParamType == global_api_strategy.ALL_TYPE {
 			paramTypes = append(paramTypes, `application/json`, `multipart/form-data`)
 		} else {
 			paramTypes = append(paramTypes, route.ParamType)

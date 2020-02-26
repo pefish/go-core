@@ -1,25 +1,25 @@
 package global_api_strategy
 
 
-type StrategyData struct {
-	Strategy InterfaceStrategy
+type GlobalStrategyData struct {
+	Strategy InterfaceGlobalStrategy
 	Param    interface{}
 	Disable  bool
 }
 
 type GlobalApiStrategyDriverClass struct {
-	GlobalStrategies []StrategyData
+	GlobalStrategies []GlobalStrategyData
 }
 
 var GlobalApiStrategyDriver = GlobalApiStrategyDriverClass{
-	GlobalStrategies: []StrategyData{},
+	GlobalStrategies: []GlobalStrategyData{},
 }
 
 func (this *GlobalApiStrategyDriverClass) Startup() {
 
 }
 
-func (this *GlobalApiStrategyDriverClass) Register(strategyData StrategyData) bool {
+func (this *GlobalApiStrategyDriverClass) Register(strategyData GlobalStrategyData) bool {
 	this.GlobalStrategies = append(this.GlobalStrategies, strategyData)
 	return true
 }

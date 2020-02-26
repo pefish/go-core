@@ -1,4 +1,4 @@
-package api_strategy
+package global_api_strategy
 
 import (
 	"bytes"
