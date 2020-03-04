@@ -164,6 +164,7 @@ github.com/pefish/go-error v0.2.0 h1:WNJX9EpOlfhqc8OX/FuLDcgZ+ccDRXdQbikOiMmF9Q8
 github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-error v0.3.4 h1:ZXO3jkHwWRljXmR+EiDPr2sWPBO3EQ1/X0qwb2I3ilY=
 github.com/pefish/go-error v0.3.4/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
+github.com/pefish/go-error v0.3.5/go.mod h1:Sxi4hCIX2XqeG8ayIpN5dX1LHYwCKgPquY2jRS0tNsI=
 github.com/pefish/go-file v0.1.0 h1:fInpo+hLKHfAhkZWh63IsCJl/bdko2pZ4hq0AfuARi4=
 github.com/pefish/go-file v0.1.0/go.mod h1:8iLoQZ4UMvslNfHR7+9rrO8tGYpvfIC3DkVV5oq6lxY=
 github.com/pefish/go-format v0.1.1 h1:ERqLlOXdUrppAtA72p6lz0owlmYEAfVVpJohcgvF6gY=
