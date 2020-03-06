@@ -152,8 +152,6 @@ github.com/parnurzeal/gorequest v0.2.15 h1:oPjDCsF5IkD4gUk6vIgsxYNaSgvAnIh1EJeRO
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pefish/go-application v0.1.0 h1:xzr+g74pqrwMe1TFTOnBLgSD3nWgFWe7ACGqwiFrDOk=
 github.com/pefish/go-application v0.1.0/go.mod h1:bIM667i1fBpkJxZWE0lTbYs/FW4O9YgnW5gj4sy33ko=
-github.com/pefish/go-application v0.1.1 h1:ltoPF7Pi8Xief05bRxWTlCxe5miNk+NHzUNjbh8KJTw=
-github.com/pefish/go-application v0.1.1/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-application v0.1.2 h1:OXRL/d/YUh1XhYXv5WduxpyBqhRXhCZei55jLCZmMng=
 github.com/pefish/go-application v0.1.2/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-decimal v0.2.0 h1:oRe3Q29YdhS7vswFNcprsMYSmwAiwYqyNjUuEw8OMvQ=
@@ -162,8 +160,7 @@ github.com/pefish/go-desensitize v0.0.4 h1:1HpBlntkLwcPjgFk9ImjfYOeUKJ6zY76PEZ1d
 github.com/pefish/go-desensitize v0.0.4/go.mod h1:QsnbRf4QSy4+asVq9A5Gi61bJDWM1xPqSD9ybJGe6xY=
 github.com/pefish/go-error v0.2.0 h1:WNJX9EpOlfhqc8OX/FuLDcgZ+ccDRXdQbikOiMmF9Q8=
 github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
-github.com/pefish/go-error v0.3.4 h1:ZXO3jkHwWRljXmR+EiDPr2sWPBO3EQ1/X0qwb2I3ilY=
-github.com/pefish/go-error v0.3.4/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
+github.com/pefish/go-error v0.3.5 h1:IGoql+VnTUpEUePl/rnBw0jgyumYG7Et26STkb1aVI0=
 github.com/pefish/go-error v0.3.5/go.mod h1:Sxi4hCIX2XqeG8ayIpN5dX1LHYwCKgPquY2jRS0tNsI=
 github.com/pefish/go-file v0.1.0 h1:fInpo+hLKHfAhkZWh63IsCJl/bdko2pZ4hq0AfuARi4=
 github.com/pefish/go-file v0.1.0/go.mod h1:8iLoQZ4UMvslNfHR7+9rrO8tGYpvfIC3DkVV5oq6lxY=

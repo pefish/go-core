@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"github.com/kataras/iris"
-	"github.com/kataras/iris/hero"
 	"github.com/pefish/go-application"
 	api_session "github.com/pefish/go-core/api-session"
 	api_strategy2 "github.com/pefish/go-core/api-strategy"
@@ -14,7 +13,6 @@ import (
 )
 
 type Api struct {
-	hero             *hero.Hero
 	Description      string                            // api描述
 	Path             string                            // api路径
 	IgnoreRootPath   bool                              // api路径是否忽略根路径
@@ -79,15 +77,11 @@ func NewApi() *Api {
 wrap api处理器
 */
 func (this *Api) WrapJson(func_ ApiHandlerType) func(ctx iris.Context) {
-	this.hero = hero.New()
-	this.hero.Register(func(ctx iris.Context) *api_session.ApiSessionClass {
-		// api入口
+	return func(ctx iris.Context) {
 		apiSession := api_session.NewApiSession() // 新建会话
 		apiSession.Ctx = ctx
 		apiSession.Api = this
-		return apiSession
-	})
-	return this.hero.Handler(func(apiSession *api_session.ApiSessionClass) {
+
 		defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
 			apiSession.Ctx.StatusCode(iris.StatusOK)
 			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
@@ -178,5 +172,5 @@ func (this *Api) WrapJson(func_ ApiHandlerType) func(ctx iris.Context) {
 		} else {
 			apiSession.Ctx.JSON(apiResult)
 		}
-	})
+	}
 }
