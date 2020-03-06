@@ -130,22 +130,26 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 
 	tempParam := map[string]interface{}{}
 
-	if out.Ctx.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
-		for k, v := range out.Ctx.URLParams() {
+	if out.GetMethod() == `GET` { // +号和%都有特殊含义，+会被替换成空格
+		for k, v := range out.GetUrlParams() {
 			tempParam[k] = v
 		}
-	} else if out.Ctx.Method() == `POST` {
-		requestContentType := out.Ctx.GetHeader(`content-type`)
+	} else if out.GetMethod() == `POST` {
+		requestContentType := out.GetHeader(`content-type`)
 		if out.Api.GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api.GetParamType()) {
 			go_error.Throw(`content-type error`, this.errorCode)
 		}
 
 		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api.GetParamType() == MULTIPART_TYPE || out.Api.GetParamType() == ``) {
-			for k, v := range out.Ctx.FormValues() {
+			formValues, err := out.GetFormValues()
+			if err != nil {
+				panic(err)
+			}
+			for k, v := range formValues {
 				tempParam[k] = v[0]
 			}
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api.GetParamType() == JSON_TYPE || out.Api.GetParamType() == ``) {
-			if err := out.Ctx.ReadJSON(&tempParam); err != nil {
+			if err := out.ReadJSON(&tempParam); err != nil {
 				go_error.ThrowError(`parse params error`, this.errorCode, err)
 			}
 		} else {
@@ -159,7 +163,7 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
 	logger.LoggerDriver.Logger.DebugF(`Params: %s`, paramsStr)
-	util.UpdateCtxValuesErrorMsg(out.Ctx, `params`, paramsStr)
+	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if out.Api.GetParams() != nil {
 		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(out.Api.GetParams()), reflect.ValueOf(out.Api.GetParams()))

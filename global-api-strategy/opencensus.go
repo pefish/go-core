@@ -97,7 +97,7 @@ func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param int
 		}
 	}()
 	newParam := param.(OpenCensusStrategyParam)
-	w, r := out.Ctx.ResponseWriter(), out.Ctx.Request()
+	w, r := out.ResponseWriter, out.Request
 	if newParam.EnableTrace {
 		r1, traceEnd := startTrace(w, r)
 		out.AddDefer(func() {

@@ -46,8 +46,8 @@ func (this *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, pa
 		go_error.Throw(`strategy need param`, this.errorCode)
 	}
 	newParam := param.(RateLimitParam)
-	methodPath := fmt.Sprintf(`%s_%s`, out.Ctx.Method(), out.Ctx.Path())
-	key := fmt.Sprintf(`%s_%s`, out.Ctx.RemoteAddr(), methodPath)
+	methodPath := fmt.Sprintf(`%s_%s`, out.GetMethod(), out.GetPath())
+	key := fmt.Sprintf(`%s_%s`, out.GetRemoteAddress(), methodPath)
 	if !(*this.db)[key].IsZero() && time.Now().Sub((*this.db)[key]) < newParam.Limit {
 		go_error.Throw(`api ratelimit`, this.errorCode)
 	}
