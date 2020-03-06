@@ -11,7 +11,7 @@ service access layer -- business logic layer -- data access layer
     1、generate automaticly controller template code
     2、abstract http and rpc request
     3、generate automaticly api strategy template code
-    4、remove iris
+    4、remove iris [done]
 
 ### dependencies relationship
 
