@@ -66,7 +66,7 @@ func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	out.JwtHeaderName = this.headerName
-	jwt := out.Ctx.GetHeader(this.headerName)
+	jwt := out.GetHeader(this.headerName)
 
 	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(this.pubKey, jwt, this.noCheckExpire)
 	if err != nil {
@@ -85,6 +85,6 @@ func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, para
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
 		out.UserId = userId
 
-		util.UpdateCtxValuesErrorMsg(out.Ctx, `jwtAuth`, userId)
+		util.UpdateSessionErrorMsg(out, `jwtAuth`, userId)
 	}
 }

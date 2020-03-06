@@ -2,10 +2,10 @@ package swagger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/kataras/iris/core/errors"
+	go_core "github.com/pefish/go-core"
 	"github.com/pefish/go-core/global-api-strategy"
-	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-file"
 	"github.com/pefish/go-format"
@@ -192,16 +192,16 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	paths := map[string]map[string]Yaml_Path{}
 
-	for key, route := range service.Service.GetRoutes() {
+	for _, api := range go_core.Service.GetApis() {
 		temp := map[string]Yaml_Path{}
 
-		desc := route.Description
+		desc := api.Description
 
 		parameters := []Yaml_Parameter{}
 
 		description := ``
-		if route.Strategies != nil {
-			for _, strategy := range route.Strategies {
+		if api.Strategies != nil {
+			for _, strategy := range api.Strategies {
 				if strategy.Disable == false && strategy.Strategy.GetName() == `jwtAuth` {
 					// 添加 jwt header
 					parameters = append(parameters, Yaml_Parameter{
@@ -216,8 +216,8 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			}
 		}
 
-		if route.Params != nil {
-			paramsType := reflect.TypeOf(route.Params)
+		if api.Params != nil {
+			paramsType := reflect.TypeOf(api.Params)
 			if paramsType.Kind() == reflect.Ptr {
 				paramsType = paramsType.Elem()
 			}
@@ -225,8 +225,8 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			requiredParams := []string{}
 			// 解析 properties
 			properties := map[string]Yaml_Property{}
-			if route.Method == `POST` {
-				this.recuPostParams(paramsType, reflect.ValueOf(route.Params), properties, &requiredParams)
+			if api.Method == `POST` {
+				this.recuPostParams(paramsType, reflect.ValueOf(api.Params), properties, &requiredParams)
 				parameter := Yaml_Parameter{
 					In:       `body`,
 					Name:     `body`,
@@ -236,8 +236,8 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 					},
 				}
 				parameters = append(parameters, parameter)
-			} else if route.Method == `GET` {
-				this.recuGetParams(paramsType, reflect.ValueOf(route.Params), properties, &requiredParams, &parameters)
+			} else if api.Method == `GET` {
+				this.recuGetParams(paramsType, reflect.ValueOf(api.Params), properties, &requiredParams, &parameters)
 			} else {
 				go_error.Throw(`method error`, 0)
 			}
@@ -249,37 +249,37 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		responses := map[string]Yaml_Response{}
-		if route.Return != nil {
-			type_ := reflect.TypeOf(route.Return)
+		if api.Return != nil {
+			type_ := reflect.TypeOf(api.Return)
 			returnTypeName := type_.Name()
 			kind := type_.Kind()
 			properties := map[string]Yaml_Property{}
 			if kind == reflect.Struct {
-				this.recuReturn(go_format.Format.StructToMap(route.Return), properties)
+				this.recuReturn(go_format.Format.StructToMap(api.Return), properties)
 			} else {
 				go_error.ThrowInternal(`return config type error`)
 			}
-			definitions[key+`_`+returnTypeName] = Yaml_Definition{
+			definitions[api.Path+`_`+returnTypeName] = Yaml_Definition{
 				Type:       `object`,
 				Properties: properties,
 			}
 			responses[`200`] = Yaml_Response{
 				Description: `正确返回`,
 				Schema: map[string]interface{}{
-					`$ref`: fmt.Sprintf(`#/definitions/%s`, key+`_`+returnTypeName),
+					`$ref`: fmt.Sprintf(`#/definitions/%s`, api.Path+`_`+returnTypeName),
 				},
 			}
 		}
 
 		paramTypes := []string{}
-		if route.ParamType == global_api_strategy.ALL_TYPE {
+		if api.ParamType == global_api_strategy.ALL_TYPE {
 			paramTypes = append(paramTypes, `application/json`, `multipart/form-data`)
 		} else {
-			paramTypes = append(paramTypes, route.ParamType)
+			paramTypes = append(paramTypes, api.ParamType)
 		}
 
-		temp[strings.ToLower(route.Method)] = Yaml_Path{
-			Tags:        []string{service.Service.GetName()},
+		temp[strings.ToLower(string(api.Method))] = Yaml_Path{
+			Tags:        []string{go_core.Service.GetName()},
 			Summary:     desc,
 			Consumes:    paramTypes,
 			Produces:    []string{`application/json`},
@@ -287,22 +287,22 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			Responses:   responses,
 			Description: description,
 		}
-		paths[service.Service.GetPath()+route.Path] = temp
+		paths[go_core.Service.GetPath()+api.Path] = temp
 	}
 
 	swagger := Yaml_Swagger{
 		`2.0`,
 		Yaml_Info{
-			Title:       service.Service.GetName(),
-			Description: service.Service.GetDescription(),
+			Title:       go_core.Service.GetName(),
+			Description: go_core.Service.GetDescription(),
 			Version:     `1.0.0`,
 		},
 		hostAndPort,
-		service.Service.GetPath(),
+		go_core.Service.GetPath(),
 		[]Yaml_Tag{
 			{
-				Name:        service.Service.GetName(),
-				Description: service.Service.GetDescription(),
+				Name:        go_core.Service.GetName(),
+				Description: go_core.Service.GetDescription(),
 			},
 		},
 		[]string{`http`},

@@ -43,7 +43,7 @@ func (this *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, par
 	if newParam.GetValidIp == nil {
 		return
 	}
-	clientIp := out.Ctx.RemoteAddr()
+	clientIp := out.GetRemoteAddress()
 	allowedIps := newParam.GetValidIp(out)
 	for _, ip := range allowedIps {
 		if ip == clientIp {

@@ -42,25 +42,23 @@ func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {
 
 func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
-	apiMsg := fmt.Sprintf(`%s %s %s`, out.Ctx.RemoteAddr(), out.Ctx.Path(), out.Ctx.Method())
+	apiMsg := fmt.Sprintf(`%s %s %s`, out.GetRemoteAddress(), out.GetPath(), out.GetMethod())
 	logger.LoggerDriver.Logger.Debug(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
-	util.UpdateCtxValuesErrorMsg(out.Ctx, `apiMsg`, apiMsg)
-	logger.LoggerDriver.Logger.DebugF(`UrlParams: %#v`, out.Ctx.URLParams())
-	logger.LoggerDriver.Logger.DebugF(`Headers: %#v`, out.Ctx.Request().Header)
+	util.UpdateSessionErrorMsg(out, `apiMsg`, apiMsg)
+	logger.LoggerDriver.Logger.DebugF(`UrlParams: %#v`, out.GetUrlParams())
+	logger.LoggerDriver.Logger.DebugF(`Headers: %#v`, out.Request.Header)
 
-	rawData, _ := ioutil.ReadAll(out.Ctx.Request().Body)
-	if out.Ctx.Application().ConfigurationReadOnly().GetDisableBodyConsumptionOnUnmarshal() {
-		out.Ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
-	}
+	rawData, _ := ioutil.ReadAll(out.Request.Body)
+	out.Request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData)) // 使其可以重复读
 	logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 
-	lang := out.Ctx.GetHeader(`lang`)
+	lang := out.GetHeader(`lang`)
 	if lang == `` {
 		lang = `zh-CN`
 	}
 	out.Lang = lang
 
-	clientType := out.Ctx.GetHeader(`client_type`)
+	clientType := out.GetHeader(`client_type`)
 	if clientType == `` {
 		clientType = `web`
 	}

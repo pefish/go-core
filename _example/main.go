@@ -56,7 +56,6 @@ func main() {
 	api_strategy.RateLimitApiStrategy.SetErrorCode(2006)
 	global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)
 	api_strategy.IpFilterStrategy.SetErrorCode(2007)
-	global_api_strategy.CorsApiStrategy.SetAllowedOrigins([]string{`*`})
 	go_core.Service.SetRoutes(route.TestRoute)
 	go_core.Service.SetPort(go_config.Config.GetUint64(`port`))
 
