@@ -10,7 +10,7 @@ It provides some features. like
 3. Return Hook
 4. Cors
 5. Api Error Catch
-6. And so on
+6. ...
 
 ## Quick start
 
