@@ -12,7 +12,7 @@ It provides some features. like
 5. Api Error Catch
 6. And so on
 
-## 📖 Learning Iris
+## 📖 Learning Go-Core
 
 <details>
 <summary>Quick start</summary>
