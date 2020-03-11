@@ -1,6 +1,6 @@
 # Go-Core Web Framework
 
-[![view examples](https://img.shields.io/badge/learn%20by-examples-0C8EC5.svg?style=for-the-badge&logo=go)](https://github.com/pefish/go-core/tree/master/_examples)
+[![view examples](https://img.shields.io/badge/learn%20by-examples-0C8EC5.svg?style=for-the-badge&logo=go)](https://github.com/pefish/go-core/tree/master/_example)
 
 Go-Core is a fast, simple and young web framework for Go.
 
