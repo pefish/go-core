@@ -12,10 +12,7 @@ It provides some features. like
 5. Api Error Catch
 6. And so on
 
-## 📖 Learning Go-Core
-
-<details>
-<summary>Quick start</summary>
+## Quick start
 
 ```go
 package main
@@ -67,12 +64,10 @@ func main() {
 $ go run main.go
 ```
 
-</details>
-
-## 🛡 Security Vulnerabilities
+## Security Vulnerabilities
 
 If you discover a security vulnerability within Go-Core, please send an e-mail to [pefish@qq.com](mailto:pefish@qq.com). All security vulnerabilities will be promptly addressed.
 
-## 📝 License
+## License
 
 This project is licensed under the [BSD 3-clause license](LICENSE), just like the Go project itself.
