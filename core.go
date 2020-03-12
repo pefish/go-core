@@ -6,6 +6,7 @@ import (
 	"github.com/pefish/go-core/service"
 )
 
+// New Service instance
 func NewService(name string) *service.ServiceClass {
 	svc := &service.ServiceClass{}
 	svc.SetName(name)
@@ -18,4 +19,5 @@ func NewService(name string) *service.ServiceClass {
 	return svc
 }
 
+// Default Service instance
 var Service = NewService(`default`)

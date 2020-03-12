@@ -188,10 +188,13 @@ func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
 	}
 }
 
+// Add defer handler.
+// Defer handlers will be executed by order at the end of api session.
 func (apiSession *ApiSessionClass) AddDefer(defer_ func()) {
 	apiSession.Defers = append(apiSession.Defers, defer_)
 }
 
+// Response json body.
 func (apiSession *ApiSessionClass) WriteJson(data interface{}) error {
 	apiSession.SetHeader(string(HeaderName_ContentType), string(ContentTypeValue_JSON))
 	result, err := json.Marshal(data)
@@ -206,10 +209,12 @@ func (apiSession *ApiSessionClass) WriteJson(data interface{}) error {
 	return nil
 }
 
+// Set header of response.
 func (apiSession *ApiSessionClass) SetHeader(key string, value string) {
 	apiSession.ResponseWriter.Header().Set(key, value)
 }
 
+// Response text body.
 func (apiSession *ApiSessionClass) WriteText(text string) error {
 	apiSession.ResponseWriter.Header().Set(string(HeaderName_ContentType), string(ContentTypeValue_Text))
 	apiSession.ResponseWriter.WriteHeader(int(apiSession.statusCode))
@@ -220,22 +225,27 @@ func (apiSession *ApiSessionClass) WriteText(text string) error {
 	return nil
 }
 
+// Set status code of response.
 func (apiSession *ApiSessionClass) SetStatusCode(code StatusCode) {
 	apiSession.statusCode = code
 }
 
+// Get request path.
 func (apiSession *ApiSessionClass) GetPath() string {
 	return apiSession.Request.URL.Path
 }
 
+// Get request method (GET, POST, PUT, etc.).
 func (apiSession *ApiSessionClass) GetMethod() string {
 	return apiSession.Request.Method
 }
 
+// Read header by key from request headers.
 func (apiSession *ApiSessionClass) GetHeader(name string) string {
 	return apiSession.Request.Header.Get(name)
 }
 
+// Read remote address from request headers.
 func (apiSession *ApiSessionClass) GetRemoteAddress() string {
 	remoteHeaders := map[string]bool{
 		`X-Forwarded-For`: true,
@@ -270,6 +280,7 @@ func (apiSession *ApiSessionClass) GetRemoteAddress() string {
 	return addr
 }
 
+// Read url params from get request.
 func (apiSession *ApiSessionClass) GetUrlParams() map[string]string {
 	values := map[string]string{}
 
@@ -283,6 +294,7 @@ func (apiSession *ApiSessionClass) GetUrlParams() map[string]string {
 	return values
 }
 
+// Read form data from request.
 func (apiSession *ApiSessionClass) GetFormValues() (map[string][]string, error) {
 	err := apiSession.Request.ParseMultipartForm(32 << 20) // 默认32M
 	if err != nil {
@@ -306,6 +318,7 @@ func (apiSession *ApiSessionClass) GetFormValues() (map[string][]string, error) 
 	return form, nil
 }
 
+// Read json data from request body.
 func (apiSession *ApiSessionClass) ReadJSON(jsonObject interface{}) error {
 	if apiSession.Request.Body == nil {
 		return errors.New("unmarshal: empty body")

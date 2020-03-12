@@ -64,6 +64,10 @@ func main() {
 $ go run main.go
 ```
 
+## Document
+
+[Doc](https://godoc.org/github.com/pefish/go-core)
+
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Go-Core, please send an e-mail to [pefish@qq.com](mailto:pefish@qq.com). All security vulnerabilities will be promptly addressed.
