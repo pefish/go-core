@@ -9,21 +9,22 @@ import (
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-reflect"
+	"golang.org/x/net/http2"
 	"io/ioutil"
 	"net/http"
 	"runtime"
 )
 
 type ServiceClass struct {
-	name             string            // 服务名
-	description      string            // 服务描述
-	path             string            // 服务的基础路径
-	host             string            // 服务监听host
-	port             uint64            // 服务监听port
-	accessHost       string            // 服务访问host，没有设置的话使用监听host
-	accessPort       uint64            // 服务访问port，没有设置的话使用监听port
-	apis             []*api.Api        // 服务的所有路由
-	healthyCheckFunc func()            // 健康检查函数
+	name             string     // 服务名
+	description      string     // 服务描述
+	path             string     // 服务的基础路径
+	host             string     // 服务监听host
+	port             uint64     // 服务监听port
+	accessHost       string     // 服务访问host，没有设置的话使用监听host
+	accessPort       uint64     // 服务访问port，没有设置的话使用监听port
+	apis             []*api.Api // 服务的所有路由
+	healthyCheckFunc func()     // 健康检查函数
 
 	Mux *http.ServeMux
 }
@@ -127,7 +128,15 @@ func (this *ServiceClass) Run() {
 
 	addr := host + `:` + go_reflect.Reflect.MustToString(this.port)
 	logger.LoggerDriver.Logger.InfoF(`server started!!! http://%s`, addr)
-	err := http.ListenAndServe(addr, this.Mux)
+	s := &http.Server{
+		Addr:    addr,
+		Handler: this.Mux,
+	}
+	err := http2.ConfigureServer(s, &http2.Server{}) // 可以使用http2协议
+	if err != nil {
+		panic(err)
+	}
+	err = s.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
