@@ -43,6 +43,9 @@ func (this *ParamValidateStrategyClass) SetErrorCode(code uint64) {
 }
 
 func (this *ParamValidateStrategyClass) GetErrorCode() uint64 {
+	if this.errorCode == 0 {
+		return go_error.INTERNAL_ERROR_CODE
+	}
 	return this.errorCode
 }
 

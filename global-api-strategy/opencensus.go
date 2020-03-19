@@ -39,6 +39,9 @@ func (this *OpenCensusClass) SetErrorCode(code uint64) {
 }
 
 func (this *OpenCensusClass) GetErrorCode() uint64 {
+	if this.errorCode == 0 {
+		return go_error.INTERNAL_ERROR_CODE
+	}
 	return this.errorCode
 }
 

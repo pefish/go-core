@@ -11,7 +11,7 @@ import (
 )
 
 type ServiceBaseInfoStrategyClass struct {
-
+	errorCode uint64
 }
 
 var ServiceBaseInfoApiStrategy = ServiceBaseInfoStrategyClass{
@@ -26,7 +26,14 @@ func (this *ServiceBaseInfoStrategyClass) GetDescription() string {
 	return `get service base info`
 }
 
+func (this *ServiceBaseInfoStrategyClass) SetErrorCode(code uint64) {
+	this.errorCode = code
+}
+
 func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
+	if this.errorCode == 0 {
+		return go_error.INTERNAL_ERROR_CODE
+	}
 	return go_error.INTERNAL_ERROR_CODE
 }
 
