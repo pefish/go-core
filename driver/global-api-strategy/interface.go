@@ -6,6 +6,6 @@ import (
 
 type InterfaceGlobalStrategy interface {
 	Init(param interface{})  // 同步的初始化函数
-	InitAsync(param interface{}, onAppTerminated chan interface{})  // 异步的初始化函数，应用推出init才能退出的场景
+	InitAsync(param interface{})  // 异步的初始化函数，应用推出init才能退出的场景
 	api_strategy.InterfaceStrategy
 }

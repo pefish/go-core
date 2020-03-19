@@ -112,7 +112,7 @@ func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessio
 	}
 }
 
-func (this *ParamValidateStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+func (this *ParamValidateStrategyClass) InitAsync(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
 }

@@ -103,7 +103,7 @@ func (this *ServiceClass) GetApis() []*api.Api {
 
 func (this *ServiceClass) Run() {
 	defer func() {
-		close(go_application.OnTerminated) // 关闭通道。实现广播让所有订阅此通道都得到消息
+		go_application.Application.Exit()
 	}()
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -116,7 +116,7 @@ func (this *ServiceClass) Run() {
 	for _, globalStrategy := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
 		if !globalStrategy.Disable {
 			globalStrategy.Strategy.Init(globalStrategy.Param)
-			go globalStrategy.Strategy.InitAsync(globalStrategy.Param, go_application.OnTerminated)
+			go globalStrategy.Strategy.InitAsync(globalStrategy.Param)
 		}
 	}
 

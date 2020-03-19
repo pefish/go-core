@@ -51,7 +51,7 @@ type OpenCensusStrategyParam struct {
 	EnableStats       bool
 }
 
-func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+func (this *OpenCensusClass) InitAsync(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
 	option := stackdriver.Options{
@@ -79,7 +79,7 @@ func (this *OpenCensusClass) InitAsync(param interface{}, onAppTerminated chan i
 		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
 	}
 	select {
-	case <-onAppTerminated:
+	case <- go_application.Application.OnFinished():
 		break
 	}
 }

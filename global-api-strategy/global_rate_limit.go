@@ -2,6 +2,7 @@
 package global_api_strategy
 
 import (
+	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
@@ -36,7 +37,7 @@ func (this *GlobalRateLimitStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *GlobalRateLimitStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+func (this *GlobalRateLimitStrategyClass) InitAsync(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
 
@@ -90,6 +91,8 @@ func (this *GlobalRateLimitStrategyClass) fillToken(fillInterval time.Duration) 
 			case this.tokenBucket <- struct{}{}:
 			default:
 			}
+		case <- go_application.Application.OnFinished():
+			return
 		}
 	}
 }

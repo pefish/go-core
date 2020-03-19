@@ -37,7 +37,7 @@ func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 	return go_error.INTERNAL_ERROR_CODE
 }
 
-func (this *ServiceBaseInfoStrategyClass) InitAsync(param interface{}, onAppTerminated chan interface{}) {
+func (this *ServiceBaseInfoStrategyClass) InitAsync(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
 }

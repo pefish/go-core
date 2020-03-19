@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/validator v9.24.0+incompatible
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/pefish/go-application v0.1.2
+	github.com/pefish/go-application v0.1.3
 	github.com/pefish/go-decimal v0.2.0
 	github.com/pefish/go-desensitize v0.0.4
 	github.com/pefish/go-error v0.3.5
@@ -24,6 +24,7 @@ require (
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
 	go.opencensus.io v0.22.1
+	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 
