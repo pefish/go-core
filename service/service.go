@@ -116,7 +116,6 @@ func (this *ServiceClass) Run() {
 	for _, globalStrategy := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
 		if !globalStrategy.Disable {
 			globalStrategy.Strategy.Init(globalStrategy.Param)
-			go globalStrategy.Strategy.InitAsync(globalStrategy.Param)
 		}
 	}
 

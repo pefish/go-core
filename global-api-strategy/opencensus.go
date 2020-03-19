@@ -51,45 +51,42 @@ type OpenCensusStrategyParam struct {
 	EnableStats       bool
 }
 
-func (this *OpenCensusClass) InitAsync(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
-	option := stackdriver.Options{
-		ReportingInterval: 60 * time.Second,
-	}
-	newParam := param.(OpenCensusStrategyParam)
-	if newParam.StackDriverOption != nil {
-		option.ProjectID = newParam.StackDriverOption.ProjectID
-	}
-	exporter, err := stackdriver.NewExporter(option)
-	if err != nil {
-		panic(err)
-	}
-	defer exporter.Flush()
-	if newParam.EnableStats {
-		err = exporter.StartMetricsExporter()
-		if err != nil {
-			panic(err)
-		}
-		defer exporter.StopMetricsExporter()
-	}
-	trace.RegisterExporter(exporter)
-	defer trace.UnregisterExporter(exporter)
-	if go_application.Application.Env == `local` { // 本地调试才打开
-		trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
-	}
-	select {
-	case <- go_application.Application.OnFinished():
-		break
-	}
-}
-
 func (this *OpenCensusClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
 	if param == nil {
 		go_error.Throw(`OpenCensusStrategyParam must be set`, this.GetErrorCode())
 	}
+	go func() {
+		option := stackdriver.Options{
+			ReportingInterval: 60 * time.Second,
+		}
+		newParam := param.(OpenCensusStrategyParam)
+		if newParam.StackDriverOption != nil {
+			option.ProjectID = newParam.StackDriverOption.ProjectID
+		}
+		exporter, err := stackdriver.NewExporter(option)
+		if err != nil {
+			panic(err)
+		}
+		defer exporter.Flush()
+		if newParam.EnableStats {
+			err = exporter.StartMetricsExporter()
+			if err != nil {
+				panic(err)
+			}
+			defer exporter.StopMetricsExporter()
+		}
+		trace.RegisterExporter(exporter)
+		defer trace.UnregisterExporter(exporter)
+		if go_application.Application.Env == `local` { // 本地调试才打开
+			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()}) // 每个请求一个trace，生产环境不要使用
+		}
+		select {
+		case <- go_application.Application.OnFinished():
+			break
+		}
+	}()
 }
 
 func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {

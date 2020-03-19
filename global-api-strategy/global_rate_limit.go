@@ -37,17 +37,26 @@ func (this *GlobalRateLimitStrategyClass) GetErrorCode() uint64 {
 	return this.errorCode
 }
 
-func (this *GlobalRateLimitStrategyClass) InitAsync(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s InitAsync defer`, this.GetName())
-
-	params := param.(GlobalRateLimitStrategyParam)
-	this.fillToken(params.FillInterval)
-}
 
 func (this *GlobalRateLimitStrategyClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+
+	go func() {
+		params := param.(GlobalRateLimitStrategyParam)
+		ticker := time.NewTicker(params.FillInterval)
+		for {
+			select {
+			case <-ticker.C:
+				select {
+				case this.tokenBucket <- struct{}{}:
+				default:
+				}
+			case <- go_application.Application.OnFinished():
+				return
+			}
+		}
+	}()
 }
 
 type GlobalRateLimitStrategyParam struct {
@@ -80,19 +89,4 @@ func (this *GlobalRateLimitStrategyClass) takeAvailable(block bool) bool{
 	}
 	logger.LoggerDriver.Logger.DebugF("current global rate limit token count: %d", len(this.tokenBucket))
 	return takenResult
-}
-
-func (this *GlobalRateLimitStrategyClass) fillToken(fillInterval time.Duration) {
-	ticker := time.NewTicker(fillInterval)
-	for {
-		select {
-		case <-ticker.C:
-			select {
-			case this.tokenBucket <- struct{}{}:
-			default:
-			}
-		case <- go_application.Application.OnFinished():
-			return
-		}
-	}
 }
