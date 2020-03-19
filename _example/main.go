@@ -16,6 +16,7 @@ import (
 	"runtime/debug"
 	external_service2 "test/external-service"
 	"test/route"
+	"time"
 )
 
 func main() {
@@ -43,6 +44,15 @@ func main() {
 			EnableTrace:       true,
 			EnableStats:       false,
 		},
+	})
+
+	global_api_strategy.GlobalRateLimitStrategy.SetErrorCode(10000)
+	global_api_strategy2.GlobalApiStrategyDriver.Register(global_api_strategy2.GlobalStrategyData{
+		Strategy: &global_api_strategy.GlobalRateLimitStrategy,
+		Param:    global_api_strategy.GlobalRateLimitStrategyParam{
+			FillInterval: 1000 * time.Millisecond,
+		},
+		Disable:  false,
 	})
 
 	go_logger.Logger = go_logger.NewLogger(go_logger.WithIsDebug(go_application.Application.Debug))

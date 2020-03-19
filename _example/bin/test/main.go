@@ -5,6 +5,7 @@ import (
 	"github.com/pefish/go-core/api"
 	api_session "github.com/pefish/go-core/api-session"
 	api_strategy "github.com/pefish/go-core/api-strategy"
+	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	go_logger "github.com/pefish/go-logger"
@@ -27,15 +28,26 @@ func main() {
 			Method:      `POST`,
 			Strategies: []api_strategy.StrategyData{
 				{
-					Strategy: &api_strategy.RateLimitApiStrategy,
-					Param: api_strategy.RateLimitParam{
-						Limit: 1 * time.Second,
+					Strategy: &api_strategy.IpFilterStrategy,
+					Param: api_strategy.IpFilterParam{
+						GetValidIp: func(apiSession *api_session.ApiSessionClass) []string {
+							return []string{`127.0.0.1`}
+						},
 					},
+					Disable: true,
 				},
 			},
 			ParamType:  global_api_strategy.ALL_TYPE,
 			Controller: PostTest,
 		},
+	})
+	global_api_strategy.GlobalRateLimitStrategy.SetErrorCode(10000)
+	global_api_strategy2.GlobalApiStrategyDriver.Register(global_api_strategy2.GlobalStrategyData{
+		Strategy: &global_api_strategy.GlobalRateLimitStrategy,
+		Param:    global_api_strategy.GlobalRateLimitStrategyParam{
+			FillInterval: 1000 * time.Millisecond,
+		},
+		Disable:  false,
 	})
 	go_core.Service.SetPort(8080)
 

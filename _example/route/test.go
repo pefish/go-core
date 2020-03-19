@@ -7,7 +7,6 @@ import (
 	"github.com/pefish/go-core/global-api-strategy"
 	api_strategy3 "test/api-strategy"
 	"test/controller"
-	"time"
 )
 
 var TestRoute = []*api.Api{
@@ -16,12 +15,6 @@ var TestRoute = []*api.Api{
 		Path:        "/v1/test_api",
 		Method:      `POST`,
 		Strategies: []api_strategy.StrategyData{
-			{
-				Strategy: &api_strategy.RateLimitApiStrategy,
-				Param: api_strategy.RateLimitParam{
-					Limit: 1 * time.Second,
-				},
-			},
 			{
 				Strategy: &api_strategy.IpFilterStrategy,
 				Param: api_strategy.IpFilterParam{
@@ -52,12 +45,6 @@ var TestRoute = []*api.Api{
 			{
 				Strategy: &api_strategy3.TestApiStrategy,
 				Disable: true,
-			},
-			{
-				Strategy: &api_strategy.RateLimitApiStrategy,
-				Param: api_strategy.RateLimitParam{
-					Limit: 1 * time.Second,
-				},
 			},
 			{
 				Strategy: &api_strategy.IpFilterStrategy,
