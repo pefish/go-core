@@ -77,7 +77,7 @@ func (this *GlobalRateLimitStrategyClass) takeAvailable(block bool) bool{
 			takenResult = false
 		}
 	}
-
+	logger.LoggerDriver.Logger.DebugF("current global rate limit token count: %d", len(this.tokenBucket))
 	return takenResult
 }
 

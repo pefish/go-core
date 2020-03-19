@@ -76,6 +76,12 @@ func main() {
 $ go run main.go
 ```
 
+```shell script
+curl -H "Content-Type: application/json" http://0.0.0.0:8080/api/test/v1/test_api -d "{}"
+
+{"msg":"","internal_msg":"","code":0,"data":"haha, this is return value"}
+```
+
 ## Document
 
 [Doc](https://godoc.org/github.com/pefish/go-core)
