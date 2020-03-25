@@ -213,7 +213,7 @@ func (this *ServiceClass) buildRoutes() {
 					string(method): apiObject,
 				}
 			} else {
-				if registedApi[apiPath][string(method)] != nil {
+				if registedApi[apiPath][string(method)] == nil {
 					registedApi[apiPath][string(method)] = apiObject
 				}
 			}
@@ -221,8 +221,8 @@ func (this *ServiceClass) buildRoutes() {
 	}
 	for apiPath, map_ := range registedApi {
 		this.Mux.HandleFunc(apiPath, api.WrapJson(map_))
-		for method, api := range map_ {
-			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api.Description))
+		for method, api_ := range map_ {
+			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
 		}
 	}
 }

@@ -39,6 +39,33 @@ var TestRoute = []*api.Api{
 	},
 	{
 		Description: "这是测试路由",
+		Path:        "/v1/test_api",
+		Method:      `GET`,
+		Strategies: []api_strategy.StrategyData{
+			{
+				Strategy: &api_strategy.IpFilterStrategy,
+				Param: api_strategy.IpFilterParam{
+					GetValidIp: func(apiSession *api_session.ApiSessionClass) []string {
+						return []string{`127.0.0.1`}
+					},
+				},
+				Disable: true,
+			},
+		},
+		ParamType:  global_api_strategy.ALL_TYPE,
+		Controller: controller.TestController.PostTest,
+		Params: controller.TestParam{
+			UserId: 122,
+			Token:  "fghsfghs",
+		},
+		Return: api.ApiResult{
+			Data: controller.TestReturn{
+				Test: `hha`,
+			},
+		},
+	},
+	{
+		Description: "这是测试路由",
 		Path:        "/v1/test_api1",
 		Method:      `GET`,
 		Strategies: []api_strategy.StrategyData{
