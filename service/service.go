@@ -8,6 +8,7 @@ import (
 	external_service "github.com/pefish/go-core/driver/external-service"
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
+	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-reflect"
 	"golang.org/x/net/http2"
 	"io/ioutil"
@@ -34,6 +35,13 @@ func (this *ServiceClass) SetRoutes(routes ...[]*api.Api) {
 	for _, route := range routes {
 		this.apis = append(this.apis, route...)
 	}
+}
+
+func (this *ServiceClass) AddRoute(routes ...*api.Api) {
+	if len(this.apis) == 0 {
+		this.apis = []*api.Api{}
+	}
+	this.apis = append(this.apis, routes...)
 }
 
 func (this *ServiceClass) SetPath(path string) {
@@ -142,52 +150,79 @@ func (this *ServiceClass) Run() {
 }
 
 func (this *ServiceClass) buildRoutes() {
+	// healthz
+	var healthApi = &api.Api{
+		Description:            "健康检查api",
+		Path:                   "/healthz",
+		IgnoreRootPath:         true,
+		IgnoreGlobalStrategies: true,
+		Method:                 api_session.ApiMethod_All,
+		Controller: func(apiSession *api_session.ApiSessionClass) interface{} {
+			defer func() {
+				if err := recover(); err != nil {
+					logger.LoggerDriver.Logger.Error(err)
+					apiSession.SetStatusCode(api_session.StatusCode_InternalServerError)
+					apiSession.WriteText(`not ok`)
+				}
+			}()
+			if this.healthyCheckFunc != nil {
+				this.healthyCheckFunc()
+			}
+
+			apiSession.SetStatusCode(api_session.StatusCode_OK)
+			apiSession.WriteText(`ok`)
+			return nil
+		},
+		ParamType: global_api_strategy.ALL_TYPE,
+	}
+
+	// 处理未知路由
+	var apiObject = &api.Api{
+		Description:            "404 not found",
+		Path:                   "/",
+		IgnoreRootPath:         true,
+		IgnoreGlobalStrategies: true,
+		Method:                 api_session.ApiMethod_All,
+		Controller: func(apiSession *api_session.ApiSessionClass) interface{} {
+			rawData, _ := ioutil.ReadAll(apiSession.Request.Body)
+			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
+			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
+			logger.LoggerDriver.Logger.Debug(`api not found`)
+			apiSession.WriteText(`Not Found`)
+			return nil
+		},
+		ParamType: global_api_strategy.ALL_TYPE,
+	}
+
+	this.AddRoute(healthApi, apiObject) // 添加缺省api
+
 	this.Mux = http.NewServeMux()
-	registedApi := map[string]bool{}
+	registedApi := map[string]map[string]*api.Api{}
 	for _, apiObject := range this.GetApis() {
 		// 得到apiPath
 		apiPath := this.path + apiObject.Path
 		if apiObject.IgnoreRootPath == true {
 			apiPath = apiObject.Path
 		}
-		// 方法为空字符串就是All
 		method := apiObject.Method
+
 		// 挂载处理器
-		if apiObject.Controller != nil && !registedApi[apiPath] {
-			this.Mux.HandleFunc(apiPath, apiObject.WrapJson(method, apiObject.Controller))
-			registedApi[apiPath] = true
-			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, apiObject.Description))
+		if apiObject.Controller != nil {
+			if registedApi[apiPath] == nil {
+				registedApi[apiPath] = map[string]*api.Api{
+					string(method): apiObject,
+				}
+			} else {
+				if registedApi[apiPath][string(method)] != nil {
+					registedApi[apiPath][string(method)] = apiObject
+				}
+			}
 		}
 	}
-
-	// healthz
-	var healthApiObject = api.NewApi()
-	this.Mux.HandleFunc(`/healthz`, healthApiObject.WrapJson(api_session.ApiMethod_All, func(apiSession *api_session.ApiSessionClass) interface{} {
-		defer func() {
-			if err := recover(); err != nil {
-				logger.LoggerDriver.Logger.Error(err)
-				apiSession.SetStatusCode(api_session.StatusCode_InternalServerError)
-				apiSession.WriteText(`not ok`)
-			}
-		}()
-		if this.healthyCheckFunc != nil {
-			this.healthyCheckFunc()
+	for apiPath, map_ := range registedApi {
+		this.Mux.HandleFunc(apiPath, api.WrapJson(map_))
+		for method, api := range map_ {
+			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api.Description))
 		}
-
-		apiSession.SetStatusCode(api_session.StatusCode_OK)
-		apiSession.WriteText(`ok`)
-		return nil
-	}))
-	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, api_session.ApiMethod_All, `/healthz`, `健康检查api`))
-	// 处理未知路由
-	var apiObject = api.NewApi()
-	this.Mux.HandleFunc(`/*`, apiObject.WrapJson(api_session.ApiMethod_All, func(apiSession *api_session.ApiSessionClass) interface{} {
-		rawData, _ := ioutil.ReadAll(apiSession.Request.Body)
-		logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
-		apiSession.SetStatusCode(api_session.StatusCode_NotFound)
-		logger.LoggerDriver.Logger.Debug(`api not found`)
-		apiSession.WriteText(`Not Found`)
-		return nil
-	}))
-	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, api_session.ApiMethod_All, `/*`, `404 not found`))
+	}
 }
