@@ -143,6 +143,7 @@ func (this *ServiceClass) Run() {
 
 func (this *ServiceClass) buildRoutes() {
 	this.Mux = http.NewServeMux()
+	registedApi := map[string]bool{}
 	for _, apiObject := range this.GetApis() {
 		// 得到apiPath
 		apiPath := this.path + apiObject.Path
@@ -152,8 +153,9 @@ func (this *ServiceClass) buildRoutes() {
 		// 方法为空字符串就是All
 		method := apiObject.Method
 		// 挂载处理器
-		if apiObject.Controller != nil {
+		if apiObject.Controller != nil && !registedApi[apiPath] {
 			this.Mux.HandleFunc(apiPath, apiObject.WrapJson(method, apiObject.Controller))
+			registedApi[apiPath] = true
 			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, apiObject.Description))
 		}
 	}
