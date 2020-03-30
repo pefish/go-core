@@ -86,8 +86,8 @@ github.com/pefish/go-application v0.1.3 h1:4IM/9HFKvG7aKhRtNXLKdk+q9bmOO8oGF0o4z
 github.com/pefish/go-application v0.1.3/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-decimal v0.2.0 h1:oRe3Q29YdhS7vswFNcprsMYSmwAiwYqyNjUuEw8OMvQ=
 github.com/pefish/go-decimal v0.2.0/go.mod h1:cA32n7NTQBt7TGv8iE7uHFH/1xhu8RWDaoyYlJHf5CM=
-github.com/pefish/go-desensitize v0.0.4 h1:1HpBlntkLwcPjgFk9ImjfYOeUKJ6zY76PEZ1d6C2obo=
-github.com/pefish/go-desensitize v0.0.4/go.mod h1:QsnbRf4QSy4+asVq9A5Gi61bJDWM1xPqSD9ybJGe6xY=
+github.com/pefish/go-desensitize v0.0.5 h1:Vh/bBYsl13wPNZc9rvceR5WI2C/kYTcTU5zF47nH9go=
+github.com/pefish/go-desensitize v0.0.5/go.mod h1:QsnbRf4QSy4+asVq9A5Gi61bJDWM1xPqSD9ybJGe6xY=
 github.com/pefish/go-error v0.2.0 h1:WNJX9EpOlfhqc8OX/FuLDcgZ+ccDRXdQbikOiMmF9Q8=
 github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-error v0.3.5 h1:IGoql+VnTUpEUePl/rnBw0jgyumYG7Et26STkb1aVI0=

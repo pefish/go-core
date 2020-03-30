@@ -160,7 +160,7 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriver.Logger.DebugF(`Params: %s`, paramsStr)
+	logger.LoggerDriver.Logger.InfoF(`Params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
 	glovalValdator := []string{`no-sql-inject`}
 	if out.Api.GetParams() != nil {
