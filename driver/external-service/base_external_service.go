@@ -32,10 +32,13 @@ func (this *BaseExternalServiceClass) PostJsonForStruct(url string, params map[s
 
 func (this *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) interface{} {
 	result := api.ApiResult{}
-	go_http.Http.PostJsonForStruct(go_http.RequestParam{
+	_, err := go_http.NewHttpRequester().PostForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
 	}, &result)
+	if err != nil {
+		panic(err)
+	}
 	if result.Code != 0 {
 		go_error.Throw(result.Msg, result.Code)
 	}
@@ -56,10 +59,13 @@ func (this *BaseExternalServiceClass) GetJsonForStruct(url string, params map[st
 
 func (this *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) interface{} {
 	result := api.ApiResult{}
-	go_http.Http.GetForStruct(go_http.RequestParam{
+	_, err := go_http.NewHttpRequester().GetForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
 	}, &result)
+	if err != nil {
+		panic(err)
+	}
 	if result.Code != 0 {
 		go_error.Throw(result.Msg, result.Code)
 	}

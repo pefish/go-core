@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api"
@@ -14,6 +15,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"sync"
 )
 
 type ServiceClass struct {
@@ -28,88 +30,115 @@ type ServiceClass struct {
 	healthyCheckFunc func()     // 健康检查函数
 
 	Mux *http.ServeMux
+	stopChan chan bool
+	stopWg   sync.WaitGroup
 }
 
-func (this *ServiceClass) SetRoutes(routes ...[]*api.Api) {
-	this.apis = []*api.Api{}
+// New Service instance
+func NewService(name string) *ServiceClass {
+	svc := &ServiceClass{
+		stopChan: make(chan bool),
+	}
+	svc.SetName(name)
+	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{
+		Strategy: &global_api_strategy.ServiceBaseInfoApiStrategy,
+	})
+	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{
+		Strategy: &global_api_strategy.ParamValidateStrategy,
+	})
+	return svc
+}
+
+// Default Service instance
+var Service = NewService(`default`)
+
+func (serviceInstance *ServiceClass) SetRoutes(routes ...[]*api.Api) {
+	serviceInstance.apis = []*api.Api{}
 	for _, route := range routes {
-		this.apis = append(this.apis, route...)
+		serviceInstance.apis = append(serviceInstance.apis, route...)
 	}
 }
 
-func (this *ServiceClass) AddRoute(routes ...*api.Api) {
-	if len(this.apis) == 0 {
-		this.apis = []*api.Api{}
+func (serviceInstance *ServiceClass) AddRoute(routes ...*api.Api) {
+	if len(serviceInstance.apis) == 0 {
+		serviceInstance.apis = []*api.Api{}
 	}
-	this.apis = append(this.apis, routes...)
+	serviceInstance.apis = append(serviceInstance.apis, routes...)
 }
 
-func (this *ServiceClass) SetPath(path string) {
-	this.path = path
+func (serviceInstance *ServiceClass) SetPath(path string) {
+	serviceInstance.path = path
 }
 
-func (this *ServiceClass) SetName(name string) {
-	this.name = name
+func (serviceInstance *ServiceClass) SetName(name string) {
+	serviceInstance.name = name
 }
 
-func (this *ServiceClass) GetHost() string {
-	return this.host
+func (serviceInstance *ServiceClass) GetHost() string {
+	return serviceInstance.host
 }
 
-func (this *ServiceClass) SetHost(host string) {
-	this.host = host
+func (serviceInstance *ServiceClass) SetHost(host string) {
+	serviceInstance.host = host
 }
 
-func (this *ServiceClass) GetPort() uint64 {
-	return this.port
+func (serviceInstance *ServiceClass) GetPort() uint64 {
+	return serviceInstance.port
 }
 
-func (this *ServiceClass) SetPort(port uint64) {
-	this.port = port
+func (serviceInstance *ServiceClass) SetPort(port uint64) {
+	serviceInstance.port = port
 }
 
-func (this *ServiceClass) GetAccessHost() string {
-	return this.accessHost
+func (serviceInstance *ServiceClass) GetAccessHost() string {
+	return serviceInstance.accessHost
 }
 
-func (this *ServiceClass) SetAccessHost(accessHost string) {
-	this.accessHost = accessHost
+func (serviceInstance *ServiceClass) SetAccessHost(accessHost string) {
+	serviceInstance.accessHost = accessHost
 }
 
-func (this *ServiceClass) GetAccessPort() uint64 {
-	return this.accessPort
+func (serviceInstance *ServiceClass) GetAccessPort() uint64 {
+	return serviceInstance.accessPort
 }
 
-func (this *ServiceClass) SetAccessPort(accessPort uint64) {
-	this.accessPort = accessPort
+func (serviceInstance *ServiceClass) SetAccessPort(accessPort uint64) {
+	serviceInstance.accessPort = accessPort
 }
 
-func (this *ServiceClass) SetDescription(desc string) {
-	this.description = desc
+func (serviceInstance *ServiceClass) SetDescription(desc string) {
+	serviceInstance.description = desc
 }
 
-func (this *ServiceClass) SetHealthyCheckFunc(func_ func()) *ServiceClass {
-	this.healthyCheckFunc = func_
-	return this
+func (serviceInstance *ServiceClass) SetHealthyCheckFunc(func_ func()) *ServiceClass {
+	serviceInstance.healthyCheckFunc = func_
+	return serviceInstance
 }
 
-func (this *ServiceClass) GetName() string {
-	return this.name
+func (serviceInstance *ServiceClass) GetName() string {
+	return serviceInstance.name
 }
 
-func (this *ServiceClass) GetDescription() string {
-	return this.description
+func (serviceInstance *ServiceClass) GetDescription() string {
+	return serviceInstance.description
 }
 
-func (this *ServiceClass) GetPath() string {
-	return this.path
+func (serviceInstance *ServiceClass) GetPath() string {
+	return serviceInstance.path
 }
 
-func (this *ServiceClass) GetApis() []*api.Api {
-	return this.apis
+func (serviceInstance *ServiceClass) GetApis() []*api.Api {
+	return serviceInstance.apis
 }
 
-func (this *ServiceClass) Run() {
+func (serviceInstance *ServiceClass) Stop() error {
+	close(serviceInstance.stopChan)
+	serviceInstance.stopWg.Wait()
+	return nil
+}
+
+
+func (serviceInstance *ServiceClass) Run() error {
 	defer func() {
 		go_application.Application.Exit()
 	}()
@@ -127,29 +156,38 @@ func (this *ServiceClass) Run() {
 		}
 	}
 
-	this.buildRoutes()
-	host := this.host
+	serviceInstance.buildRoutes()
+	host := serviceInstance.host
 	if host == `` {
 		host = `0.0.0.0`
 	}
 
-	addr := host + `:` + go_reflect.Reflect.MustToString(this.port)
+	addr := host + `:` + go_reflect.Reflect.ToString(serviceInstance.port)
 	logger.LoggerDriver.Logger.InfoF(`server started!!! http://%s`, addr)
 	s := &http.Server{
 		Addr:    addr,
-		Handler: this.Mux,
+		Handler: serviceInstance.Mux,
 	}
 	err := http2.ConfigureServer(s, &http2.Server{}) // 可以使用http2协议
 	if err != nil {
 		panic(err)
 	}
-	err = s.ListenAndServe()
-	if err != nil {
-		panic(err)
+	go func() {
+		serviceInstance.stopWg.Add(1)
+		defer serviceInstance.stopWg.Done()
+		err := s.ListenAndServe()
+		if err != nil {
+			logger.LoggerDriver.Logger.Error(err)
+		}
+	}()
+	select {
+	case <- serviceInstance.stopChan:
+		s.Shutdown(context.Background())
 	}
+	return nil
 }
 
-func (this *ServiceClass) buildRoutes() {
+func (serviceInstance *ServiceClass) buildRoutes() {
 	// healthz
 	var healthApi = &api.Api{
 		Description:            "健康检查api",
@@ -165,8 +203,8 @@ func (this *ServiceClass) buildRoutes() {
 					apiSession.WriteText(`not ok`)
 				}
 			}()
-			if this.healthyCheckFunc != nil {
-				this.healthyCheckFunc()
+			if serviceInstance.healthyCheckFunc != nil {
+				serviceInstance.healthyCheckFunc()
 			}
 
 			apiSession.SetStatusCode(api_session.StatusCode_OK)
@@ -194,13 +232,13 @@ func (this *ServiceClass) buildRoutes() {
 		ParamType: global_api_strategy.ALL_TYPE,
 	}
 
-	this.AddRoute(healthApi, apiObject) // 添加缺省api
+	serviceInstance.AddRoute(healthApi, apiObject) // 添加缺省api
 
-	this.Mux = http.NewServeMux()
+	serviceInstance.Mux = http.NewServeMux()
 	registedApi := map[string]map[string]*api.Api{}
-	for _, apiObject := range this.GetApis() {
+	for _, apiObject := range serviceInstance.GetApis() {
 		// 得到apiPath
-		apiPath := this.path + apiObject.Path
+		apiPath := serviceInstance.path + apiObject.Path
 		if apiObject.IgnoreRootPath == true {
 			apiPath = apiObject.Path
 		}
@@ -220,7 +258,7 @@ func (this *ServiceClass) buildRoutes() {
 		}
 	}
 	for apiPath, map_ := range registedApi {
-		this.Mux.HandleFunc(apiPath, api.WrapJson(map_))
+		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
 		for method, api_ := range map_ {
 			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
 		}

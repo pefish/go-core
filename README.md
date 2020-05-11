@@ -1,7 +1,5 @@
 # Go-Core Web Framework
 
-[![view examples](https://img.shields.io/badge/learn%20by-examples-0C8EC5.svg?style=for-the-badge&logo=go)](https://github.com/pefish/go-core/tree/master/_example)
-
 Go-Core is a fast, simple and young web framework for Go.
 
 It provides some features. like
@@ -18,14 +16,15 @@ It provides some features. like
 package main
 
 import (
-	go_core "github.com/pefish/go-core"
 	"github.com/pefish/go-core/api"
 	api_session "github.com/pefish/go-core/api-session"
 	api_strategy "github.com/pefish/go-core/api-strategy"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
+	"github.com/pefish/go-core/service"
 	go_logger "github.com/pefish/go-logger"
+	task_driver "github.com/pefish/go-task-driver"
 	"time"
 )
 
@@ -34,11 +33,11 @@ func PostTest(apiSession *api_session.ApiSessionClass) interface{} {
 }
 
 func main() {
-	go_core.Service.SetName(`test service`) // set service name
+	service.Service.SetName(`test service`) // set service name
 	logger.LoggerDriver.Register(go_logger.NewLogger(go_logger.WithIsDebug(true))) // register logger
-	go_core.Service.SetPath(`/api/test`)
+	service.Service.SetPath(`/api/test`)
 	global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)
-	go_core.Service.SetRoutes([]*api.Api{
+	service.Service.SetRoutes([]*api.Api{
 		{
 			Description: "this is a test api",
 			Path:        "/v1/test_api",
@@ -66,9 +65,12 @@ func main() {
 		},
 		Disable:  false,
 	})
-	go_core.Service.SetPort(8080)
+	service.Service.SetPort(8080)
 
-	go_core.Service.Run()
+	taskDriver := task_driver.NewTaskDriver()
+	taskDriver.Register(service.Service.GetName(), service.Service)
+
+	taskDriver.RunWait()
 }
 ```
 

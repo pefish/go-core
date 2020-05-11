@@ -10,16 +10,16 @@ require (
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.3
-	github.com/pefish/go-decimal v0.2.0
+	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.5
 	github.com/pefish/go-error v0.3.5
 	github.com/pefish/go-file v0.1.0
 	github.com/pefish/go-format v0.1.3
-	github.com/pefish/go-http v0.4.4
-	github.com/pefish/go-interface-logger v0.0.1
+	github.com/pefish/go-http v0.4.7
+	github.com/pefish/go-interface-logger v0.0.4
 	github.com/pefish/go-json v0.1.2
 	github.com/pefish/go-jwt v0.3.1
-	github.com/pefish/go-reflect v0.1.1
+	github.com/pefish/go-reflect v0.2.0
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
