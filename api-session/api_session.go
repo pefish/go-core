@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/mitchellh/mapstructure"
 	_interface "github.com/pefish/go-core/api-session/interface"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -233,6 +234,11 @@ func (apiSession *ApiSessionClass) SetStatusCode(code StatusCode) {
 // Get request path.
 func (apiSession *ApiSessionClass) GetPath() string {
 	return apiSession.Request.URL.Path
+}
+
+// Get request body.
+func (apiSession *ApiSessionClass) GetBody() io.ReadCloser {
+	return apiSession.Request.Body
 }
 
 // Get request method (GET, POST, PUT, etc.).
