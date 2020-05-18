@@ -225,7 +225,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 			rawData, _ := ioutil.ReadAll(apiSession.Request.Body)
 			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
-			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s", apiSession.GetPath())
+			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.GetPath(), apiSession.GetMethod())
 			apiSession.WriteText(`Not Found`)
 			return nil
 		},
