@@ -19,17 +19,18 @@ import (
 )
 
 type ServiceClass struct {
-	name             string     // 服务名
-	description      string     // 服务描述
-	path             string     // 服务的基础路径
-	host             string     // 服务监听host
-	port             uint64     // 服务监听port
-	accessHost       string     // 服务访问host，没有设置的话使用监听host
-	accessPort       uint64     // 服务访问port，没有设置的话使用监听port
-	apis             []*api.Api // 服务的所有路由
-	healthyCheckFunc func()     // 健康检查函数
+	name             string                         // 服务名
+	description      string                         // 服务描述
+	path             string                         // 服务的基础路径
+	host             string                         // 服务监听host
+	port             uint64                         // 服务监听port
+	accessHost       string                         // 服务访问host，没有设置的话使用监听host
+	accessPort       uint64                         // 服务访问port，没有设置的话使用监听port
+	apis             []*api.Api                     // 服务的所有路由
+	healthyCheckFunc func()                         // 健康检查函数
+	registeredApi    map[string]map[string]*api.Api // 所有注册了的api。path->method->api
 
-	Mux *http.ServeMux
+	Mux      *http.ServeMux
 	stopChan chan bool
 	stopWg   sync.WaitGroup
 }
@@ -37,7 +38,9 @@ type ServiceClass struct {
 // New Service instance
 func NewService(name string) *ServiceClass {
 	svc := &ServiceClass{
-		stopChan: make(chan bool),
+		stopChan:      make(chan bool),
+		registeredApi: make(map[string]map[string]*api.Api),
+		apis:          make([]*api.Api, 0),
 	}
 	svc.SetName(name)
 	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{
@@ -53,16 +56,12 @@ func NewService(name string) *ServiceClass {
 var Service = NewService(`default`)
 
 func (serviceInstance *ServiceClass) SetRoutes(routes ...[]*api.Api) {
-	serviceInstance.apis = []*api.Api{}
 	for _, route := range routes {
 		serviceInstance.apis = append(serviceInstance.apis, route...)
 	}
 }
 
 func (serviceInstance *ServiceClass) AddRoute(routes ...*api.Api) {
-	if len(serviceInstance.apis) == 0 {
-		serviceInstance.apis = []*api.Api{}
-	}
 	serviceInstance.apis = append(serviceInstance.apis, routes...)
 }
 
@@ -137,7 +136,6 @@ func (serviceInstance *ServiceClass) Stop() error {
 	return nil
 }
 
-
 func (serviceInstance *ServiceClass) Run() error {
 	defer func() {
 		go_application.Application.Exit()
@@ -164,6 +162,13 @@ func (serviceInstance *ServiceClass) Run() error {
 
 	addr := host + `:` + go_reflect.Reflect.ToString(serviceInstance.port)
 	logger.LoggerDriver.Logger.InfoF(`server started!!! http://%s`, addr)
+
+	for apiPath, map_ := range serviceInstance.registeredApi {
+		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
+		for method, api_ := range map_ {
+			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
+		}
+	}
 	s := &http.Server{
 		Addr:    addr,
 		Handler: serviceInstance.Mux,
@@ -181,7 +186,7 @@ func (serviceInstance *ServiceClass) Run() error {
 		}
 	}()
 	select {
-	case <- serviceInstance.stopChan:
+	case <-serviceInstance.stopChan:
 		s.Shutdown(context.Background())
 	}
 	return nil
@@ -235,7 +240,6 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 	serviceInstance.AddRoute(healthApi, apiObject) // 添加缺省api
 
 	serviceInstance.Mux = http.NewServeMux()
-	registedApi := map[string]map[string]*api.Api{}
 	for _, apiObject := range serviceInstance.GetApis() {
 		// 得到apiPath
 		apiPath := serviceInstance.path + apiObject.Path
@@ -246,21 +250,15 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 
 		// 挂载处理器
 		if apiObject.Controller != nil {
-			if registedApi[apiPath] == nil {
-				registedApi[apiPath] = map[string]*api.Api{
+			if serviceInstance.registeredApi[apiPath] == nil {
+				serviceInstance.registeredApi[apiPath] = map[string]*api.Api{
 					string(method): apiObject,
 				}
 			} else {
-				if registedApi[apiPath][string(method)] == nil {
-					registedApi[apiPath][string(method)] = apiObject
+				if serviceInstance.registeredApi[apiPath][string(method)] == nil {
+					serviceInstance.registeredApi[apiPath][string(method)] = apiObject
 				}
 			}
-		}
-	}
-	for apiPath, map_ := range registedApi {
-		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
-		for method, api_ := range map_ {
-			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
 		}
 	}
 }

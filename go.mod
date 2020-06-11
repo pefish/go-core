@@ -24,7 +24,7 @@ require (
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
 	go.opencensus.io v0.22.1
-	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
 

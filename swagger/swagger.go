@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	go_core "github.com/pefish/go-core"
 	"github.com/pefish/go-core/global-api-strategy"
+	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-file"
 	"github.com/pefish/go-format"
@@ -192,7 +192,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	paths := map[string]map[string]Yaml_Path{}
 
-	for _, api := range go_core.Service.GetApis() {
+	for _, api := range service.Service.GetApis() {
 		temp := map[string]Yaml_Path{}
 
 		desc := api.Description
@@ -279,7 +279,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		temp[strings.ToLower(string(api.Method))] = Yaml_Path{
-			Tags:        []string{go_core.Service.GetName()},
+			Tags:        []string{service.Service.GetName()},
 			Summary:     desc,
 			Consumes:    paramTypes,
 			Produces:    []string{`application/json`},
@@ -287,22 +287,22 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			Responses:   responses,
 			Description: description,
 		}
-		paths[go_core.Service.GetPath()+api.Path] = temp
+		paths[service.Service.GetPath()+api.Path] = temp
 	}
 
 	swagger := Yaml_Swagger{
 		`2.0`,
 		Yaml_Info{
-			Title:       go_core.Service.GetName(),
-			Description: go_core.Service.GetDescription(),
+			Title:       service.Service.GetName(),
+			Description: service.Service.GetDescription(),
 			Version:     `1.0.0`,
 		},
 		hostAndPort,
-		go_core.Service.GetPath(),
+		service.Service.GetPath(),
 		[]Yaml_Tag{
 			{
-				Name:        go_core.Service.GetName(),
-				Description: go_core.Service.GetDescription(),
+				Name:        service.Service.GetName(),
+				Description: service.Service.GetDescription(),
 			},
 		},
 		[]string{`http`},
