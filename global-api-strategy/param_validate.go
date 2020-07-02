@@ -1,7 +1,6 @@
 package global_api_strategy
 
 import (
-	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-core/api-session"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
@@ -115,10 +114,6 @@ func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessio
 func (this *ParamValidateStrategyClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
-}
-
-type ParamValidateStrategyParam struct {
-	Route api.Api
 }
 
 func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {

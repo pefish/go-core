@@ -27,16 +27,16 @@ type Api struct {
 	ReturnHookFunc         ReturnHookFuncType           // 返回前的处理函数
 }
 
-func (this *Api) GetDescription() string {
-	return this.Description
+func (api *Api) GetDescription() string {
+	return api.Description
 }
 
-func (this *Api) GetParamType() string {
-	return this.ParamType
+func (api *Api) GetParamType() string {
+	return api.ParamType
 }
 
-func (this *Api) GetParams() interface{} {
-	return this.Params
+func (api *Api) GetParams() interface{} {
+	return api.Params
 }
 
 type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
@@ -69,12 +69,6 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 	}
 }
 
-func NewApi() *Api {
-	return &Api{
-		Strategies: []api_strategy2.StrategyData{},
-	}
-}
-
 /**
 wrap api处理器. 一个path一个，方法内分别处理method
 */
@@ -103,7 +97,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			currentApi = methodController[string(api_session.ApiMethod_All)]
 			apiSession.Api = currentApi
 		} else {
-			apiSession.WriteText(`not found`)
+			apiSession.WriteText(`Not found`)
 			return
 		}
 
