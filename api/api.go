@@ -109,7 +109,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 					"\n" +
 					errMsg +
 					"\n" +
-					apiSession.Datas[`error_msg`].(string) +
+					apiSession.GetDate(`error_msg`).(string) +
 					"\n" +
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)
@@ -159,7 +159,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				strategyData.Strategy.Execute(apiSession, strategyData.Param)
 			}()
 		}
-		for _, defer_ := range apiSession.Defers {
+		for _, defer_ := range apiSession.GetDefers() {
 			defer defer_()
 		}
 

@@ -157,17 +157,18 @@ type ApiSessionClass struct {
 	Lang       string
 	ClientType string // web、android、ios
 
-	Datas map[string]interface{}
+	datas map[string]interface{}
 
 	OriginalParams map[string]interface{} // 客户端传过来的原始参数
 	Params         map[string]interface{} // 经过前置处理器修饰过的参数
 
-	Defers []func() // api结束后执行的函数
+	defers []func() // api结束后执行的函数
 }
 
 func NewApiSession() *ApiSessionClass {
 	return &ApiSessionClass{
-		Datas: map[string]interface{}{},
+		datas:  make(map[string]interface{}, 5),
+		defers: make([]func(), 0, 20),
 	}
 }
 
@@ -192,7 +193,19 @@ func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
 // Add defer handler.
 // Defer handlers will be executed by order at the end of api session.
 func (apiSession *ApiSessionClass) AddDefer(defer_ func()) {
-	apiSession.Defers = append(apiSession.Defers, defer_)
+	apiSession.defers = append(apiSession.GetDefers(), defer_)
+}
+
+func (apiSession *ApiSessionClass) GetDefers() []func() {
+	return apiSession.defers
+}
+
+func (apiSession *ApiSessionClass) SetData(key string, data interface{}) {
+	apiSession.datas[key] = data
+}
+
+func (apiSession *ApiSessionClass) GetDate(key string) interface{} {
+	return apiSession.datas[key]
 }
 
 // Response json body.
@@ -288,7 +301,7 @@ func (apiSession *ApiSessionClass) GetRemoteAddress() string {
 
 // Read url params from get request.
 func (apiSession *ApiSessionClass) GetUrlParams() map[string]string {
-	values := map[string]string{}
+	values := make(map[string]string, 10)
 
 	q := apiSession.Request.URL.Query()
 	if q != nil {
