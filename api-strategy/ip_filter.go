@@ -18,37 +18,45 @@ type IpFilterParam struct {
 	GetValidIp func(apiSession *api_session.ApiSessionClass) []string
 }
 
-func (this *IpFilterStrategyClass) GetName() string {
+func (ipFilter *IpFilterStrategyClass) GetName() string {
 	return `ipFilter`
 }
 
-func (this *IpFilterStrategyClass) GetDescription() string {
+func (ipFilter *IpFilterStrategyClass) GetDescription() string {
 	return `filter ip`
 }
 
-func (this *IpFilterStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (ipFilter *IpFilterStrategyClass) SetErrorCode(code uint64) {
+	ipFilter.errorCode = code
 }
 
-func (this *IpFilterStrategyClass) GetErrorCode() uint64 {
-	return this.errorCode
+func (ipFilter *IpFilterStrategyClass) GetErrorCode() uint64 {
+	return ipFilter.errorCode
 }
 
-func (this *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (ipFilter *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, ipFilter.GetName())
 	if param == nil {
-		go_error.Throw(`strategy need param`, this.errorCode)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `strategy need param`,
+			ErrorMessage: `strategy need param`,
+			ErrorCode: ipFilter.errorCode,
+		}
 	}
 	newParam := param.(IpFilterParam)
 	if newParam.GetValidIp == nil {
-		return
+		return nil
 	}
 	clientIp := out.GetRemoteAddress()
 	allowedIps := newParam.GetValidIp(out)
 	for _, ip := range allowedIps {
 		if ip == clientIp {
-			return
+			return nil
 		}
 	}
-	go_error.ThrowInternal(`ip is baned`)
+	return &go_error.ErrorInfo{
+		InternalErrorMessage: `ip is baned`,
+		ErrorMessage: `ip is baned`,
+		ErrorCode: ipFilter.errorCode,
+	}
 }

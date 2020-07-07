@@ -133,15 +133,10 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				if strategyData.Disable {
 					continue
 				}
-				func() {
-					defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
-						if code == go_error.INTERNAL_ERROR_CODE {
-							code = strategyData.Strategy.GetErrorCode()
-						}
-						go_error.ThrowErrorWithDataInternalMsg(msg, internalMsg, code, data, err)
-					})
-					strategyData.Strategy.Execute(apiSession, strategyData.Param)
-				}()
+				err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 
@@ -149,19 +144,17 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			if strategyData.Disable {
 				continue
 			}
-			func() {
-				defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
-					if code == go_error.INTERNAL_ERROR_CODE {
-						code = strategyData.Strategy.GetErrorCode()
-					}
-					go_error.ThrowErrorWithDataInternalMsg(msg, internalMsg, code, data, err)
-				})
-				strategyData.Strategy.Execute(apiSession, strategyData.Param)
-			}()
+			err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+			if err != nil {
+				panic(err)
+			}
 		}
-		for _, defer_ := range apiSession.GetDefers() {
-			defer defer_()
-		}
+
+		defer func() {
+			for _, defer_ := range apiSession.GetDefers() {
+				defer_()
+			}
+		}()
 
 		result := currentApi.Controller(apiSession)
 		if result == nil {

@@ -18,29 +18,29 @@ var GlobalRateLimitStrategy = GlobalRateLimitStrategyClass{
 	tokenBucket: make(chan struct{}, 200),
 }
 
-func (this *GlobalRateLimitStrategyClass) GetName() string {
+func (globalRateLimit *GlobalRateLimitStrategyClass) GetName() string {
 	return `GlobalRateLimit`
 }
 
-func (this *GlobalRateLimitStrategyClass) GetDescription() string {
+func (globalRateLimit *GlobalRateLimitStrategyClass) GetDescription() string {
 	return `global rate limit for all api`
 }
 
-func (this *GlobalRateLimitStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (globalRateLimit *GlobalRateLimitStrategyClass) SetErrorCode(code uint64) {
+	globalRateLimit.errorCode = code
 }
 
-func (this *GlobalRateLimitStrategyClass) GetErrorCode() uint64 {
-	if this.errorCode == 0 {
+func (globalRateLimit *GlobalRateLimitStrategyClass) GetErrorCode() uint64 {
+	if globalRateLimit.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
-	return this.errorCode
+	return globalRateLimit.errorCode
 }
 
 
-func (this *GlobalRateLimitStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+func (globalRateLimit *GlobalRateLimitStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, globalRateLimit.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, globalRateLimit.GetName())
 
 	go func() {
 		params := param.(GlobalRateLimitStrategyParam)
@@ -49,7 +49,7 @@ func (this *GlobalRateLimitStrategyClass) Init(param interface{}) {
 			select {
 			case <-ticker.C:
 				select {
-				case this.tokenBucket <- struct{}{}:
+				case globalRateLimit.tokenBucket <- struct{}{}:
 				default:
 				}
 			case <- go_application.Application.OnFinished():
@@ -63,30 +63,36 @@ type GlobalRateLimitStrategyParam struct {
 	FillInterval time.Duration
 }
 
-func (this *GlobalRateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, globalRateLimit.GetName())
 
-	succ := this.takeAvailable(false)
+	succ := globalRateLimit.takeAvailable(false)
 	if !succ {
-		go_error.ThrowInternal(`global rate limit`)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `global rate limit`,
+			ErrorMessage: `global rate limit`,
+			ErrorCode: globalRateLimit.errorCode,
+		}
 	}
+
+	return nil
 }
 
-func (this *GlobalRateLimitStrategyClass) takeAvailable(block bool) bool{
+func (globalRateLimit *GlobalRateLimitStrategyClass) takeAvailable(block bool) bool{
 	var takenResult bool
 	if block {
 		select {
-		case <-this.tokenBucket:
+		case <-globalRateLimit.tokenBucket:
 			takenResult = true
 		}
 	} else {
 		select {
-		case <-this.tokenBucket:
+		case <-globalRateLimit.tokenBucket:
 			takenResult = true
 		default:
 			takenResult = false
 		}
 	}
-	logger.LoggerDriver.Logger.DebugF("current global rate limit token count: %d", len(this.tokenBucket))
+	logger.LoggerDriver.Logger.DebugF("current global rate limit token count: %d", len(globalRateLimit.tokenBucket))
 	return takenResult
 }

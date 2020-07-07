@@ -29,26 +29,26 @@ var ParamValidateStrategy = ParamValidateStrategyClass{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
-func (this *ParamValidateStrategyClass) GetName() string {
+func (paramValidate *ParamValidateStrategyClass) GetName() string {
 	return `paramValidate`
 }
 
-func (this *ParamValidateStrategyClass) GetDescription() string {
+func (paramValidate *ParamValidateStrategyClass) GetDescription() string {
 	return `validate params`
 }
 
-func (this *ParamValidateStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (paramValidate *ParamValidateStrategyClass) SetErrorCode(code uint64) {
+	paramValidate.errorCode = code
 }
 
-func (this *ParamValidateStrategyClass) GetErrorCode() uint64 {
-	if this.errorCode == 0 {
+func (paramValidate *ParamValidateStrategyClass) GetErrorCode() uint64 {
+	if paramValidate.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
-	return this.errorCode
+	return paramValidate.errorCode
 }
 
-func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
+func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
 	result := ``
 	for _, validatorName := range globalValidator {
 		if validatorName == `no-sql-inject` && (strings.Contains(oldTag, `disable-inject-check`) || fieldValue.Type().Kind() != reflect.String) {
@@ -65,19 +65,22 @@ func (this *ParamValidateStrategyClass) processGlobalValidators(fieldValue refle
 	return result
 }
 
-func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessionClass, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) {
+func (paramValidate *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessionClass, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
 		fieldKind := typeFieldType.Kind()
 		fieldValue := value_.Field(i)
 		if fieldKind == reflect.Struct {
-			this.recurValidate(out, myValidator, map_, globalValidator, typeFieldType, fieldValue)
+			err := paramValidate.recurValidate(out, myValidator, map_, globalValidator, typeFieldType, fieldValue)
+			if err != nil {
+				return err
+			}
 		} else {
 			tagVal := typeField.Tag.Get(`validate`)
 			newTag := tagVal
 			if len(globalValidator) != 0 {
-				newTag = this.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
+				newTag = paramValidate.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
 			}
 			jsonTag := typeField.Tag.Get(`json`)
 			fieldName := strings.Split(jsonTag, `,`)[0]
@@ -103,21 +106,29 @@ func (this *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessio
 			err := myValidator.Validator.Var(map_[fieldName], newTag)
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
-				go_error.ThrowErrorWithData(go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag, this.errorCode, map[string]interface{}{
-					`field`: fieldName,
-				}, err)
+				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag
+				return &go_error.ErrorInfo{
+					InternalErrorMessage: msg,
+					ErrorMessage: msg,
+					ErrorCode: paramValidate.errorCode,
+					Data: map[string]interface{}{
+						`field`: fieldName,
+					},
+					Err: err,
+				}
 			}
 		}
 	}
+	return nil
 }
 
-func (this *ParamValidateStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+func (paramValidate *ParamValidateStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, paramValidate.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
 }
 
-func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (paramValidate *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()
 
@@ -130,7 +141,11 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 	} else if out.GetMethod() == `POST` {
 		requestContentType := out.GetHeader(`content-type`)
 		if out.Api.GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api.GetParamType()) {
-			go_error.Throw(`content-type error`, this.errorCode)
+			return &go_error.ErrorInfo{
+				InternalErrorMessage: `content-type error`,
+				ErrorMessage: `content-type error`,
+				ErrorCode: paramValidate.errorCode,
+			}
 		}
 
 		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api.GetParamType() == MULTIPART_TYPE || out.Api.GetParamType() == ``) {
@@ -143,13 +158,25 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 			}
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api.GetParamType() == JSON_TYPE || out.Api.GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				go_error.ThrowError(`parse params error`, this.errorCode, err)
+				return &go_error.ErrorInfo{
+					InternalErrorMessage: `parse params error`,
+					ErrorMessage: `parse params error`,
+					ErrorCode: paramValidate.errorCode,
+				}
 			}
 		} else {
-			go_error.Throw(`content-type not be supported`, this.errorCode)
+			return &go_error.ErrorInfo{
+				InternalErrorMessage: `content-type not be supported`,
+				ErrorMessage: `content-type not be supported`,
+				ErrorCode: paramValidate.errorCode,
+			}
 		}
 	} else {
-		go_error.Throw(`scan params not be supported`, this.errorCode)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `scan params not be supported`,
+			ErrorMessage: `scan params not be supported`,
+			ErrorCode: paramValidate.errorCode,
+		}
 	}
 	// 深拷贝
 	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
@@ -157,8 +184,13 @@ func (this *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
 	logger.LoggerDriver.Logger.InfoF(`Params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
-	glovalValdator := []string{`no-sql-inject`}
+	globalValidator := []string{`no-sql-inject`}
 	if out.Api.GetParams() != nil {
-		this.recurValidate(out, myValidator, tempParam, glovalValdator, reflect.TypeOf(out.Api.GetParams()), reflect.ValueOf(out.Api.GetParams()))
+		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api.GetParams()), reflect.ValueOf(out.Api.GetParams()))
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

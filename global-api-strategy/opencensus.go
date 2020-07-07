@@ -26,23 +26,23 @@ type OpenCensusClass struct {
 
 var OpenCensusStrategy = OpenCensusClass{}
 
-func (this *OpenCensusClass) GetName() string {
+func (openCensus *OpenCensusClass) GetName() string {
 	return `OpenCensus`
 }
 
-func (this *OpenCensusClass) GetDescription() string {
+func (openCensus *OpenCensusClass) GetDescription() string {
 	return `OpenCensus`
 }
 
-func (this *OpenCensusClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (openCensus *OpenCensusClass) SetErrorCode(code uint64) {
+	openCensus.errorCode = code
 }
 
-func (this *OpenCensusClass) GetErrorCode() uint64 {
-	if this.errorCode == 0 {
+func (openCensus *OpenCensusClass) GetErrorCode() uint64 {
+	if openCensus.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
-	return this.errorCode
+	return openCensus.errorCode
 }
 
 type OpenCensusStrategyParam struct {
@@ -51,11 +51,11 @@ type OpenCensusStrategyParam struct {
 	EnableStats       bool
 }
 
-func (this *OpenCensusClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+func (openCensus *OpenCensusClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, openCensus.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, openCensus.GetName())
 	if param == nil {
-		go_error.Throw(`OpenCensusStrategyParam must be set`, this.GetErrorCode())
+		go_error.Throw(`OpenCensusStrategyParam must be set`, openCensus.GetErrorCode())
 	}
 	go func() {
 		option := stackdriver.Options{
@@ -89,8 +89,8 @@ func (this *OpenCensusClass) Init(param interface{}) {
 	}()
 }
 
-func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (openCensus *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, openCensus.GetName())
 	defer func() {
 		if err := recover(); err != nil {
 			logger.LoggerDriver.Logger.Error(err)
@@ -112,6 +112,8 @@ func (this *OpenCensusClass) Execute(out *api_session.ApiSessionClass, param int
 			statsEnd(&tags)
 		})
 	}
+
+	return nil
 }
 
 // -----------------

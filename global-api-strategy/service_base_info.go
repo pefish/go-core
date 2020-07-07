@@ -42,7 +42,7 @@ func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
 }
 
-func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
+func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.GetRemoteAddress(), out.GetPath(), out.GetMethod())
 	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
@@ -65,4 +65,6 @@ func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionCla
 		clientType = `web`
 	}
 	out.ClientType = clientType
+
+	return nil
 }

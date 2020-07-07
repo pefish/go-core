@@ -40,7 +40,7 @@ func NewService(name string) *ServiceClass {
 	svc := &ServiceClass{
 		stopChan:      make(chan bool),
 		registeredApi: make(map[string]map[string]*api.Api),
-		apis:          make([]*api.Api, 0),
+		apis:          make([]*api.Api, 0, 20),
 	}
 	svc.SetName(name)
 	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{

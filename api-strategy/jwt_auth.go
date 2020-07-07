@@ -27,59 +27,72 @@ var JwtAuthApiStrategy = JwtAuthStrategyClass{
 type JwtAuthParam struct {
 }
 
-func (this *JwtAuthStrategyClass) GetName() string {
+func (jwtAuth *JwtAuthStrategyClass) GetName() string {
 	return `jwtAuth`
 }
 
-func (this *JwtAuthStrategyClass) GetDescription() string {
+func (jwtAuth *JwtAuthStrategyClass) GetDescription() string {
 	return `jwt auth`
 }
 
-func (this *JwtAuthStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (jwtAuth *JwtAuthStrategyClass) SetErrorCode(code uint64) {
+	jwtAuth.errorCode = code
 }
 
-func (this *JwtAuthStrategyClass) SetErrorMessage(msg string) {
-	this.errorMsg = msg
+func (jwtAuth *JwtAuthStrategyClass) SetErrorMessage(msg string) {
+	jwtAuth.errorMsg = msg
 }
 
-func (this *JwtAuthStrategyClass) GetErrorCode() uint64 {
-	return this.errorCode
+func (jwtAuth *JwtAuthStrategyClass) GetErrorCode() uint64 {
+	return jwtAuth.errorCode
 }
 
-func (this *JwtAuthStrategyClass) SetNoCheckExpire() {
-	this.noCheckExpire = true
+func (jwtAuth *JwtAuthStrategyClass) SetNoCheckExpire() {
+	jwtAuth.noCheckExpire = true
 }
 
-func (this *JwtAuthStrategyClass) DisableUserId() {
-	this.disableUserId = true
+func (jwtAuth *JwtAuthStrategyClass) DisableUserId() {
+	jwtAuth.disableUserId = true
 }
 
-func (this *JwtAuthStrategyClass) SetPubKey(pubKey string) {
-	this.pubKey = pubKey
+func (jwtAuth *JwtAuthStrategyClass) SetPubKey(pubKey string) {
+	jwtAuth.pubKey = pubKey
 }
 
-func (this *JwtAuthStrategyClass) SetHeaderName(headerName string) {
-	this.headerName = headerName
+func (jwtAuth *JwtAuthStrategyClass) SetHeaderName(headerName string) {
+	jwtAuth.headerName = headerName
 }
 
-func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
-	out.JwtHeaderName = this.headerName
-	jwt := out.GetHeader(this.headerName)
+func (jwtAuth *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
+	out.JwtHeaderName = jwtAuth.headerName
+	jwt := out.GetHeader(jwtAuth.headerName)
 
-	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(this.pubKey, jwt, this.noCheckExpire)
+	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(jwtAuth.pubKey, jwt, jwtAuth.noCheckExpire)
 	if err != nil {
-		go_error.ThrowWithInternalMsg(this.errorMsg, err.Error(), this.errorCode)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: jwtAuth.errorMsg,
+			ErrorMessage: jwtAuth.errorMsg,
+			ErrorCode: jwtAuth.errorCode,
+			Err: err,
+		}
 	}
 	if !verifyResult {
-		go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error or jwt expired`, this.errorCode)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `jwt verify error or jwt expired`,
+			ErrorMessage: jwtAuth.errorMsg,
+			ErrorCode: jwtAuth.errorCode,
+		}
 	}
 	out.JwtBody = token.Claims.(jwt2.MapClaims)
-	if !this.disableUserId {
+	if !jwtAuth.disableUserId {
 		jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
-			go_error.ThrowWithInternalMsg(this.errorMsg, `jwt verify error, user_id not exist`, this.errorCode)
+			return &go_error.ErrorInfo{
+				InternalErrorMessage: `jwt verify error, user_id not exist`,
+				ErrorMessage: jwtAuth.errorMsg,
+				ErrorCode: jwtAuth.errorCode,
+			}
 		}
 
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
@@ -87,4 +100,5 @@ func (this *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, para
 
 		util.UpdateSessionErrorMsg(out, `jwtAuth`, userId)
 	}
+	return nil
 }

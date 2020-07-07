@@ -24,33 +24,42 @@ type RateLimitParam struct {
 	Limit time.Duration // 限制多少s只能访问一次
 }
 
-func (this *RateLimitStrategyClass) GetName() string {
+func (rateLimit *RateLimitStrategyClass) GetName() string {
 	return `rateLimit`
 }
 
-func (this *RateLimitStrategyClass) GetDescription() string {
+func (rateLimit *RateLimitStrategyClass) GetDescription() string {
 	return `rate limit`
 }
 
-func (this *RateLimitStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (rateLimit *RateLimitStrategyClass) SetErrorCode(code uint64) {
+	rateLimit.errorCode = code
 }
 
-func (this *RateLimitStrategyClass) GetErrorCode() uint64 {
-	return this.errorCode
+func (rateLimit *RateLimitStrategyClass) GetErrorCode() uint64 {
+	return rateLimit.errorCode
 }
 
-func (this *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (rateLimit *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, rateLimit.GetName())
 	if param == nil {
-		go_error.Throw(`strategy need param`, this.errorCode)
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `strategy need param`,
+			ErrorMessage: `strategy need param`,
+			ErrorCode: rateLimit.errorCode,
+		}
 	}
 	newParam := param.(RateLimitParam)
 	methodPath := fmt.Sprintf(`%s_%s`, out.GetMethod(), out.GetPath())
 	key := fmt.Sprintf(`%s_%s`, out.GetRemoteAddress(), methodPath)
-	if !(*this.db)[key].IsZero() && time.Now().Sub((*this.db)[key]) < newParam.Limit {
-		go_error.Throw(`api ratelimit`, this.errorCode)
+	if !(*rateLimit.db)[key].IsZero() && time.Now().Sub((*rateLimit.db)[key]) < newParam.Limit {
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `api ratelimit`,
+			ErrorMessage: `api ratelimit`,
+			ErrorCode: rateLimit.errorCode,
+		}
 	}
 
-	(*this.db)[key] = time.Now()
+	(*rateLimit.db)[key] = time.Now()
+	return nil
 }
