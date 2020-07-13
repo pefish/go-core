@@ -24,7 +24,7 @@ func TestApiSessionClass_ScanParams(t *testing.T) {
 	}
 
 	apiSession := NewApiSession()
-	apiSession.Params = map[string]interface{}{
+	apiSession.params = map[string]interface{}{
 		"test": "test",
 		"haha": 4,
 		"xixi": Test{a: "a"},
@@ -54,7 +54,7 @@ func TestApiSessionClass_WriteJson(t *testing.T) {
 	httpResponseWriter.EXPECT().Header().Return(resHeaders).AnyTimes()
 
 	apiSession := NewApiSession()
-	apiSession.ResponseWriter = httpResponseWriter
+	apiSession.responseWriter = httpResponseWriter
 	apiSession.SetStatusCode(400)
 	err := apiSession.WriteJson(map[string]interface{}{
 		"haha": "xixi",
@@ -88,7 +88,7 @@ func TestApiSessionClass_WriteText(t *testing.T) {
 	httpResponseWriter.EXPECT().Header().Return(http.Header{}).AnyTimes()
 
 	apiSession := NewApiSession()
-	apiSession.ResponseWriter = httpResponseWriter
+	apiSession.responseWriter = httpResponseWriter
 	apiSession.SetStatusCode(400)
 	err := apiSession.WriteText("hgfhdfghd")
 	test.Equal(t, nil, err)
@@ -98,33 +98,33 @@ func TestApiSessionClass_WriteText(t *testing.T) {
 
 func TestApiSessionClass_GetRemoteAddress(t *testing.T) {
 	apiSession := NewApiSession()
-	apiSession.Request = &http.Request{
+	apiSession.request = &http.Request{
 		Method: "GET",
 		Header: http.Header{},
 		RemoteAddr: "124.56.66.7",
 	}
-	test.Equal(t, "124.56.66.7", apiSession.GetRemoteAddress())
+	test.Equal(t, "124.56.66.7", apiSession.RemoteAddress())
 
-	apiSession.Request = &http.Request{
+	apiSession.request = &http.Request{
 		Method: "GET",
 		Header: http.Header{
 			"X-Forwarded-For": []string{"24.56.11.23"},
 		},
 		RemoteAddr: "124.56.66.7",
 	}
-	test.Equal(t, "24.56.11.23", apiSession.GetRemoteAddress())
+	test.Equal(t, "24.56.11.23", apiSession.RemoteAddress())
 }
 
 func TestApiSessionClass_GetUrlParams(t *testing.T) {
 	apiSession := NewApiSession()
-	apiSession.Request = &http.Request{
+	apiSession.request = &http.Request{
 		Method: "GET",
 		Header: http.Header{},
 		URL: &url.URL{
 			RawQuery:   "test=qq&aa=aa&bb=bb",
 		},
 	}
-	test.Equal(t, "map[aa:aa bb:bb test:qq]", fmt.Sprint(apiSession.GetUrlParams()))
+	test.Equal(t, "map[aa:aa bb:bb test:qq]", fmt.Sprint(apiSession.UrlParams()))
 }
 
 func TestApiSessionClass_GetFormValues(t *testing.T) {
@@ -151,8 +151,8 @@ value2
 		Body:   ioutil.NopCloser(bytes.NewReader([]byte(postData))),
 	}
 
-	apiSession.Request = req
-	result, err := apiSession.GetFormValues()
+	apiSession.request = req
+	result, err := apiSession.FormValues()
 	test.Equal(t, nil, err)
 	test.Equal(t, "[value1 value1_value1]", fmt.Sprint(result["field1"]))
 	test.Equal(t, "[value2]", fmt.Sprint(result["field2"]))
@@ -167,7 +167,7 @@ func TestApiSessionClass_ReadJSON(t *testing.T) {
 		Body:   ioutil.NopCloser(bytes.NewReader([]byte(`{"test":"test","a":"a"}`))),
 	}
 
-	apiSession.Request = req
+	apiSession.request = req
 	type Test struct {
 		Test string `json:"test"`
 		A string `json:"a"`

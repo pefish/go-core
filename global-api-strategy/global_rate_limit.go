@@ -45,6 +45,7 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) Init(param interface{}) {
 	go func() {
 		params := param.(GlobalRateLimitStrategyParam)
 		ticker := time.NewTicker(params.FillInterval)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
@@ -60,10 +61,10 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) Init(param interface{}) {
 }
 
 type GlobalRateLimitStrategyParam struct {
-	FillInterval time.Duration
+	FillInterval time.Duration  // 每这么长时间往令牌桶塞一个令牌
 }
 
-func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, globalRateLimit.GetName())
 
 	succ := globalRateLimit.takeAvailable(false)

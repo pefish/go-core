@@ -40,7 +40,7 @@ func (rateLimit *RateLimitStrategyClass) GetErrorCode() uint64 {
 	return rateLimit.errorCode
 }
 
-func (rateLimit *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (rateLimit *RateLimitStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, rateLimit.GetName())
 	if param == nil {
 		return &go_error.ErrorInfo{
@@ -50,8 +50,8 @@ func (rateLimit *RateLimitStrategyClass) Execute(out *api_session.ApiSessionClas
 		}
 	}
 	newParam := param.(RateLimitParam)
-	methodPath := fmt.Sprintf(`%s_%s`, out.GetMethod(), out.GetPath())
-	key := fmt.Sprintf(`%s_%s`, out.GetRemoteAddress(), methodPath)
+	methodPath := fmt.Sprintf(`%s_%s`, out.Method(), out.Path())
+	key := fmt.Sprintf(`%s_%s`, out.RemoteAddress(), methodPath)
 	if !(*rateLimit.db)[key].IsZero() && time.Now().Sub((*rateLimit.db)[key]) < newParam.Limit {
 		return &go_error.ErrorInfo{
 			InternalErrorMessage: `api ratelimit`,

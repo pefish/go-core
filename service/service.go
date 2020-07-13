@@ -200,7 +200,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession *api_session.ApiSessionClass) interface{} {
+		Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
 			defer func() {
 				if err := recover(); err != nil {
 					logger.LoggerDriver.Logger.Error(err)
@@ -226,11 +226,11 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession *api_session.ApiSessionClass) interface{} {
-			rawData, _ := ioutil.ReadAll(apiSession.Request.Body)
+		Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+			rawData, _ := ioutil.ReadAll(apiSession.Request().Body)
 			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
-			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.GetPath(), apiSession.GetMethod())
+			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not Found`)
 			return nil
 		},

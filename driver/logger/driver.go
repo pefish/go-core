@@ -6,13 +6,15 @@ type LoggerDriverClass struct {
 	Logger go_interface_logger.InterfaceLogger
 }
 
-var LoggerDriver = LoggerDriverClass{}
+var LoggerDriver = LoggerDriverClass{
+	Logger: go_interface_logger.DefaultLogger,
+}
 
-func (this *LoggerDriverClass) Startup() {
+func (loggerDriver *LoggerDriverClass) Startup() {
 
 }
 
-func (this *LoggerDriverClass) Register(logger go_interface_logger.InterfaceLogger) bool {
-	this.Logger = logger
+func (loggerDriver *LoggerDriverClass) Register(logger go_interface_logger.InterfaceLogger) bool {
+	loggerDriver.Logger = logger
 	return true
 }

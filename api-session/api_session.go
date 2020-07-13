@@ -143,36 +143,156 @@ const (
 	ContentTypeValue_YAML ContentTypeValue = "application/x-yaml; charset=UTF-8"
 )
 
-type ApiSessionClass struct {
+type InterfaceApiSession interface {
+	SetJwtBody(jwtBody map[string]interface{})
+	JwtBody() map[string]interface{}
+	SetUserId(userId uint64)
+	UserId() uint64
+	SetJwtHeaderName(headerName string)
+	JwtHeaderName() string
+	ScanParams(dest interface{})
+	AddDefer(defer_ func())
+	Defers() []func()
+	SetData(key string, data interface{})
+	Date(key string) interface{}
+	WriteJson(data interface{}) error
+	SetHeader(key string, value string)
+	WriteText(text string) error
+	SetStatusCode(code StatusCode)
+	Path() string
+	Body() io.ReadCloser
+	Method() string
+	Header(name string) string
+	RemoteAddress() string
+	UrlParams() map[string]string
+	FormValues() (map[string][]string, error)
+	ReadJSON(jsonObject interface{}) error
+	Api() _interface.InterfaceApi
+	SetApi(api _interface.InterfaceApi)
+	ResponseWriter() http.ResponseWriter
+	SetResponseWriter(w http.ResponseWriter)
+	Request()        *http.Request
+	SetRequest(r *http.Request)
+	Params() map[string]interface{}
+	SetParams(params map[string]interface{})
+	OriginalParams() map[string]interface{}
+	SetOriginalParams(originalParams map[string]interface{})
+	SetLang(lang string)
+	Lang() string
+	SetClientType(clientType string)
+	ClientType() string
+}
+
+type apiSessionClass struct {
 	statusCode StatusCode
 
-	Api            _interface.InterfaceApi
-	ResponseWriter http.ResponseWriter
-	Request        *http.Request
+	api            _interface.InterfaceApi
+	responseWriter http.ResponseWriter
+	request        *http.Request
 
-	JwtHeaderName string
-	JwtBody       map[string]interface{}
-	UserId        uint64
+	jwtHeaderName string
+	jwtBody       map[string]interface{}
+	userId        uint64
 
-	Lang       string
-	ClientType string // web、android、ios
+	lang       string
+	clientType string // web、android、ios
 
-	datas map[string]interface{}
+	data map[string]interface{}
 
-	OriginalParams map[string]interface{} // 客户端传过来的原始参数
-	Params         map[string]interface{} // 经过前置处理器修饰过的参数
+	originalParams map[string]interface{} // 客户端传过来的原始参数
+	params         map[string]interface{} // 经过前置处理器修饰过的参数
 
 	defers []func() // api结束后执行的函数
 }
 
-func NewApiSession() *ApiSessionClass {
-	return &ApiSessionClass{
-		datas:  make(map[string]interface{}, 5),
+func NewApiSession() *apiSessionClass {
+	return &apiSessionClass{
+		data:   make(map[string]interface{}, 5),
 		defers: make([]func(), 0, 20),
 	}
 }
 
-func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
+func (apiSession *apiSessionClass) SetJwtHeaderName(headerName string) {
+	apiSession.jwtHeaderName = headerName
+}
+
+func (apiSession *apiSessionClass) JwtHeaderName() string {
+	return apiSession.jwtHeaderName
+}
+
+func (apiSession *apiSessionClass) SetLang(lang string) {
+	apiSession.lang = lang
+}
+
+func (apiSession *apiSessionClass) Lang() string {
+	return apiSession.lang
+}
+
+func (apiSession *apiSessionClass) SetClientType(clientType string) {
+	apiSession.clientType = clientType
+}
+
+func (apiSession *apiSessionClass) ClientType() string {
+	return apiSession.clientType
+}
+
+func (apiSession *apiSessionClass) SetJwtBody(jwtBody map[string]interface{}) {
+	apiSession.jwtBody = jwtBody
+}
+
+func (apiSession *apiSessionClass) ResponseWriter() http.ResponseWriter {
+	return apiSession.responseWriter
+}
+
+func (apiSession *apiSessionClass) Request() *http.Request {
+	return apiSession.request
+}
+
+func (apiSession *apiSessionClass) SetResponseWriter(w http.ResponseWriter) {
+	apiSession.responseWriter = w
+}
+
+func (apiSession *apiSessionClass) SetRequest(r *http.Request) {
+	apiSession.request = r
+}
+
+func (apiSession *apiSessionClass) JwtBody() map[string]interface{} {
+	return apiSession.jwtBody
+}
+
+func (apiSession *apiSessionClass) Params() map[string]interface{} {
+	return apiSession.params
+}
+
+func (apiSession *apiSessionClass) OriginalParams() map[string]interface{} {
+	return apiSession.originalParams
+}
+
+func (apiSession *apiSessionClass) SetParams(params map[string]interface{}) {
+	apiSession.params = params
+}
+
+func (apiSession *apiSessionClass) SetOriginalParams(originalParams map[string]interface{}) {
+	apiSession.originalParams = originalParams
+}
+
+func (apiSession *apiSessionClass) Api() _interface.InterfaceApi {
+	return apiSession.api
+}
+
+func (apiSession *apiSessionClass) SetApi(api _interface.InterfaceApi) {
+	apiSession.api = api
+}
+
+func (apiSession *apiSessionClass) SetUserId(userId uint64) {
+	apiSession.userId = userId
+}
+
+func (apiSession *apiSessionClass) UserId() uint64 {
+	return apiSession.userId
+}
+
+func (apiSession *apiSessionClass) ScanParams(dest interface{}) {
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		TagName:          "json",
@@ -184,7 +304,7 @@ func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
 		panic(err)
 	}
 
-	err = decoder.Decode(apiSession.Params)
+	err = decoder.Decode(apiSession.params)
 	if err != nil {
 		panic(err)
 	}
@@ -192,31 +312,31 @@ func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
 
 // Add defer handler.
 // Defer handlers will be executed by order at the end of api session.
-func (apiSession *ApiSessionClass) AddDefer(defer_ func()) {
-	apiSession.defers = append(apiSession.GetDefers(), defer_)
+func (apiSession *apiSessionClass) AddDefer(defer_ func()) {
+	apiSession.defers = append(apiSession.Defers(), defer_)
 }
 
-func (apiSession *ApiSessionClass) GetDefers() []func() {
+func (apiSession *apiSessionClass) Defers() []func() {
 	return apiSession.defers
 }
 
-func (apiSession *ApiSessionClass) SetData(key string, data interface{}) {
-	apiSession.datas[key] = data
+func (apiSession *apiSessionClass) SetData(key string, data interface{}) {
+	apiSession.data[key] = data
 }
 
-func (apiSession *ApiSessionClass) GetDate(key string) interface{} {
-	return apiSession.datas[key]
+func (apiSession *apiSessionClass) Date(key string) interface{} {
+	return apiSession.data[key]
 }
 
 // Response json body.
-func (apiSession *ApiSessionClass) WriteJson(data interface{}) error {
+func (apiSession *apiSessionClass) WriteJson(data interface{}) error {
 	apiSession.SetHeader(string(HeaderName_ContentType), string(ContentTypeValue_JSON))
 	result, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-	apiSession.ResponseWriter.WriteHeader(int(apiSession.statusCode))
-	_, err = apiSession.ResponseWriter.Write(result)
+	apiSession.responseWriter.WriteHeader(int(apiSession.statusCode))
+	_, err = apiSession.responseWriter.Write(result)
 	if err != nil {
 		return err
 	}
@@ -224,15 +344,15 @@ func (apiSession *ApiSessionClass) WriteJson(data interface{}) error {
 }
 
 // Set header of response.
-func (apiSession *ApiSessionClass) SetHeader(key string, value string) {
-	apiSession.ResponseWriter.Header().Set(key, value)
+func (apiSession *apiSessionClass) SetHeader(key string, value string) {
+	apiSession.responseWriter.Header().Set(key, value)
 }
 
 // Response text body.
-func (apiSession *ApiSessionClass) WriteText(text string) error {
-	apiSession.ResponseWriter.Header().Set(string(HeaderName_ContentType), string(ContentTypeValue_Text))
-	apiSession.ResponseWriter.WriteHeader(int(apiSession.statusCode))
-	_, err := apiSession.ResponseWriter.Write([]byte(text))
+func (apiSession *apiSessionClass) WriteText(text string) error {
+	apiSession.responseWriter.Header().Set(string(HeaderName_ContentType), string(ContentTypeValue_Text))
+	apiSession.responseWriter.WriteHeader(int(apiSession.statusCode))
+	_, err := apiSession.responseWriter.Write([]byte(text))
 	if err != nil {
 		return err
 	}
@@ -240,39 +360,39 @@ func (apiSession *ApiSessionClass) WriteText(text string) error {
 }
 
 // Set status code of response.
-func (apiSession *ApiSessionClass) SetStatusCode(code StatusCode) {
+func (apiSession *apiSessionClass) SetStatusCode(code StatusCode) {
 	apiSession.statusCode = code
 }
 
 // Get request path.
-func (apiSession *ApiSessionClass) GetPath() string {
-	return apiSession.Request.URL.Path
+func (apiSession *apiSessionClass) Path() string {
+	return apiSession.request.URL.Path
 }
 
 // Get request body.
-func (apiSession *ApiSessionClass) GetBody() io.ReadCloser {
-	return apiSession.Request.Body
+func (apiSession *apiSessionClass) Body() io.ReadCloser {
+	return apiSession.request.Body
 }
 
 // Get request method (GET, POST, PUT, etc.).
-func (apiSession *ApiSessionClass) GetMethod() string {
-	return apiSession.Request.Method
+func (apiSession *apiSessionClass) Method() string {
+	return apiSession.request.Method
 }
 
 // Read header by key from request headers.
-func (apiSession *ApiSessionClass) GetHeader(name string) string {
-	return apiSession.Request.Header.Get(name)
+func (apiSession *apiSessionClass) Header(name string) string {
+	return apiSession.request.Header.Get(name)
 }
 
 // Read remote address from request headers.
-func (apiSession *ApiSessionClass) GetRemoteAddress() string {
+func (apiSession *apiSessionClass) RemoteAddress() string {
 	remoteHeaders := map[string]bool{
 		`X-Forwarded-For`: true,
 	}
 
 	for headerName, enabled := range remoteHeaders {
 		if enabled {
-			headerValue := apiSession.GetHeader(headerName)
+			headerValue := apiSession.Header(headerName)
 			// exception needed for 'X-Forwarded-For' only , if enabled.
 			if headerName == "X-Forwarded-For" {
 				idx := strings.IndexByte(headerValue, ',')
@@ -288,7 +408,7 @@ func (apiSession *ApiSessionClass) GetRemoteAddress() string {
 		}
 	}
 
-	addr := strings.TrimSpace(apiSession.Request.RemoteAddr)
+	addr := strings.TrimSpace(apiSession.request.RemoteAddr)
 	if addr != "" {
 		// if addr has port use the net.SplitHostPort otherwise(error occurs) take as it is
 		if ip, _, err := net.SplitHostPort(addr); err == nil {
@@ -300,10 +420,10 @@ func (apiSession *ApiSessionClass) GetRemoteAddress() string {
 }
 
 // Read url params from get request.
-func (apiSession *ApiSessionClass) GetUrlParams() map[string]string {
+func (apiSession *apiSessionClass) UrlParams() map[string]string {
 	values := make(map[string]string, 10)
 
-	q := apiSession.Request.URL.Query()
+	q := apiSession.request.URL.Query()
 	if q != nil {
 		for k, v := range q {
 			values[k] = strings.Join(v, ",")
@@ -314,21 +434,21 @@ func (apiSession *ApiSessionClass) GetUrlParams() map[string]string {
 }
 
 // Read form data from request.
-func (apiSession *ApiSessionClass) GetFormValues() (map[string][]string, error) {
-	err := apiSession.Request.ParseMultipartForm(32 << 20) // 默认32M
+func (apiSession *apiSessionClass) FormValues() (map[string][]string, error) {
+	err := apiSession.request.ParseMultipartForm(32 << 20) // 默认32M
 	if err != nil {
 		return nil, err
 	}
 	var form map[string][]string
-	if form := apiSession.Request.Form; len(form) > 0 {
+	if form := apiSession.request.Form; len(form) > 0 {
 		return form, nil
 	}
 
-	if form := apiSession.Request.PostForm; len(form) > 0 {
+	if form := apiSession.request.PostForm; len(form) > 0 {
 		return form, nil
 	}
 
-	if m := apiSession.Request.MultipartForm; m != nil {
+	if m := apiSession.request.MultipartForm; m != nil {
 		if len(m.Value) > 0 {
 			return m.Value, nil
 		}
@@ -338,17 +458,17 @@ func (apiSession *ApiSessionClass) GetFormValues() (map[string][]string, error) 
 }
 
 // Read json data from request body.
-func (apiSession *ApiSessionClass) ReadJSON(jsonObject interface{}) error {
-	if apiSession.Request.Body == nil {
+func (apiSession *apiSessionClass) ReadJSON(jsonObject interface{}) error {
+	if apiSession.request.Body == nil {
 		return errors.New("unmarshal: empty body")
 	}
 
-	rawData, err := ioutil.ReadAll(apiSession.Request.Body)
+	rawData, err := ioutil.ReadAll(apiSession.request.Body)
 	if err != nil {
 		return err
 	}
 
-	apiSession.Request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
+	apiSession.request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
 
 	return json.Unmarshal(rawData, jsonObject)
 }

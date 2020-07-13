@@ -63,10 +63,11 @@ func (jwtAuth *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	jwtAuth.headerName = headerName
 }
 
-func (jwtAuth *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (jwtAuth *JwtAuthStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
-	out.JwtHeaderName = jwtAuth.headerName
-	jwt := out.GetHeader(jwtAuth.headerName)
+
+	out.SetJwtHeaderName(jwtAuth.headerName)
+	jwt := out.Header(jwtAuth.headerName)
 
 	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(jwtAuth.pubKey, jwt, jwtAuth.noCheckExpire)
 	if err != nil {
@@ -84,9 +85,9 @@ func (jwtAuth *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, p
 			ErrorCode: jwtAuth.errorCode,
 		}
 	}
-	out.JwtBody = token.Claims.(jwt2.MapClaims)
+	out.SetJwtBody(token.Claims.(jwt2.MapClaims))
 	if !jwtAuth.disableUserId {
-		jwtPayload := out.JwtBody[`payload`].(map[string]interface{})
+		jwtPayload := out.JwtBody()[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
 			return &go_error.ErrorInfo{
 				InternalErrorMessage: `jwt verify error, user_id not exist`,
@@ -96,7 +97,7 @@ func (jwtAuth *JwtAuthStrategyClass) Execute(out *api_session.ApiSessionClass, p
 		}
 
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
-		out.UserId = userId
+		out.SetUserId(userId)
 
 		util.UpdateSessionErrorMsg(out, `jwtAuth`, userId)
 	}

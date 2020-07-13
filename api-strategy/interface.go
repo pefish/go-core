@@ -6,7 +6,7 @@ import (
 )
 
 type InterfaceStrategy interface {
-	Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo
+	Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo
 	GetName() string
 	GetDescription() string
 	GetErrorCode() uint64

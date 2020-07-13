@@ -15,7 +15,7 @@ var IpFilterStrategy = IpFilterStrategyClass{
 }
 
 type IpFilterParam struct {
-	GetValidIp func(apiSession *api_session.ApiSessionClass) []string
+	GetValidIp func(apiSession api_session.InterfaceApiSession) []string
 }
 
 func (ipFilter *IpFilterStrategyClass) GetName() string {
@@ -34,7 +34,7 @@ func (ipFilter *IpFilterStrategyClass) GetErrorCode() uint64 {
 	return ipFilter.errorCode
 }
 
-func (ipFilter *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (ipFilter *IpFilterStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, ipFilter.GetName())
 	if param == nil {
 		return &go_error.ErrorInfo{
@@ -47,7 +47,7 @@ func (ipFilter *IpFilterStrategyClass) Execute(out *api_session.ApiSessionClass,
 	if newParam.GetValidIp == nil {
 		return nil
 	}
-	clientIp := out.GetRemoteAddress()
+	clientIp := out.RemoteAddress()
 	allowedIps := newParam.GetValidIp(out)
 	for _, ip := range allowedIps {
 		if ip == clientIp {

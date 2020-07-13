@@ -65,7 +65,7 @@ func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldVa
 	return result
 }
 
-func (paramValidate *ParamValidateStrategyClass) recurValidate(out *api_session.ApiSessionClass, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
+func (paramValidate *ParamValidateStrategyClass) recurValidate(out api_session.InterfaceApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
@@ -91,14 +91,14 @@ func (paramValidate *ParamValidateStrategyClass) recurValidate(out *api_session.
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
-						out.Params[fieldName] = defaultVal
+						out.Params()[fieldName] = defaultVal
 					}
 				} else if strings.Contains(typeName, `int`) || strings.Contains(typeName, `float`) {
 					map_[fieldName] = 0
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
-						out.Params[fieldName] = defaultVal
+						out.Params()[fieldName] = defaultVal
 					}
 				}
 			}
@@ -127,20 +127,20 @@ func (paramValidate *ParamValidateStrategyClass) Init(param interface{}) {
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
 }
 
-func (paramValidate *ParamValidateStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (paramValidate *ParamValidateStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()
 
 	tempParam := map[string]interface{}{}
 
-	if out.GetMethod() == `GET` { // +号和%都有特殊含义，+会被替换成空格
-		for k, v := range out.GetUrlParams() {
+	if out.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
+		for k, v := range out.UrlParams() {
 			tempParam[k] = v
 		}
-	} else if out.GetMethod() == `POST` {
-		requestContentType := out.GetHeader(`content-type`)
-		if out.Api.GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api.GetParamType()) {
+	} else if out.Method() == `POST` {
+		requestContentType := out.Header(`content-type`)
+		if out.Api().GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api().GetParamType()) {
 			return &go_error.ErrorInfo{
 				InternalErrorMessage: `content-type error`,
 				ErrorMessage: `content-type error`,
@@ -148,15 +148,15 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out *api_session.ApiSes
 			}
 		}
 
-		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api.GetParamType() == MULTIPART_TYPE || out.Api.GetParamType() == ``) {
-			formValues, err := out.GetFormValues()
+		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api().GetParamType() == MULTIPART_TYPE || out.Api().GetParamType() == ``) {
+			formValues, err := out.FormValues()
 			if err != nil {
 				panic(err)
 			}
 			for k, v := range formValues {
 				tempParam[k] = v[0]
 			}
-		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api.GetParamType() == JSON_TYPE || out.Api.GetParamType() == ``) {
+		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api().GetParamType() == JSON_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
 				return &go_error.ErrorInfo{
 					InternalErrorMessage: `parse params error`,
@@ -179,14 +179,14 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out *api_session.ApiSes
 		}
 	}
 	// 深拷贝
-	out.OriginalParams = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
-	out.Params = go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam))
+	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
+	out.SetParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriver.Logger.InfoF(`Params: %s`, paramsStr)
+	logger.LoggerDriver.Logger.InfoF(`params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
 	globalValidator := []string{`no-sql-inject`}
-	if out.Api.GetParams() != nil {
-		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api.GetParams()), reflect.ValueOf(out.Api.GetParams()))
+	if out.Api().GetParams() != nil {
+		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
 		if err != nil {
 			return err
 		}

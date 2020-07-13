@@ -39,7 +39,7 @@ func (api *Api) GetParams() interface{} {
 	return api.Params
 }
 
-type ReturnHookFuncType func(apiContext *api_session.ApiSessionClass, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
+type ReturnHookFuncType func(apiContext api_session.InterfaceApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiResult struct {
 	Msg         string      `json:"msg"`
@@ -48,7 +48,7 @@ type ApiResult struct {
 	Data        interface{} `json:"data"`
 }
 
-type ApiHandlerType func(apiSession *api_session.ApiSessionClass) interface{}
+type ApiHandlerType func(apiSession api_session.InterfaceApiSession) interface{}
 
 func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
@@ -75,16 +75,16 @@ wrap api处理器. 一个path一个，方法内分别处理method
 func WrapJson(methodController map[string]*Api) func(response http.ResponseWriter, request *http.Request) {
 	return func(response http.ResponseWriter, request *http.Request) {
 		apiSession := api_session.NewApiSession() // 新建会话
-		apiSession.ResponseWriter = response
-		apiSession.Request = request
+		apiSession.SetResponseWriter(response)
+		apiSession.SetRequest(request)
 		apiSession.SetStatusCode(api_session.StatusCode_OK)
 		// 应用层直接允许跨域。推荐接口层做跨域处理
-		apiSession.SetHeader("Vary", "Origin, Access-Control-Request-Method, Access-Control-Request-Headers")
-		apiSession.SetHeader("Access-Control-Allow-Origin", apiSession.GetHeader("Origin"))
-		apiSession.SetHeader("Access-Control-Allow-Methods", apiSession.GetMethod())
+		apiSession.SetHeader("Vary", "Origin, Access-Control-request-Method, Access-Control-request-Headers")
+		apiSession.SetHeader("Access-Control-Allow-Origin", apiSession.Header("Origin"))
+		apiSession.SetHeader("Access-Control-Allow-Methods", apiSession.Method())
 		apiSession.SetHeader("Access-Control-Allow-Headers", "*")
 		apiSession.SetHeader("Access-Control-Allow-Credentials", "true")
-		requestMethod := apiSession.GetMethod()
+		requestMethod := apiSession.Method()
 		if requestMethod == string(api_session.ApiMethod_Option) {
 			apiSession.WriteText(`ok`)
 			return
@@ -92,10 +92,10 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		var currentApi *Api
 		if methodController[requestMethod] != nil { // 优先使用具体方法注册的控制器
 			currentApi = methodController[requestMethod]
-			apiSession.Api = currentApi
+			apiSession.SetApi(currentApi)
 		} else if methodController[string(api_session.ApiMethod_All)] != nil {
 			currentApi = methodController[string(api_session.ApiMethod_All)]
-			apiSession.Api = currentApi
+			apiSession.SetApi(currentApi)
 		} else {
 			apiSession.WriteText(`Not found`)
 			return
@@ -109,7 +109,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 					"\n" +
 					errMsg +
 					"\n" +
-					apiSession.GetDate(`error_msg`).(string) +
+					apiSession.Date(`error_msg`).(string) +
 					"\n" +
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)
@@ -151,7 +151,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		}
 
 		defer func() {
-			for _, defer_ := range apiSession.GetDefers() {
+			for _, defer_ := range apiSession.Defers() {
 				defer_()
 			}
 		}()

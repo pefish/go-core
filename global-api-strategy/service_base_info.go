@@ -42,29 +42,29 @@ func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Init(param interface{}) {
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
-	apiMsg := fmt.Sprintf(`%s %s %s`, out.GetRemoteAddress(), out.GetPath(), out.GetMethod())
+	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
 	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateSessionErrorMsg(out, `apiMsg`, apiMsg)
-	logger.LoggerDriver.Logger.DebugF(`UrlParams: %#v`, out.GetUrlParams())
-	logger.LoggerDriver.Logger.DebugF(`Headers: %#v`, out.Request.Header)
+	logger.LoggerDriver.Logger.DebugF(`UrlParams: %#v`, out.UrlParams())
+	logger.LoggerDriver.Logger.DebugF(`Headers: %#v`, out.Request().Header)
 
-	rawData, _ := ioutil.ReadAll(out.Request.Body)
-	out.Request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData)) // 读出来后又新建一个流填进去，使out.Request.Body可以被再次读
+	rawData, _ := ioutil.ReadAll(out.Request().Body)
+	out.Request().Body = ioutil.NopCloser(bytes.NewBuffer(rawData)) // 读出来后又新建一个流填进去，使out.request.Body可以被再次读
 	logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 
-	lang := out.GetHeader(`lang`)
+	lang := out.Header(`lang`)
 	if lang == `` {
 		lang = `zh-CN`
 	}
-	out.Lang = lang
+	out.SetLang(lang)
 
-	clientType := out.GetHeader(`client_type`)
+	clientType := out.Header(`client_type`)
 	if clientType == `` {
 		clientType = `web`
 	}
-	out.ClientType = clientType
+	out.SetClientType(clientType)
 
 	return nil
 }
