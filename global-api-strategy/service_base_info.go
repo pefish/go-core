@@ -18,32 +18,32 @@ var ServiceBaseInfoApiStrategy = ServiceBaseInfoStrategyClass{
 
 }
 
-func (this *ServiceBaseInfoStrategyClass) GetName() string {
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetName() string {
 	return `serviceBaseInfo`
 }
 
-func (this *ServiceBaseInfoStrategyClass) GetDescription() string {
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetDescription() string {
 	return `get service base info`
 }
 
-func (this *ServiceBaseInfoStrategyClass) SetErrorCode(code uint64) {
-	this.errorCode = code
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) SetErrorCode(code uint64) {
+	serviceBaseInfo.errorCode = code
 }
 
-func (this *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
-	if this.errorCode == 0 {
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
+	if serviceBaseInfo.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
 	return go_error.INTERNAL_ERROR_CODE
 }
 
-func (this *ServiceBaseInfoStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, this.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, this.GetName())
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Init(param interface{}) {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, serviceBaseInfo.GetName())
+	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
 }
 
-func (this *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, this.GetName())
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out *api_session.ApiSessionClass, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.GetRemoteAddress(), out.GetPath(), out.GetMethod())
 	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateSessionErrorMsg(out, `apiMsg`, apiMsg)
