@@ -4,10 +4,14 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fatih/color v1.9.0 // indirect
+	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/go-playground/validator v9.24.0+incompatible
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/mock v1.3.1
+	github.com/jpoles1/gopherbadger v2.3.0+incompatible // indirect
 	github.com/leodido/go-urn v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.3

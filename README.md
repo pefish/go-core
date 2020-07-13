@@ -1,5 +1,7 @@
 # Go-Core Web Framework
 
+<a>![](https://img.shields.io/badge/Go%20Coverage-72%25-brightgreen.svg?longCache=true&style=flat)</a>
+
 Go-Core is a fast, simple and young web framework for Go.
 
 It provides some features. like
