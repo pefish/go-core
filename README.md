@@ -27,7 +27,7 @@ import (
 )
 
 func main() {
-	service.Service.SetName(`test service`) // set service name
+    service.Service.SetName(`test service`) // set service name
     service.Service.SetPath(`/api/test`)
     global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)
     service.Service.SetRoutes([]*api.Api{
