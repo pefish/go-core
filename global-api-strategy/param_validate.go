@@ -51,8 +51,8 @@ func (paramValidate *ParamValidateStrategyClass) GetErrorCode() uint64 {
 func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
 	result := ``
 	for _, validatorName := range globalValidator {
-		if validatorName == `no-sql-inject` && (strings.Contains(oldTag, `disable-inject-check`) || fieldValue.Type().Kind() != reflect.String) {
-			// 不是string类型 或者 有disable-inject-check tag，就不校验no-sql-inject
+		if validatorName == validator.SQL_INJECT_CHECK && (strings.Contains(oldTag, validator.DISABLE_SQL_INJECT_CHECK) || fieldValue.Type().Kind() != reflect.String) {
+			// 不是string类型 或者 有 DISABLE_SQL_INJECT_CHECK tag，就不校验 SQL_INJECT_CHECK
 			continue
 		}
 		result += validatorName + `,`
@@ -130,7 +130,14 @@ func (paramValidate *ParamValidateStrategyClass) Init(param interface{}) {
 func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
 	myValidator := validator.ValidatorClass{}
-	myValidator.Init()
+	err := myValidator.Init()
+	if err != nil {
+		return &go_error.ErrorInfo{
+			InternalErrorMessage: `validator init error`,
+			ErrorMessage: go_error.INTERNAL_ERROR,
+			ErrorCode: paramValidate.errorCode,
+		}
+	}
 
 	tempParam := map[string]interface{}{}
 
@@ -184,7 +191,7 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, 
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
 	logger.LoggerDriver.Logger.InfoF(`params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
-	globalValidator := []string{`no-sql-inject`}
+	globalValidator := []string{validator.SQL_INJECT_CHECK}
 	if out.Api().GetParams() != nil {
 		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
 		if err != nil {
