@@ -1,4 +1,4 @@
-package _interface
+package _type
 
 type IApi interface {
 	GetDescription() string

@@ -4,7 +4,7 @@ import (
 	"context"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	go_application "github.com/pefish/go-application"
-	"github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
 	go_error "github.com/pefish/go-error"
 	"go.opencensus.io/plugin/ochttp"
@@ -89,7 +89,7 @@ func (openCensus *OpenCensusClass) Init(param interface{}) {
 	}()
 }
 
-func (openCensus *OpenCensusClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (openCensus *OpenCensusClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, openCensus.GetName())
 	defer func() {
 		if err := recover(); err != nil {

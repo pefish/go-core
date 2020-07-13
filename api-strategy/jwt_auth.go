@@ -2,7 +2,7 @@ package api_strategy
 
 import (
 	jwt2 "github.com/dgrijalva/jwt-go"
-	"github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
@@ -63,7 +63,7 @@ func (jwtAuth *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	jwtAuth.headerName = headerName
 }
 
-func (jwtAuth *JwtAuthStrategyClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (jwtAuth *JwtAuthStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
 
 	out.SetJwtHeaderName(jwtAuth.headerName)

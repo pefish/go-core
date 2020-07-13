@@ -1,7 +1,7 @@
-package api_strategy
+package _type
 
 import (
-	api_session "github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	go_error "github.com/pefish/go-error"
 )
 
@@ -12,7 +12,7 @@ type StrategyData struct {
 }
 
 type IStrategy interface {
-	Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo
+	Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo
 	GetName() string
 	GetDescription() string
 	GetErrorCode() uint64

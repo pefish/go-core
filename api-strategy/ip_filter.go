@@ -1,7 +1,7 @@
 package api_strategy
 
 import (
-	"github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 )
@@ -15,7 +15,7 @@ var IpFilterStrategy = IpFilterStrategyClass{
 }
 
 type IpFilterParam struct {
-	GetValidIp func(apiSession api_session.IApiSession) []string
+	GetValidIp func(apiSession _type.IApiSession) []string
 }
 
 func (ipFilter *IpFilterStrategyClass) GetName() string {
@@ -34,7 +34,7 @@ func (ipFilter *IpFilterStrategyClass) GetErrorCode() uint64 {
 	return ipFilter.errorCode
 }
 
-func (ipFilter *IpFilterStrategyClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (ipFilter *IpFilterStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, ipFilter.GetName())
 	if param == nil {
 		return &go_error.ErrorInfo{

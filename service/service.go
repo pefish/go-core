@@ -6,6 +6,7 @@ import (
 	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api"
 	api_session "github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	external_service "github.com/pefish/go-core/driver/external-service"
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
@@ -200,7 +201,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession api_session.IApiSession) interface{} {
+		Controller: func(apiSession _type.IApiSession) interface{} {
 			defer func() {
 				if err := recover(); err != nil {
 					logger.LoggerDriver.Logger.Error(err)
@@ -226,7 +227,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession api_session.IApiSession) interface{} {
+		Controller: func(apiSession _type.IApiSession) interface{} {
 			rawData, _ := ioutil.ReadAll(apiSession.Request().Body)
 			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)

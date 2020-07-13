@@ -10,7 +10,7 @@ import (
 	reflect "reflect"
 )
 
-// MockResponseWriter is a mock of responseWriter interface
+// MockResponseWriter is a mock of responseWriter type
 type MockResponseWriter struct {
 	ctrl     *gomock.Controller
 	recorder *MockResponseWriterMockRecorder

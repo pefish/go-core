@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/golang/mock/gomock"
 	api_session "github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	mock_http "github.com/pefish/go-core/mock/mock-http"
 	"github.com/pefish/go-test-assert"
@@ -29,7 +30,7 @@ func TestWrapJson(t *testing.T) {
 			IgnoreRootPath:         true,
 			IgnoreGlobalStrategies: true,
 			Method:                 api_session.ApiMethod_Get,
-			Controller: func(apiSession api_session.IApiSession) interface{} {
+			Controller: func(apiSession _type.IApiSession) interface{} {
 				apiSession.WriteText(`this is a get api`)
 				return nil
 			},
@@ -41,7 +42,7 @@ func TestWrapJson(t *testing.T) {
 			IgnoreRootPath:         true,
 			IgnoreGlobalStrategies: true,
 			Method:                 api_session.ApiMethod_Post,
-			Controller: func(apiSession api_session.IApiSession) interface{} {
+			Controller: func(apiSession _type.IApiSession) interface{} {
 				apiSession.WriteText(`this is a post api`)
 				return nil
 			},

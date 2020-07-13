@@ -2,29 +2,30 @@ package api
 
 import (
 	"fmt"
+	_type2 "github.com/pefish/go-core/api-session/type"
+	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"net/http"
 
 	"github.com/pefish/go-application"
 	api_session "github.com/pefish/go-core/api-session"
-	api_strategy2 "github.com/pefish/go-core/api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-stack"
 )
 
 type Api struct {
-	Description            string                       // api描述
-	Path                   string                       // api路径
-	IgnoreRootPath         bool                         // api路径是否忽略根路径
-	IgnoreGlobalStrategies bool                         // 是否跳过全局策略
-	Method                 api_session.ApiMethod        // api方法
-	Strategies             []api_strategy2.StrategyData // api前置处理策略,不包含全局策略
-	Params                 interface{}                  // api参数
-	Return                 interface{}                  // api返回值
-	Controller             ApiHandlerType               // api业务处理器
-	ParamType              string                       // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
-	ReturnHookFunc         ReturnHookFuncType           // 返回前的处理函数
+	Description            string                // api描述
+	Path                   string                // api路径
+	IgnoreRootPath         bool                  // api路径是否忽略根路径
+	IgnoreGlobalStrategies bool                  // 是否跳过全局策略
+	Method                 api_session.ApiMethod // api方法
+	Strategies             []_type.StrategyData  // api前置处理策略,不包含全局策略
+	Params                 interface{}           // api参数
+	Return                 interface{}           // api返回值
+	Controller             ApiHandlerType        // api业务处理器
+	ParamType              string                // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+	ReturnHookFunc         ReturnHookFuncType    // 返回前的处理函数
 }
 
 func (api *Api) GetDescription() string {
@@ -39,7 +40,7 @@ func (api *Api) GetParams() interface{} {
 	return api.Params
 }
 
-type ReturnHookFuncType func(apiContext api_session.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
+type ReturnHookFuncType func(apiContext _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiResult struct {
 	Msg         string      `json:"msg"`
@@ -48,7 +49,7 @@ type ApiResult struct {
 	Data        interface{} `json:"data"`
 }
 
-type ApiHandlerType func(apiSession api_session.IApiSession) interface{}
+type ApiHandlerType func(apiSession _type2.IApiSession) interface{}
 
 func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {

@@ -3,7 +3,7 @@ package global_api_strategy
 import (
 	"bytes"
 	"fmt"
-	"github.com/pefish/go-core/api-session"
+	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
@@ -42,7 +42,7 @@ func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Init(param interface{}) {
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
 	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))

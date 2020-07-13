@@ -1,8 +1,9 @@
 package global_api_strategy
 
+import "github.com/pefish/go-core/driver/global-api-strategy/type"
 
 type GlobalStrategyData struct {
-	Strategy IGlobalStrategy
+	Strategy _type.IGlobalStrategy
 	Param    interface{}
 	Disable  bool
 }
