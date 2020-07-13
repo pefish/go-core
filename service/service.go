@@ -200,7 +200,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+		Controller: func(apiSession api_session.IApiSession) interface{} {
 			defer func() {
 				if err := recover(); err != nil {
 					logger.LoggerDriver.Logger.Error(err)
@@ -226,7 +226,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+		Controller: func(apiSession api_session.IApiSession) interface{} {
 			rawData, _ := ioutil.ReadAll(apiSession.Request().Body)
 			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)

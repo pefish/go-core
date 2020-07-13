@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/mitchellh/mapstructure"
 	_interface "github.com/pefish/go-core/api-session/interface"
 	"io"
@@ -143,9 +144,9 @@ const (
 	ContentTypeValue_YAML ContentTypeValue = "application/x-yaml; charset=UTF-8"
 )
 
-type InterfaceApiSession interface {
-	SetJwtBody(jwtBody map[string]interface{})
-	JwtBody() map[string]interface{}
+type IApiSession interface {
+	SetJwtBody(jwtBody jwt2.MapClaims)
+	JwtBody() jwt2.MapClaims
 	SetUserId(userId uint64)
 	UserId() uint64
 	SetJwtHeaderName(headerName string)
@@ -154,7 +155,7 @@ type InterfaceApiSession interface {
 	AddDefer(defer_ func())
 	Defers() []func()
 	SetData(key string, data interface{})
-	Date(key string) interface{}
+	Data(key string) interface{}
 	WriteJson(data interface{}) error
 	SetHeader(key string, value string)
 	WriteText(text string) error
@@ -167,8 +168,8 @@ type InterfaceApiSession interface {
 	UrlParams() map[string]string
 	FormValues() (map[string][]string, error)
 	ReadJSON(jsonObject interface{}) error
-	Api() _interface.InterfaceApi
-	SetApi(api _interface.InterfaceApi)
+	Api() _interface.IApi
+	SetApi(api _interface.IApi)
 	ResponseWriter() http.ResponseWriter
 	SetResponseWriter(w http.ResponseWriter)
 	Request()        *http.Request
@@ -186,7 +187,7 @@ type InterfaceApiSession interface {
 type apiSessionClass struct {
 	statusCode StatusCode
 
-	api            _interface.InterfaceApi
+	api            _interface.IApi
 	responseWriter http.ResponseWriter
 	request        *http.Request
 
@@ -236,7 +237,7 @@ func (apiSession *apiSessionClass) ClientType() string {
 	return apiSession.clientType
 }
 
-func (apiSession *apiSessionClass) SetJwtBody(jwtBody map[string]interface{}) {
+func (apiSession *apiSessionClass) SetJwtBody(jwtBody jwt2.MapClaims) {
 	apiSession.jwtBody = jwtBody
 }
 
@@ -256,7 +257,7 @@ func (apiSession *apiSessionClass) SetRequest(r *http.Request) {
 	apiSession.request = r
 }
 
-func (apiSession *apiSessionClass) JwtBody() map[string]interface{} {
+func (apiSession *apiSessionClass) JwtBody() jwt2.MapClaims {
 	return apiSession.jwtBody
 }
 
@@ -276,11 +277,11 @@ func (apiSession *apiSessionClass) SetOriginalParams(originalParams map[string]i
 	apiSession.originalParams = originalParams
 }
 
-func (apiSession *apiSessionClass) Api() _interface.InterfaceApi {
+func (apiSession *apiSessionClass) Api() _interface.IApi {
 	return apiSession.api
 }
 
-func (apiSession *apiSessionClass) SetApi(api _interface.InterfaceApi) {
+func (apiSession *apiSessionClass) SetApi(api _interface.IApi) {
 	apiSession.api = api
 }
 
@@ -324,7 +325,7 @@ func (apiSession *apiSessionClass) SetData(key string, data interface{}) {
 	apiSession.data[key] = data
 }
 
-func (apiSession *apiSessionClass) Date(key string) interface{} {
+func (apiSession *apiSessionClass) Data(key string) interface{} {
 	return apiSession.data[key]
 }
 

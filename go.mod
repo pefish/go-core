@@ -19,7 +19,7 @@ require (
 	github.com/pefish/go-http v0.4.7
 	github.com/pefish/go-interface-logger v0.0.4
 	github.com/pefish/go-json v0.1.2
-	github.com/pefish/go-jwt v0.3.1
+	github.com/pefish/go-jwt v0.3.2
 	github.com/pefish/go-reflect v0.2.0
 	github.com/pefish/go-stack v0.0.1
 	github.com/pefish/go-string v0.1.0

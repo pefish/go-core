@@ -29,7 +29,7 @@ func TestWrapJson(t *testing.T) {
 			IgnoreRootPath:         true,
 			IgnoreGlobalStrategies: true,
 			Method:                 api_session.ApiMethod_Get,
-			Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+			Controller: func(apiSession api_session.IApiSession) interface{} {
 				apiSession.WriteText(`this is a get api`)
 				return nil
 			},
@@ -41,7 +41,7 @@ func TestWrapJson(t *testing.T) {
 			IgnoreRootPath:         true,
 			IgnoreGlobalStrategies: true,
 			Method:                 api_session.ApiMethod_Post,
-			Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+			Controller: func(apiSession api_session.IApiSession) interface{} {
 				apiSession.WriteText(`this is a post api`)
 				return nil
 			},

@@ -2,11 +2,11 @@ package external_service
 
 // 接口驱动
 type ExternalServiceDriverClass struct {
-	externalServices map[string]InterfaceExternalService
+	externalServices map[string]IExternalService
 }
 
 var ExternalServiceDriver = ExternalServiceDriverClass{
-	externalServices: map[string]InterfaceExternalService{},
+	externalServices: map[string]IExternalService{},
 }
 
 func (this *ExternalServiceDriverClass) Startup() {
@@ -15,7 +15,7 @@ func (this *ExternalServiceDriverClass) Startup() {
 	}
 }
 
-func (this *ExternalServiceDriverClass) Register(name string, svc InterfaceExternalService) bool {
+func (this *ExternalServiceDriverClass) Register(name string, svc IExternalService) bool {
 	this.externalServices[name] = svc
 	return true
 }
@@ -25,7 +25,7 @@ func (this *ExternalServiceDriverClass) Call(name string, method string) interfa
 	return nil
 }
 
-type InterfaceExternalService interface {
+type IExternalService interface {
 	Init(driver *ExternalServiceDriverClass)
 
 	PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{})

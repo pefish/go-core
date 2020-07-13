@@ -89,7 +89,7 @@ func (openCensus *OpenCensusClass) Init(param interface{}) {
 	}()
 }
 
-func (openCensus *OpenCensusClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
+func (openCensus *OpenCensusClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, openCensus.GetName())
 	defer func() {
 		if err := recover(); err != nil {

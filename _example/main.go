@@ -24,7 +24,7 @@ func main() {
 				{
 					Strategy: &api_strategy.IpFilterStrategy,
 					Param: api_strategy.IpFilterParam{
-						GetValidIp: func(apiSession api_session.InterfaceApiSession) []string {
+						GetValidIp: func(apiSession api_session.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
 					},
@@ -32,7 +32,7 @@ func main() {
 				},
 			},
 			ParamType:  global_api_strategy.ALL_TYPE,
-			Controller: func(apiSession api_session.InterfaceApiSession) interface{} {
+			Controller: func(apiSession api_session.IApiSession) interface{} {
 				return "haha"
 			},
 		},

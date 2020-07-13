@@ -1,5 +1,5 @@
 package model
 
-type InterfaceModel interface {
+type IModel interface {
 	GetTableName() string
 }

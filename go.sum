@@ -99,8 +99,8 @@ github.com/pefish/go-interface-logger v0.0.4 h1:dzBhn4Y5aOn86h4RseoPFa5C6lO0149L
 github.com/pefish/go-interface-logger v0.0.4/go.mod h1:OWmqpZPYoGn57lLAZLn8y6dFdD339YKge1+WxbzQ9bQ=
 github.com/pefish/go-json v0.1.2 h1:AxnTvOyyTMHLp/DUsG08g6eGdTBSQrEFLIquL0MFUEE=
 github.com/pefish/go-json v0.1.2/go.mod h1:tw3I12A75Lx3QG+s2hYKfn+svhb7yQVZyxAPh5Ed6F8=
-github.com/pefish/go-jwt v0.3.1 h1:lUo+fT6AtcYk5/H0q+ihg2XfMsNv1pSywTkJRMcotLo=
-github.com/pefish/go-jwt v0.3.1/go.mod h1:lH27d4piTPWnwRbaqlTDiylYkzhgJY8PGt3/piGmzNY=
+github.com/pefish/go-jwt v0.3.2 h1:P77qMssunKImelFfzWWMcvwX9e2vE/xH4NnTpHlCf8A=
+github.com/pefish/go-jwt v0.3.2/go.mod h1:Gl5DwnU5GYFrGi2xQqC0vDwQSsPvg+bdgjvt0Bu23ow=
 github.com/pefish/go-reflect v0.2.0 h1:EUB7sDyRdAHkB8SxZcsLgkDgS1X/5yUrNFhNwSbPfBE=
 github.com/pefish/go-reflect v0.2.0/go.mod h1:KTxD5dhPvgUFiL+v2cxvYH/u4qEf7MPI+RouiiMNnRk=
 github.com/pefish/go-stack v0.0.1 h1:CJjPZBu2OZB+J0CjojAyfALTpJqkTUgy4oy6e4/RNtw=

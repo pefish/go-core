@@ -2,7 +2,7 @@ package global_api_strategy
 
 
 type GlobalStrategyData struct {
-	Strategy InterfaceGlobalStrategy
+	Strategy IGlobalStrategy
 	Param    interface{}
 	Disable  bool
 }

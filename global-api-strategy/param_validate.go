@@ -65,7 +65,7 @@ func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldVa
 	return result
 }
 
-func (paramValidate *ParamValidateStrategyClass) recurValidate(out api_session.InterfaceApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
+func (paramValidate *ParamValidateStrategyClass) recurValidate(out api_session.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
@@ -127,7 +127,7 @@ func (paramValidate *ParamValidateStrategyClass) Init(param interface{}) {
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
 }
 
-func (paramValidate *ParamValidateStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
+func (paramValidate *ParamValidateStrategyClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
 	myValidator := validator.ValidatorClass{}
 	myValidator.Init()

@@ -39,7 +39,7 @@ func (api *Api) GetParams() interface{} {
 	return api.Params
 }
 
-type ReturnHookFuncType func(apiContext api_session.InterfaceApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
+type ReturnHookFuncType func(apiContext api_session.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiResult struct {
 	Msg         string      `json:"msg"`
@@ -48,7 +48,7 @@ type ApiResult struct {
 	Data        interface{} `json:"data"`
 }
 
-type ApiHandlerType func(apiSession api_session.InterfaceApiSession) interface{}
+type ApiHandlerType func(apiSession api_session.IApiSession) interface{}
 
 func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
@@ -109,7 +109,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 					"\n" +
 					errMsg +
 					"\n" +
-					apiSession.Date(`error_msg`).(string) +
+					apiSession.Data(`error_msg`).(string) +
 					"\n" +
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
 			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)

@@ -63,7 +63,7 @@ func (jwtAuth *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 	jwtAuth.headerName = headerName
 }
 
-func (jwtAuth *JwtAuthStrategyClass) Execute(out api_session.InterfaceApiSession, param interface{}) *go_error.ErrorInfo {
+func (jwtAuth *JwtAuthStrategyClass) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
 
 	out.SetJwtHeaderName(jwtAuth.headerName)
@@ -85,9 +85,10 @@ func (jwtAuth *JwtAuthStrategyClass) Execute(out api_session.InterfaceApiSession
 			ErrorCode: jwtAuth.errorCode,
 		}
 	}
-	out.SetJwtBody(token.Claims.(jwt2.MapClaims))
+	jwtBody := token.Claims.(jwt2.MapClaims)
+	out.SetJwtBody(jwtBody)
 	if !jwtAuth.disableUserId {
-		jwtPayload := out.JwtBody()[`payload`].(map[string]interface{})
+		jwtPayload := jwtBody[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
 			return &go_error.ErrorInfo{
 				InternalErrorMessage: `jwt verify error, user_id not exist`,
