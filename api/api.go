@@ -6,7 +6,6 @@ import (
 	_type "github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
-	go_stack "github.com/pefish/go-stack"
 	"net/http"
 
 	api_session "github.com/pefish/go-core/api-session"
@@ -88,9 +87,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				"err: " +
 					errMsg +
 					"\n" +
-					apiSession.Data(`error_msg`).(string) +
-					"\n" +
-					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
+					apiSession.Data(`error_msg`).(string))
 			apiResult := &ApiResult{
 				Msg:  errorInfo.Err.Error(),
 				Code: errorInfo.Code,
