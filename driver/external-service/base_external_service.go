@@ -2,6 +2,7 @@ package external_service
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-http"
@@ -14,60 +15,68 @@ type BaseExternalServiceClass struct {
 }
 
 
-func (this *BaseExternalServiceClass) Init(driver *ExternalServiceDriverClass) {
+func (bes *BaseExternalServiceClass) Init(driver *ExternalServiceDriverClass) {
 
 }
 
-func (this *BaseExternalServiceClass) PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
-	data := this.PostJson(url, params)
+func (bes *BaseExternalServiceClass) PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo {
+	data, errInfo := bes.PostJson(url, params)
+	if errInfo != nil {
+		return errInfo
+	}
 	inrec, err := json.Marshal(data)
 	if err != nil {
-		panic(err)
+		return go_error.Wrap(err)
 	}
 	err = json.Unmarshal(inrec, struct_)
 	if err != nil {
-		panic(err)
+		return go_error.Wrap(err)
 	}
+	return nil
 }
 
-func (this *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) interface{} {
+func (bes *BaseExternalServiceClass) PostJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo) {
 	result := api.ApiResult{}
 	_, err := go_http.NewHttpRequester().PostForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
 	}, &result)
 	if err != nil {
-		panic(err)
+		return nil, go_error.Wrap(err)
 	}
 	if result.Code != 0 {
-		go_error.Throw(result.Msg, result.Code)
+		return nil, go_error.WrapWithAll(errors.New(result.InternalMsg), result.Code, result.Data)
 	}
-	return result.Data
+	return result.Data, nil
 }
 
-func (this *BaseExternalServiceClass) GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) {
-	data := this.GetJson(url, params)
+func (bes *BaseExternalServiceClass) GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo {
+	data, errInfo := bes.GetJson(url, params)
+	if errInfo != nil {
+		return errInfo
+	}
 	inrec, err := json.Marshal(data)
 	if err != nil {
-		panic(err)
+		return go_error.Wrap(err)
 	}
 	err = json.Unmarshal(inrec, struct_)
 	if err != nil {
-		panic(err)
+		return go_error.Wrap(err)
 	}
+	return nil
 }
 
-func (this *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) interface{} {
+func (bes *BaseExternalServiceClass) GetJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo) {
 	result := api.ApiResult{}
 	_, err := go_http.NewHttpRequester().GetForStruct(go_http.RequestParam{
 		Url:    url,
 		Params: params,
 	}, &result)
 	if err != nil {
-		panic(err)
+		return nil, go_error.Wrap(err)
 	}
 	if result.Code != 0 {
-		go_error.Throw(result.Msg, result.Code)
+		return nil, go_error.WrapWithAll(errors.New(result.InternalMsg), result.Code, result.Data)
 	}
-	return result.Data
+	return result.Data, nil
 }

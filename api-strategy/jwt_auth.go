@@ -1,6 +1,7 @@
 package api_strategy
 
 import (
+	"errors"
 	jwt2 "github.com/dgrijalva/jwt-go"
 	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
@@ -71,30 +72,17 @@ func (jwtAuth *JwtAuthStrategyClass) Execute(out _type.IApiSession, param interf
 
 	verifyResult, token, err := go_jwt.Jwt.VerifyJwt(jwtAuth.pubKey, jwt, jwtAuth.noCheckExpire)
 	if err != nil {
-		return &go_error.ErrorInfo{
-			InternalErrorMessage: jwtAuth.errorMsg,
-			ErrorMessage: jwtAuth.errorMsg,
-			ErrorCode: jwtAuth.errorCode,
-			Err: err,
-		}
+		return go_error.WrapWithAll(errors.New(`Unauthorized`), jwtAuth.errorCode, nil)
 	}
 	if !verifyResult {
-		return &go_error.ErrorInfo{
-			InternalErrorMessage: `jwt verify error or jwt expired`,
-			ErrorMessage: jwtAuth.errorMsg,
-			ErrorCode: jwtAuth.errorCode,
-		}
+		return go_error.WrapWithAll(errors.New(`jwt verify error or jwt expired`), jwtAuth.errorCode, nil)
 	}
 	jwtBody := token.Claims.(jwt2.MapClaims)
 	out.SetJwtBody(jwtBody)
 	if !jwtAuth.disableUserId {
 		jwtPayload := jwtBody[`payload`].(map[string]interface{})
 		if jwtPayload[`user_id`] == nil {
-			return &go_error.ErrorInfo{
-				InternalErrorMessage: `jwt verify error, user_id not exist`,
-				ErrorMessage: jwtAuth.errorMsg,
-				ErrorCode: jwtAuth.errorCode,
-			}
+			return go_error.WrapWithAll(errors.New(`jwt verify error, user_id not exist`), jwtAuth.errorCode, nil)
 		}
 
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])

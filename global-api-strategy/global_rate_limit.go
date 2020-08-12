@@ -2,6 +2,7 @@
 package global_api_strategy
 
 import (
+	"errors"
 	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
@@ -69,11 +70,7 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out _type.IApiSessi
 
 	succ := globalRateLimit.takeAvailable(false)
 	if !succ {
-		return &go_error.ErrorInfo{
-			InternalErrorMessage: `global rate limit`,
-			ErrorMessage: `global rate limit`,
-			ErrorCode: globalRateLimit.errorCode,
-		}
+		return go_error.WrapWithAll(errors.New(`global rate limit`), globalRateLimit.errorCode, nil)
 	}
 
 	return nil

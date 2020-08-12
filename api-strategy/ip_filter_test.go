@@ -21,6 +21,6 @@ func TestIpFilterStrategyClass_Execute(t *testing.T) {
 	err = IpFilterStrategy.Execute(apiSessionInstance, IpFilterParam{GetValidIp: func(apiSession _type.IApiSession) []string {
 		return []string{"127.0.0.1"}
 	}})
-	test.Equal(t, IpFilterStrategy.GetErrorCode(), err.ErrorCode)
-	test.Equal(t, "ip is baned", err.ErrorMessage)
+	test.Equal(t, IpFilterStrategy.GetErrorCode(), err.Code)
+	test.Equal(t, "ip is baned", err.Err.Error())
 }

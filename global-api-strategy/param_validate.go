@@ -1,6 +1,7 @@
 package global_api_strategy
 
 import (
+	"errors"
 	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
@@ -107,15 +108,9 @@ func (paramValidate *ParamValidateStrategyClass) recurValidate(out _type.IApiSes
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag
-				return &go_error.ErrorInfo{
-					InternalErrorMessage: msg,
-					ErrorMessage: msg,
-					ErrorCode: paramValidate.errorCode,
-					Data: map[string]interface{}{
-						`field`: fieldName,
-					},
-					Err: err,
-				}
+				return go_error.WrapWithAll(errors.New(msg), paramValidate.errorCode, map[string]interface{}{
+					`field`: fieldName,
+				})
 			}
 		}
 	}
@@ -132,11 +127,7 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, 
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()
 	if err != nil {
-		return &go_error.ErrorInfo{
-			InternalErrorMessage: `validator init error`,
-			ErrorMessage: go_error.INTERNAL_ERROR,
-			ErrorCode: paramValidate.errorCode,
-		}
+		return go_error.WrapWithAll(errors.New(`validator init error`), paramValidate.errorCode, nil)
 	}
 
 	tempParam := map[string]interface{}{}
@@ -148,11 +139,7 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, 
 	} else if out.Method() == `POST` {
 		requestContentType := out.Header(`content-type`)
 		if out.Api().GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api().GetParamType()) {
-			return &go_error.ErrorInfo{
-				InternalErrorMessage: `content-type error`,
-				ErrorMessage: `content-type error`,
-				ErrorCode: paramValidate.errorCode,
-			}
+			return go_error.WrapWithAll(errors.New(`content-type error`), paramValidate.errorCode, nil)
 		}
 
 		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api().GetParamType() == MULTIPART_TYPE || out.Api().GetParamType() == ``) {
@@ -165,25 +152,13 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, 
 			}
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api().GetParamType() == JSON_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				return &go_error.ErrorInfo{
-					InternalErrorMessage: `parse params error`,
-					ErrorMessage: `parse params error`,
-					ErrorCode: paramValidate.errorCode,
-				}
+				return go_error.WrapWithAll(errors.New(`parse params error`), paramValidate.errorCode, nil)
 			}
 		} else {
-			return &go_error.ErrorInfo{
-				InternalErrorMessage: `content-type not be supported`,
-				ErrorMessage: `content-type not be supported`,
-				ErrorCode: paramValidate.errorCode,
-			}
+			return go_error.WrapWithAll(errors.New(`content-type not be supported`), paramValidate.errorCode, nil)
 		}
 	} else {
-		return &go_error.ErrorInfo{
-			InternalErrorMessage: `scan params not be supported`,
-			ErrorMessage: `scan params not be supported`,
-			ErrorCode: paramValidate.errorCode,
-		}
+		return go_error.WrapWithAll(errors.New(`scan params not be supported`), paramValidate.errorCode, nil)
 	}
 	// 深拷贝
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))

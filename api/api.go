@@ -51,11 +51,11 @@ type ApiResult struct {
 
 type ApiHandlerType func(apiSession _type2.IApiSession) interface{}
 
-func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data interface{}) *ApiResult {
+func DefaultReturnDataFunc(msg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
 		return &ApiResult{
-			Msg:         msg,
-			InternalMsg: internalMsg,
+			Msg:        msg,
+			InternalMsg: msg,
 			Code:        code,
 			Data:        data,
 		}
@@ -65,7 +65,7 @@ func DefaultReturnDataFunc(msg string, internalMsg string, code uint64, data int
 			Msg:         msg,
 			InternalMsg: ``,
 			Code:        code,
-			Data:        data,
+			Data:       data,
 		}
 	}
 }
@@ -102,22 +102,20 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			return
 		}
 
-		defer go_error.Recover(func(msg string, internalMsg string, code uint64, data interface{}, err interface{}) {
-			errMsg := fmt.Sprintf("msg: %s\ninternal_msg: %s", msg, internalMsg)
+		defer go_error.Recover(func(errorInfo *go_error.ErrorInfo) {
+			errMsg := fmt.Sprint(errorInfo)
 			logger.LoggerDriver.Logger.Error(
 				"err: " +
-					fmt.Sprint(err) +
-					"\n" +
 					errMsg +
 					"\n" +
 					apiSession.Data(`error_msg`).(string) +
 					"\n" +
 					go_stack.Stack.GetStack(go_stack.Option{Skip: 0, Count: 30}))
-			apiResult := DefaultReturnDataFunc(msg, internalMsg, code, data)
+			apiResult := DefaultReturnDataFunc(errorInfo.Err.Error(), errorInfo.Code, errorInfo.Data)
 			if currentApi.ReturnHookFunc != nil {
 				hookApiResult, err := currentApi.ReturnHookFunc(apiSession, apiResult)
 				if err != nil {
-					apiSession.WriteJson(DefaultReturnDataFunc(err.ErrorMessage, err.InternalErrorMessage, err.ErrorCode, err.Data))
+					apiSession.WriteJson(DefaultReturnDataFunc(err.Err.Error(), err.Code, err.Data))
 					return
 				}
 				if hookApiResult == nil {
@@ -161,11 +159,11 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		if result == nil {
 			return
 		}
-		apiResult := DefaultReturnDataFunc(``, ``, 0, result)
+		apiResult := DefaultReturnDataFunc(``, 0, result)
 		if currentApi.ReturnHookFunc != nil {
 			hookApiResult, err := currentApi.ReturnHookFunc(apiSession, apiResult)
 			if err != nil {
-				apiSession.WriteJson(DefaultReturnDataFunc(err.ErrorMessage, err.InternalErrorMessage, err.ErrorCode, err.Data))
+				apiSession.WriteJson(DefaultReturnDataFunc(err.Err.Error(), err.Code, err.Data))
 				return
 			}
 			if hookApiResult == nil {

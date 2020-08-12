@@ -3,6 +3,7 @@ package global_api_strategy
 import (
 	"context"
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	"errors"
 	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
@@ -55,7 +56,7 @@ func (openCensus *OpenCensusClass) Init(param interface{}) {
 	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, openCensus.GetName())
 	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, openCensus.GetName())
 	if param == nil {
-		go_error.Throw(`OpenCensusStrategyParam must be set`, openCensus.GetErrorCode())
+		go_error.ThrowWithCode(errors.New(`OpenCensusStrategyParam must be set`), openCensus.GetErrorCode())
 	}
 	go func() {
 		option := stackdriver.Options{

@@ -7,9 +7,9 @@ import (
 	"github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-file"
 	"github.com/pefish/go-format"
 	"github.com/pefish/yaml"
+	"io/ioutil"
 	"reflect"
 	"strings"
 )
@@ -239,7 +239,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			} else if api.Method == `GET` {
 				this.recuGetParams(paramsType, reflect.ValueOf(api.Params), properties, &requiredParams, &parameters)
 			} else {
-				go_error.Throw(`method error`, 0)
+				go_error.ThrowInternal(errors.New(`method error`))
 			}
 			definitions[paramsTypeName] = Yaml_Definition{
 				Type:       `object`,
@@ -257,7 +257,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			if kind == reflect.Struct {
 				this.recuReturn(go_format.Format.StructToMap(api.Return), properties)
 			} else {
-				go_error.ThrowInternal(`return config type error`)
+				go_error.ThrowInternal(errors.New(`return config type error`))
 			}
 			definitions[api.Path+`_`+returnTypeName] = Yaml_Definition{
 				Type:       `object`,
@@ -312,10 +312,16 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	if type_ == `yaml` {
 		bytes, _ := yaml.Marshal(&swagger)
-		go_file.File.WriteFile(filename, bytes)
+		err := ioutil.WriteFile(filename, bytes, 0777)
+		if err != nil {
+			panic(err)
+		}
 	} else if type_ == `json` {
 		bytes, _ := json.Marshal(&swagger)
-		go_file.File.WriteFile(filename, bytes)
+		err := ioutil.WriteFile(filename, bytes, 0777)
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		panic(errors.New(`type 指定有误`))
 	}
