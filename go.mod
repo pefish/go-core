@@ -11,6 +11,8 @@ require (
 	github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609
 	github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609
 	github.com/pefish/go-core/driver/logger v0.0.0-20200812075421-22b684b8c609
+	github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200812075421-22b684b8c609
+	github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200812083123-dd35e4ccc031
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.1

@@ -3,12 +3,13 @@ package main
 import (
 	"github.com/pefish/go-core/api"
 	_type2 "github.com/pefish/go-core/api-session/type"
-	api_strategy "github.com/pefish/go-core/pkg/api-strategy"
 	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
+	api_strategy "github.com/pefish/go-core/pkg/api-strategy"
 	global_api_strategy3 "github.com/pefish/go-core/pkg/global-api-strategy"
 	"github.com/pefish/go-core/service"
+	"github.com/pefish/go-error"
 	"log"
 	"time"
 )
@@ -34,8 +35,8 @@ func main() {
 				},
 			},
 			ParamType:  global_api_strategy.ALL_TYPE,
-			Controller: func(apiSession _type2.IApiSession) interface{} {
-				return "haha"
+			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+				return "haha", nil
 			},
 		},
 	})

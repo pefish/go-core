@@ -5,13 +5,13 @@ import (
 	_type2 "github.com/pefish/go-core/api-session/type"
 	_type "github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
+	"github.com/pefish/go-core/driver/logger"
+	go_stack "github.com/pefish/go-stack"
 	"net/http"
 
 	"github.com/pefish/go-application"
 	api_session "github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-stack"
 )
 
 type Api struct {
@@ -49,7 +49,7 @@ type ApiResult struct {
 	Data        interface{} `json:"data"`
 }
 
-type ApiHandlerType func(apiSession _type2.IApiSession) interface{}
+type ApiHandlerType func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo)
 
 func DefaultReturnDataFunc(msg string, code uint64, data interface{}) *ApiResult {
 	if go_application.Application.Debug {
@@ -98,11 +98,12 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			currentApi = methodController[string(api_session.ApiMethod_All)]
 			apiSession.SetApi(currentApi)
 		} else {
+			logger.LoggerDriver.Logger.DebugF("api found but method not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not found`)
 			return
 		}
 
-		defer go_error.Recover(func(errorInfo *go_error.ErrorInfo) {
+		errorHandler := func(errorInfo *go_error.ErrorInfo) {
 			errMsg := fmt.Sprint(errorInfo)
 			logger.LoggerDriver.Logger.Error(
 				"err: " +
@@ -125,6 +126,10 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			} else {
 				apiSession.WriteJson(apiResult)
 			}
+		}
+
+		defer go_error.Recover(func(errorInfo *go_error.ErrorInfo) {
+			errorHandler(errorInfo)
 		})
 
 		if !currentApi.IgnoreGlobalStrategies {
@@ -134,7 +139,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				}
 				err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
 				if err != nil {
-					panic(err)
+					errorHandler(err)
+					return
 				}
 			}
 		}
@@ -145,7 +151,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 			err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
 			if err != nil {
-				panic(err)
+				errorHandler(err)
+				return
 			}
 		}
 
@@ -155,8 +162,12 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 		}()
 
-		result := currentApi.Controller(apiSession)
-		if result == nil {
+		result, errInfo := currentApi.Controller(apiSession)
+		if result == nil && errInfo == nil {
+			return
+		}
+		if errInfo != nil {
+			errorHandler(errInfo)
 			return
 		}
 		apiResult := DefaultReturnDataFunc(``, 0, result)

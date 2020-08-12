@@ -11,6 +11,7 @@ import (
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
+	go_error "github.com/pefish/go-error"
 	"github.com/pefish/go-reflect"
 	"golang.org/x/net/http2"
 	"io/ioutil"
@@ -201,7 +202,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession _type.IApiSession) interface{} {
+		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
 			defer func() {
 				if err := recover(); err != nil {
 					logger.LoggerDriver.Logger.Error(err)
@@ -215,7 +216,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 
 			apiSession.SetStatusCode(api_session.StatusCode_OK)
 			apiSession.WriteText(`ok`)
-			return nil
+			return nil, nil
 		},
 		ParamType: global_api_strategy.ALL_TYPE,
 	}
@@ -227,13 +228,13 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession _type.IApiSession) interface{} {
+		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
 			rawData, _ := ioutil.ReadAll(apiSession.Request().Body)
 			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
 			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not Found`)
-			return nil
+			return nil, nil
 		},
 		ParamType: global_api_strategy.ALL_TYPE,
 	}
