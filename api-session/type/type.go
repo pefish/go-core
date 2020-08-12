@@ -1,7 +1,6 @@
 package _type
 
 import (
-	jwt2 "github.com/dgrijalva/jwt-go"
 	_interface "github.com/pefish/go-core/api/type"
 	"io"
 	"net/http"
@@ -10,8 +9,8 @@ import (
 type StatusCode int
 
 type IApiSession interface {
-	SetJwtBody(jwtBody jwt2.MapClaims)
-	JwtBody() jwt2.MapClaims
+	SetJwtBody(jwtBody map[string]interface{})
+	JwtBody() map[string]interface{}
 	SetUserId(userId uint64)
 	UserId() uint64
 	SetJwtHeaderName(headerName string)

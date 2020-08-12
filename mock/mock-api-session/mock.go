@@ -5,7 +5,6 @@
 package mock_type
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
 	gomock "github.com/golang/mock/gomock"
 	_type "github.com/pefish/go-core/api-session/type"
 	_type0 "github.com/pefish/go-core/api/type"
@@ -149,10 +148,10 @@ func (mr *MockIApiSessionMockRecorder) Header(arg0 interface{}) *gomock.Call {
 }
 
 // JwtBody mocks base method
-func (m *MockIApiSession) JwtBody() jwt.MapClaims {
+func (m *MockIApiSession) JwtBody() map[string]interface{} {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "JwtBody")
-	ret0, _ := ret[0].(jwt.MapClaims)
+	ret0, _ := ret[0].(map[string]interface{})
 	return ret0
 }
 
@@ -363,7 +362,7 @@ func (mr *MockIApiSessionMockRecorder) SetHeader(arg0, arg1 interface{}) *gomock
 }
 
 // SetJwtBody mocks base method
-func (m *MockIApiSession) SetJwtBody(arg0 jwt.MapClaims) {
+func (m *MockIApiSession) SetJwtBody(arg0 map[string]interface{}) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetJwtBody", arg0)
 }

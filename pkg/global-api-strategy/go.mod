@@ -1,4 +1,4 @@
-module github.com/pefish/go-core/global-api-strategy
+module github.com/pefish/go-core/pkg/global-api-strategy
 
 go 1.14
 

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	jwt2 "github.com/dgrijalva/jwt-go"
+
 	"github.com/mitchellh/mapstructure"
 	_type "github.com/pefish/go-core/api-session/type"
 	_interface "github.com/pefish/go-core/api/type"
@@ -197,7 +197,7 @@ func (apiSession *apiSessionClass) ClientType() string {
 	return apiSession.clientType
 }
 
-func (apiSession *apiSessionClass) SetJwtBody(jwtBody jwt2.MapClaims) {
+func (apiSession *apiSessionClass) SetJwtBody(jwtBody map[string]interface{}) {
 	apiSession.jwtBody = jwtBody
 }
 
@@ -217,7 +217,7 @@ func (apiSession *apiSessionClass) SetRequest(r *http.Request) {
 	apiSession.request = r
 }
 
-func (apiSession *apiSessionClass) JwtBody() jwt2.MapClaims {
+func (apiSession *apiSessionClass) JwtBody() map[string]interface{} {
 	return apiSession.jwtBody
 }
 
