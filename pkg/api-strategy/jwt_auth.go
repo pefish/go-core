@@ -2,10 +2,10 @@ package api_strategy
 
 import (
 	"errors"
+	"fmt"
 	jwt2 "github.com/dgrijalva/jwt-go"
 	_type "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/driver/logger"
-	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-reflect"
@@ -88,7 +88,12 @@ func (jwtAuth *JwtAuthStrategyClass) Execute(out _type.IApiSession, param interf
 		userId := go_reflect.Reflect.MustToUint64(jwtPayload[`user_id`])
 		out.SetUserId(userId)
 
-		util.UpdateSessionErrorMsg(out, `jwtAuth`, userId)
+		errorMsg := out.Data(`error_msg`)
+		if errorMsg == nil {
+			out.SetData(`error_msg`, fmt.Sprintf("%s: %v\n", `jwtAuth`, userId))
+		} else {
+			out.SetData(`error_msg`, fmt.Sprintf("%s%s: %v\n", errorMsg.(string), `jwtAuth`, userId))
+		}
 	}
 	return nil
 }

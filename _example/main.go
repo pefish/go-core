@@ -3,10 +3,11 @@ package main
 import (
 	"github.com/pefish/go-core/api"
 	_type2 "github.com/pefish/go-core/api-session/type"
-	api_strategy "github.com/pefish/go-core/api-strategy"
+	api_strategy "github.com/pefish/go-core/pkg/api-strategy"
 	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
+	global_api_strategy3 "github.com/pefish/go-core/pkg/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"log"
 	"time"
@@ -38,10 +39,10 @@ func main() {
 			},
 		},
 	})
-	global_api_strategy.GlobalRateLimitStrategy.SetErrorCode(10000)
+	global_api_strategy3.GlobalRateLimitStrategy.SetErrorCode(10000)
 	global_api_strategy2.GlobalApiStrategyDriver.Register(global_api_strategy2.GlobalStrategyData{
-		Strategy: &global_api_strategy.GlobalRateLimitStrategy,
-		Param:    global_api_strategy.GlobalRateLimitStrategyParam{
+		Strategy: &global_api_strategy3.GlobalRateLimitStrategy,
+		Param:    global_api_strategy3.GlobalRateLimitStrategyParam{
 			FillInterval: 1000 * time.Millisecond,
 		},
 		Disable:  false,
