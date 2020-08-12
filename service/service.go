@@ -14,7 +14,6 @@ import (
 	go_error "github.com/pefish/go-error"
 	"github.com/pefish/go-reflect"
 	"golang.org/x/net/http2"
-	"io/ioutil"
 	"net/http"
 	"runtime"
 	"sync"
@@ -229,8 +228,6 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
 		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
-			rawData, _ := ioutil.ReadAll(apiSession.Request().Body)
-			logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
 			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not Found`)
