@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	go_application "github.com/pefish/go-application"
 	"github.com/pefish/go-core/api"
 	_type2 "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/api-strategy/type"
@@ -17,7 +16,6 @@ import (
 )
 
 func main() {
-	go_application.Application.SetEnv("prod")
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
 	global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)

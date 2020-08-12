@@ -39,7 +39,7 @@ func (api *Api) GetParams() interface{} {
 	return api.Params
 }
 
-type ReturnHookFuncType func(apiContext _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
+type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiResult struct {
 	Msg         string      `json:"msg"`
