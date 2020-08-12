@@ -1,5 +1,7 @@
 package external_service
 
+import go_error "github.com/pefish/go-error"
+
 // 接口驱动
 type ExternalServiceDriverClass struct {
 	externalServices map[string]IExternalService
@@ -28,8 +30,8 @@ func (this *ExternalServiceDriverClass) Call(name string, method string) interfa
 type IExternalService interface {
 	Init(driver *ExternalServiceDriverClass)
 
-	PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{})
-	PostJson(url string, params map[string]interface{}) interface{}
-	GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{})
-	GetJson(url string, params map[string]interface{}) interface{}
+	PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo
+	PostJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo)
+	GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo
+	GetJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo)
 }
