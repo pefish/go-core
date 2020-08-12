@@ -45,7 +45,7 @@ func (bes *BaseExternalServiceClass) PostJson(url string, params map[string]inte
 		return nil, go_error.Wrap(err)
 	}
 	if result.Code != 0 {
-		return nil, go_error.WrapWithAll(errors.New(result.InternalMsg), result.Code, result.Data)
+		return nil, go_error.WrapWithAll(errors.New(result.Msg), result.Code, result.Data)
 	}
 	return result.Data, nil
 }
@@ -76,7 +76,7 @@ func (bes *BaseExternalServiceClass) GetJson(url string, params map[string]inter
 		return nil, go_error.Wrap(err)
 	}
 	if result.Code != 0 {
-		return nil, go_error.WrapWithAll(errors.New(result.InternalMsg), result.Code, result.Data)
+		return nil, go_error.WrapWithAll(errors.New(result.Msg), result.Code, result.Data)
 	}
 	return result.Data, nil
 }
