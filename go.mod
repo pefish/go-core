@@ -10,8 +10,6 @@ require (
 	github.com/pefish/go-application v0.1.4
 	github.com/pefish/go-core/api-session/type v0.0.0-20200909071357-0e71a75f6e23
 	github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a
-	github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200909070336-1e46862c37c6
-	github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200909070336-1e46862c37c6
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.2
