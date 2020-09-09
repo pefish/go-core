@@ -10,39 +10,39 @@ import (
 	"io/ioutil"
 )
 
-type ServiceBaseInfoStrategyClass struct {
+type ServiceBaseInfoStrategy struct {
 	errorCode uint64
 }
 
-var ServiceBaseInfoApiStrategy = ServiceBaseInfoStrategyClass{
+var ServiceBaseInfoApiStrategyInstance = ServiceBaseInfoStrategy{
 
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetName() string {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) GetName() string {
 	return `serviceBaseInfo`
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetDescription() string {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) GetDescription() string {
 	return `get service base info`
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) SetErrorCode(code uint64) {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) SetErrorCode(code uint64) {
 	serviceBaseInfo.errorCode = code
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) GetErrorCode() uint64 {
 	if serviceBaseInfo.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
 	return go_error.INTERNAL_ERROR_CODE
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Init(param interface{}) {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) Init(param interface{}) {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, serviceBaseInfo.GetName())
 	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
 }
 
-func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (serviceBaseInfo *ServiceBaseInfoStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
 	logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))

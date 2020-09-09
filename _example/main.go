@@ -45,8 +45,8 @@ func main() {
 				//})
 				return params.Test, nil
 			},
-			Params: &struct {
-				Test string `json:"test" validate:"is-mobile"`
+			Params: struct {
+				Test string `json:"test" validate:"required,is-mobile"`
 			}{},
 		},
 	})
@@ -58,7 +58,7 @@ func main() {
 		},
 		Disable:  false,
 	})
-	service.Service.SetPort(3000)
+	service.Service.SetPort(8080)
 
 	err := service.Service.Run()
 	if err != nil {

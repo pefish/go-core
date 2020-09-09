@@ -45,7 +45,7 @@ func NewService(name string) *ServiceClass {
 	}
 	svc.SetName(name)
 	api_strategy.GlobalApiStrategyDriverInstance.Register(api_strategy.GlobalStrategyData{
-		Strategy: &global_api_strategy.ServiceBaseInfoApiStrategy,
+		Strategy: &global_api_strategy.ServiceBaseInfoApiStrategyInstance,
 	})
 	api_strategy.GlobalApiStrategyDriverInstance.Register(api_strategy.GlobalStrategyData{
 		Strategy: &global_api_strategy.ParamValidateStrategyInstance,
