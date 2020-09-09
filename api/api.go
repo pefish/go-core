@@ -76,14 +76,14 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			currentApi = methodController[string(api_session.ApiMethod_All)]
 			apiSession.SetApi(currentApi)
 		} else {
-			logger.LoggerDriver.Logger.DebugF("api found but method not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
+			logger.LoggerDriverInstance.Logger.DebugF("api found but method not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not found`)
 			return
 		}
 
 		errorHandler := func(errorInfo *go_error.ErrorInfo) {
 			errMsg := fmt.Sprint(errorInfo)
-			logger.LoggerDriver.Logger.Error(
+			logger.LoggerDriverInstance.Logger.Error(
 				"err: " +
 					errMsg +
 					"\n" +
@@ -117,7 +117,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		})
 
 		if !currentApi.IgnoreGlobalStrategies {
-			for _, strategyData := range global_api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
+			for _, strategyData := range global_api_strategy.GlobalApiStrategyDriverInstance.GlobalStrategies() {
 				if strategyData.Disable {
 					continue
 				}

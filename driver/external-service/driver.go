@@ -1,37 +1,33 @@
 package external_service
 
-import go_error "github.com/pefish/go-error"
+import (
+	_type "github.com/pefish/go-core/driver/external-service/type"
+	"sync"
+)
 
 // 接口驱动
-type ExternalServiceDriverClass struct {
-	externalServices map[string]IExternalService
+type ExternalServiceDriver struct {
+	externalServices map[string]_type.IExternalService
+	sync.Once
 }
 
-var ExternalServiceDriver = ExternalServiceDriverClass{
-	externalServices: map[string]IExternalService{},
+var ExternalServiceDriverInstance = ExternalServiceDriver{
+	externalServices: map[string]_type.IExternalService{},
 }
 
-func (this *ExternalServiceDriverClass) Startup() {
-	for _, v := range this.externalServices {
-		v.Init(this)
-	}
+func (esd *ExternalServiceDriver) Startup() {
+	esd.Do(func() {
+		for _, v := range esd.externalServices {
+			v.Init()
+		}
+	})
 }
 
-func (this *ExternalServiceDriverClass) Register(name string, svc IExternalService) bool {
-	this.externalServices[name] = svc
+func (esd *ExternalServiceDriver) Register(name string, svc _type.IExternalService) bool {
+	esd.externalServices[name] = svc
 	return true
 }
 
-func (this *ExternalServiceDriverClass) Call(name string, method string) interface{} {
-	// TODO 调用name外部服务
-	return nil
-}
-
-type IExternalService interface {
-	Init(driver *ExternalServiceDriverClass)
-
-	PostJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo
-	PostJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo)
-	GetJsonForStruct(url string, params map[string]interface{}, struct_ interface{}) *go_error.ErrorInfo
-	GetJson(url string, params map[string]interface{}) (interface{}, *go_error.ErrorInfo)
+func (esd *ExternalServiceDriver) ExternalServices() map[string]_type.IExternalService {
+	return esd.externalServices
 }

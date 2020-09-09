@@ -7,4 +7,5 @@ test: api-session/type/type.go
 
 api-session/type/type.go:
 	mockgen github.com/pefish/go-core/api-session/type IApiSession > mock/mock-api-session/mock.go
+	mockgen github.com/pefish/go-http IHttp > mock/mock-go-http/i_http.go
 	mockgen github.com/pefish/go-core/api-session/type IApiSession > pkg/api-strategy/mock/mock-api-session/mock.go

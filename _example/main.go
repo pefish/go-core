@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/pefish/go-core/api"
 	_type2 "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/api-strategy/type"
@@ -18,7 +17,7 @@ import (
 func main() {
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
-	global_api_strategy.ParamValidateStrategy.SetErrorCode(2005)
+	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 	service.Service.SetRoutes([]*api.Api{
 		{
 			Description: "this is a test api",
@@ -37,15 +36,22 @@ func main() {
 			},
 			ParamType:  global_api_strategy.ALL_TYPE,
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
-				return nil, go_error.WrapWithAll(errors.New("haha"), 2000, map[string]interface{}{
-					"haha": "u7ytu7",
-				})
-				//return "haha", nil
+				var params struct{
+					Test string `json:"test" validate:"is-mobile"`
+				}
+				apiSession.ScanParams(&params)
+				//return nil, go_error.WrapWithAll(errors.New("haha"), 2000, map[string]interface{}{
+				//	"haha": "u7ytu7",
+				//})
+				return params.Test, nil
 			},
+			Params: &struct {
+				Test string `json:"test" validate:"is-mobile"`
+			}{},
 		},
 	})
 	global_api_strategy3.GlobalRateLimitStrategy.SetErrorCode(10000)
-	global_api_strategy2.GlobalApiStrategyDriver.Register(global_api_strategy2.GlobalStrategyData{
+	global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
 		Strategy: &global_api_strategy3.GlobalRateLimitStrategy,
 		Param:    global_api_strategy3.GlobalRateLimitStrategyParam{
 			FillInterval: 1000 * time.Millisecond,

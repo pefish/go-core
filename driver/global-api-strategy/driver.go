@@ -1,6 +1,9 @@
 package global_api_strategy
 
-import "github.com/pefish/go-core/driver/global-api-strategy/type"
+import (
+	_type "github.com/pefish/go-core/driver/global-api-strategy/type"
+	"sync"
+)
 
 type GlobalStrategyData struct {
 	Strategy _type.IGlobalStrategy
@@ -8,19 +11,29 @@ type GlobalStrategyData struct {
 	Disable  bool
 }
 
-type GlobalApiStrategyDriverClass struct {
-	GlobalStrategies []GlobalStrategyData
+type GlobalApiStrategyDriver struct {
+	globalStrategies []GlobalStrategyData
+	sync.Once
 }
 
-var GlobalApiStrategyDriver = GlobalApiStrategyDriverClass{
-	GlobalStrategies: []GlobalStrategyData{},
+var GlobalApiStrategyDriverInstance = GlobalApiStrategyDriver{
+	globalStrategies: []GlobalStrategyData{},
 }
 
-func (this *GlobalApiStrategyDriverClass) Startup() {
-
+func (gasd *GlobalApiStrategyDriver) Startup() {
+	gasd.Do(func() {
+		for _, globalStrategy := range gasd.globalStrategies {
+			globalStrategy.Strategy.Init(globalStrategy.Param)
+		}
+	})
 }
 
-func (this *GlobalApiStrategyDriverClass) Register(strategyData GlobalStrategyData) bool {
-	this.GlobalStrategies = append(this.GlobalStrategies, strategyData)
+func (gasd *GlobalApiStrategyDriver) Register(strategyData GlobalStrategyData) bool {
+	gasd.globalStrategies = append(gasd.globalStrategies, strategyData)
 	return true
+}
+
+
+func (gasd *GlobalApiStrategyDriver) GlobalStrategies() []GlobalStrategyData {
+	return gasd.globalStrategies
 }

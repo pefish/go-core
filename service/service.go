@@ -44,11 +44,11 @@ func NewService(name string) *ServiceClass {
 		apis:          make([]*api.Api, 0, 20),
 	}
 	svc.SetName(name)
-	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{
+	api_strategy.GlobalApiStrategyDriverInstance.Register(api_strategy.GlobalStrategyData{
 		Strategy: &global_api_strategy.ServiceBaseInfoApiStrategy,
 	})
-	api_strategy.GlobalApiStrategyDriver.Register(api_strategy.GlobalStrategyData{
-		Strategy: &global_api_strategy.ParamValidateStrategy,
+	api_strategy.GlobalApiStrategyDriverInstance.Register(api_strategy.GlobalStrategyData{
+		Strategy: &global_api_strategy.ParamValidateStrategyInstance,
 	})
 	return svc
 }
@@ -144,16 +144,9 @@ func (serviceInstance *ServiceClass) Run() error {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	external_service.ExternalServiceDriver.Startup() // 启动外接服务驱动
-	logger.LoggerDriver.Startup()                    // 启动日志驱动
-	api_strategy.GlobalApiStrategyDriver.Startup()   // 启动外接全局前置处理器驱动
-
-	// 执行各个全局策略的初始化函数
-	for _, globalStrategy := range api_strategy.GlobalApiStrategyDriver.GlobalStrategies {
-		if !globalStrategy.Disable {
-			globalStrategy.Strategy.Init(globalStrategy.Param)
-		}
-	}
+	external_service.ExternalServiceDriverInstance.Startup() // 启动外接服务驱动
+	logger.LoggerDriverInstance.Startup()                    // 启动日志驱动
+	api_strategy.GlobalApiStrategyDriverInstance.Startup()   // 启动外接全局前置处理器驱动
 
 	serviceInstance.buildRoutes()
 	host := serviceInstance.host
@@ -162,12 +155,12 @@ func (serviceInstance *ServiceClass) Run() error {
 	}
 
 	addr := host + `:` + go_reflect.Reflect.ToString(serviceInstance.port)
-	logger.LoggerDriver.Logger.InfoF(`server started!!! http://%s`, addr)
+	logger.LoggerDriverInstance.Logger.InfoF(`server started!!! http://%s`, addr)
 
 	for apiPath, map_ := range serviceInstance.registeredApi {
 		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
 		for method, api_ := range map_ {
-			logger.LoggerDriver.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
+			logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
 		}
 	}
 	s := &http.Server{
@@ -183,7 +176,7 @@ func (serviceInstance *ServiceClass) Run() error {
 		defer serviceInstance.stopWg.Done()
 		err := s.ListenAndServe()
 		if err != nil {
-			logger.LoggerDriver.Logger.Error(err)
+			logger.LoggerDriverInstance.Logger.Error(err)
 		}
 	}()
 	select {
@@ -204,7 +197,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
 			defer func() {
 				if err := recover(); err != nil {
-					logger.LoggerDriver.Logger.Error(err)
+					logger.LoggerDriverInstance.Logger.Error(err)
 					apiSession.SetStatusCode(api_session.StatusCode_InternalServerError)
 					apiSession.WriteText(`not ok`)
 				}
@@ -229,7 +222,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		Method:                 api_session.ApiMethod_All,
 		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
-			logger.LoggerDriver.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
+			logger.LoggerDriverInstance.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not Found`)
 			return nil, nil
 		},

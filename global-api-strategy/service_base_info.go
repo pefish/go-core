@@ -38,21 +38,21 @@ func (serviceBaseInfo *ServiceBaseInfoStrategyClass) GetErrorCode() uint64 {
 }
 
 func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, serviceBaseInfo.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, serviceBaseInfo.GetName())
+	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, serviceBaseInfo.GetName())
 }
 
 func (serviceBaseInfo *ServiceBaseInfoStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
-	logger.LoggerDriver.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
+	logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
 	util.UpdateSessionErrorMsg(out, `apiMsg`, apiMsg)
-	logger.LoggerDriver.Logger.DebugF(`UrlParams: %#v`, out.UrlParams())
-	logger.LoggerDriver.Logger.DebugF(`Headers: %#v`, out.Request().Header)
+	logger.LoggerDriverInstance.Logger.DebugF(`UrlParams: %#v`, out.UrlParams())
+	logger.LoggerDriverInstance.Logger.DebugF(`Headers: %#v`, out.Request().Header)
 
 	rawData, _ := ioutil.ReadAll(out.Request().Body)
 	out.Request().Body = ioutil.NopCloser(bytes.NewBuffer(rawData)) // 读出来后又新建一个流填进去，使out.request.Body可以被再次读
-	logger.LoggerDriver.Logger.DebugF(`Body: %s`, string(rawData))
+	logger.LoggerDriverInstance.Logger.DebugF(`Body: %s`, string(rawData))
 
 	lang := out.Header(`lang`)
 	if lang == `` {

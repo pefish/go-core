@@ -22,34 +22,34 @@ const (
 )
 
 // 默认自带
-type ParamValidateStrategyClass struct {
+type ParamValidateStrategy struct {
 	errorCode uint64
 }
 
-var ParamValidateStrategy = ParamValidateStrategyClass{
+var ParamValidateStrategyInstance = ParamValidateStrategy{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
-func (paramValidate *ParamValidateStrategyClass) GetName() string {
+func (paramValidate *ParamValidateStrategy) GetName() string {
 	return `paramValidate`
 }
 
-func (paramValidate *ParamValidateStrategyClass) GetDescription() string {
+func (paramValidate *ParamValidateStrategy) GetDescription() string {
 	return `validate params`
 }
 
-func (paramValidate *ParamValidateStrategyClass) SetErrorCode(code uint64) {
+func (paramValidate *ParamValidateStrategy) SetErrorCode(code uint64) {
 	paramValidate.errorCode = code
 }
 
-func (paramValidate *ParamValidateStrategyClass) GetErrorCode() uint64 {
+func (paramValidate *ParamValidateStrategy) GetErrorCode() uint64 {
 	if paramValidate.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
 	return paramValidate.errorCode
 }
 
-func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
+func (paramValidate *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
 	result := ``
 	for _, validatorName := range globalValidator {
 		if validatorName == validator.SQL_INJECT_CHECK && (strings.Contains(oldTag, validator.DISABLE_SQL_INJECT_CHECK) || fieldValue.Type().Kind() != reflect.String) {
@@ -66,7 +66,7 @@ func (paramValidate *ParamValidateStrategyClass) processGlobalValidators(fieldVa
 	return result
 }
 
-func (paramValidate *ParamValidateStrategyClass) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
+func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
@@ -117,13 +117,13 @@ func (paramValidate *ParamValidateStrategyClass) recurValidate(out _type.IApiSes
 	return nil
 }
 
-func (paramValidate *ParamValidateStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, paramValidate.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
+func (paramValidate *ParamValidateStrategy) Init(param interface{}) {
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, paramValidate.GetName())
+	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
 }
 
-func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
+func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()
 	if err != nil {
@@ -164,7 +164,7 @@ func (paramValidate *ParamValidateStrategyClass) Execute(out _type.IApiSession, 
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	out.SetParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriver.Logger.InfoF(`params: %s`, paramsStr)
+	logger.LoggerDriverInstance.Logger.InfoF(`params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
 	globalValidator := []string{validator.SQL_INJECT_CHECK}
 	if out.Api().GetParams() != nil {
