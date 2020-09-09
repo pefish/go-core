@@ -60,8 +60,6 @@ github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609 h1
 github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:gEosWrqg3Umc2vmHcpcF1QAxgz8dIpP/tU4NH3HKjrc=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609 h1:c67kDH7Q4Or0wWZHg+jIFTkOys8Z41PZeQpp/p99gSY=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
-github.com/pefish/go-core/driver/logger v0.0.0-20200812075421-22b684b8c609 h1:OLH4BAJwgc4tCpHeqTbheYsQNgyFdAdFXOeo8rNa3GY=
-github.com/pefish/go-core/driver/logger v0.0.0-20200812075421-22b684b8c609/go.mod h1:EIJBxZ6/xUhTmcz57uQuR05ywCb2bWLh3B+K2ksHk40=
 github.com/pefish/go-error v1.0.1 h1:Vr/nkqTYVp5SRRLRmD1vMgkI+RZ7tZem82WQv66HQRE=
 github.com/pefish/go-error v1.0.1/go.mod h1:s4Pz1YNIVImCi4u9lyIIbwYzCGIs7BVpmPfrVpNoe6Y=
 github.com/pefish/go-interface-logger v0.0.6 h1:ia5jrxwgiTKMOntR07lqCm54wnWPJD21BF3RnMNkiFQ=

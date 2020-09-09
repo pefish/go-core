@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/pefish/go-core/driver/logger"
+	go_interface_logger "github.com/pefish/go-interface-logger"
 
 	"github.com/mitchellh/mapstructure"
 	_type "github.com/pefish/go-core/api-session/type"
@@ -432,4 +434,8 @@ func (apiSession *apiSessionClass) ReadJSON(jsonObject interface{}) error {
 	apiSession.request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
 
 	return json.Unmarshal(rawData, jsonObject)
+}
+
+func (apiSession *apiSessionClass) Logger() go_interface_logger.InterfaceLogger {
+	return logger.LoggerDriverInstance.Logger
 }

@@ -87,12 +87,10 @@ github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609 h1
 github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:gEosWrqg3Umc2vmHcpcF1QAxgz8dIpP/tU4NH3HKjrc=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609 h1:c67kDH7Q4Or0wWZHg+jIFTkOys8Z41PZeQpp/p99gSY=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
-github.com/pefish/go-core/driver/logger v0.0.0-20200812075421-22b684b8c609 h1:OLH4BAJwgc4tCpHeqTbheYsQNgyFdAdFXOeo8rNa3GY=
-github.com/pefish/go-core/driver/logger v0.0.0-20200812075421-22b684b8c609/go.mod h1:EIJBxZ6/xUhTmcz57uQuR05ywCb2bWLh3B+K2ksHk40=
-github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200812110935-900caee6532a h1:OiONmx+h+L9VaMZk5hlBfnEdK+S7QmVv0/MDbEvwngA=
-github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200812110935-900caee6532a/go.mod h1:S9b7iGJ9Tv8Zk5nLiAjWgeswIc1lHXGRcH0pgTZesVw=
-github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200812110935-900caee6532a h1:5Nbp0k394aPves7PXBsAW90jwHOoOsN8zXPpjFOEkd4=
-github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200812110935-900caee6532a/go.mod h1:FX0WtziVdyTZNtsS66fxvoQogSFhR6IlLMxyNsUnehM=
+github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200909070336-1e46862c37c6 h1:VOBeeMmaBsE3HcdNdJj1CD+2bHS5s87yQDcTT0SCyNA=
+github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200909070336-1e46862c37c6/go.mod h1:ldojuE+fjE+z7WpfZm3b4DmQiTEspoIYA8gg+rKgAEQ=
+github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200909070336-1e46862c37c6 h1:zMKQAwjtvoXILKe+FQ2Y8nH4Fr9/PYV4bRjxzZNrKvI=
+github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200909070336-1e46862c37c6/go.mod h1:C0K13OgfdnGE/PrMDcAijLRvt//Ovx3bX69KWEwi2zM=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=

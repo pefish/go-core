@@ -1,2 +1,4 @@
 github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a h1:EzekWd0ad9x6BcHoJ9QHsyf87uXCGWDZq2oOzcdjyGU=
 github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
+github.com/pefish/go-interface-logger v0.0.6 h1:ia5jrxwgiTKMOntR07lqCm54wnWPJD21BF3RnMNkiFQ=
+github.com/pefish/go-interface-logger v0.0.6/go.mod h1:OWmqpZPYoGn57lLAZLn8y6dFdD339YKge1+WxbzQ9bQ=
