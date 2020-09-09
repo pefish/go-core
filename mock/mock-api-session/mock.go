@@ -8,6 +8,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	_type "github.com/pefish/go-core/api-session/type"
 	_type0 "github.com/pefish/go-core/api/type"
+	go_interface_logger "github.com/pefish/go-interface-logger"
 	io "io"
 	http "net/http"
 	reflect "reflect"
@@ -187,6 +188,20 @@ func (m *MockIApiSession) Lang() string {
 func (mr *MockIApiSessionMockRecorder) Lang() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Lang", reflect.TypeOf((*MockIApiSession)(nil).Lang))
+}
+
+// Logger mocks base method
+func (m *MockIApiSession) Logger() go_interface_logger.InterfaceLogger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Logger")
+	ret0, _ := ret[0].(go_interface_logger.InterfaceLogger)
+	return ret0
+}
+
+// Logger indicates an expected call of Logger
+func (mr *MockIApiSessionMockRecorder) Logger() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Logger", reflect.TypeOf((*MockIApiSession)(nil).Logger))
 }
 
 // Method mocks base method
