@@ -5,7 +5,6 @@ import (
 	"fmt"
 	jwt2 "github.com/dgrijalva/jwt-go"
 	_type "github.com/pefish/go-core/api-session/type"
-	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-jwt"
 	"github.com/pefish/go-reflect"
@@ -65,7 +64,7 @@ func (jwtAuth *JwtAuthStrategyClass) SetHeaderName(headerName string) {
 }
 
 func (jwtAuth *JwtAuthStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
+	out.Logger().DebugF(`api-strategy %s trigger`, jwtAuth.GetName())
 
 	out.SetJwtHeaderName(jwtAuth.headerName)
 	jwt := out.Header(jwtAuth.headerName)

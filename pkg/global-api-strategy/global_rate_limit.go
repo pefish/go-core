@@ -5,7 +5,6 @@ import (
 	"errors"
 	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core/api-session/type"
-	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-error"
 	"time"
 )
@@ -40,9 +39,6 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) GetErrorCode() uint64 {
 
 
 func (globalRateLimit *GlobalRateLimitStrategyClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, globalRateLimit.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, globalRateLimit.GetName())
-
 	go func() {
 		params := param.(GlobalRateLimitStrategyParam)
 		ticker := time.NewTicker(params.FillInterval)
@@ -66,9 +62,9 @@ type GlobalRateLimitStrategyParam struct {
 }
 
 func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, globalRateLimit.GetName())
+	out.Logger().DebugF(`api-strategy %s trigger`, globalRateLimit.GetName())
 
-	succ := globalRateLimit.takeAvailable(false)
+	succ := globalRateLimit.takeAvailable(out, false)
 	if !succ {
 		return go_error.WrapWithAll(errors.New(`global rate limit`), globalRateLimit.errorCode, nil)
 	}
@@ -76,7 +72,7 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) Execute(out _type.IApiSessi
 	return nil
 }
 
-func (globalRateLimit *GlobalRateLimitStrategyClass) takeAvailable(block bool) bool{
+func (globalRateLimit *GlobalRateLimitStrategyClass) takeAvailable(out _type.IApiSession, block bool) bool{
 	var takenResult bool
 	if block {
 		select {
@@ -91,6 +87,6 @@ func (globalRateLimit *GlobalRateLimitStrategyClass) takeAvailable(block bool) b
 			takenResult = false
 		}
 	}
-	logger.LoggerDriver.Logger.DebugF("current global rate limit token count: %d", len(globalRateLimit.tokenBucket))
+	out.Logger().DebugF("current global rate limit token count: %d", len(globalRateLimit.tokenBucket))
 	return takenResult
 }

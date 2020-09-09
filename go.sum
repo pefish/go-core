@@ -85,8 +85,12 @@ github.com/pefish/go-application v0.1.4 h1:ykYrftZy7tuFjHRqomDIHwdoXeEoYW4KRtHKn
 github.com/pefish/go-application v0.1.4/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609 h1:3gcLOSAugRZeV4kv7nII/mBwjSRj31TgM1meR7zSEi8=
 github.com/pefish/go-core/api-session/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:gEosWrqg3Umc2vmHcpcF1QAxgz8dIpP/tU4NH3HKjrc=
+github.com/pefish/go-core/api-session/type v0.0.0-20200909071357-0e71a75f6e23 h1:8WlWbM39PNgXwCSjArT+j0hRNb0iWSESX5rwaED/S6k=
+github.com/pefish/go-core/api-session/type v0.0.0-20200909071357-0e71a75f6e23/go.mod h1:NicIlppDxGQkjDV4lP5exKIL/zay4ADHmhX81H6yAd4=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609 h1:c67kDH7Q4Or0wWZHg+jIFTkOys8Z41PZeQpp/p99gSY=
 github.com/pefish/go-core/api/type v0.0.0-20200812075421-22b684b8c609/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
+github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a h1:EzekWd0ad9x6BcHoJ9QHsyf87uXCGWDZq2oOzcdjyGU=
+github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
 github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200909070336-1e46862c37c6 h1:VOBeeMmaBsE3HcdNdJj1CD+2bHS5s87yQDcTT0SCyNA=
 github.com/pefish/go-core/pkg/api-strategy v0.0.0-20200909070336-1e46862c37c6/go.mod h1:ldojuE+fjE+z7WpfZm3b4DmQiTEspoIYA8gg+rKgAEQ=
 github.com/pefish/go-core/pkg/global-api-strategy v0.0.0-20200909070336-1e46862c37c6 h1:zMKQAwjtvoXILKe+FQ2Y8nH4Fr9/PYV4bRjxzZNrKvI=

@@ -6,7 +6,6 @@ import (
 	"errors"
 	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core/api-session/type"
-	"github.com/pefish/go-core/driver/logger"
 	go_error "github.com/pefish/go-error"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
@@ -53,8 +52,6 @@ type OpenCensusStrategyParam struct {
 }
 
 func (openCensus *OpenCensusClass) Init(param interface{}) {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init`, openCensus.GetName())
-	defer logger.LoggerDriver.Logger.DebugF(`api-strategy %s Init defer`, openCensus.GetName())
 	if param == nil {
 		go_error.ThrowWithCode(errors.New(`OpenCensusStrategyParam must be set`), openCensus.GetErrorCode())
 	}
@@ -91,10 +88,10 @@ func (openCensus *OpenCensusClass) Init(param interface{}) {
 }
 
 func (openCensus *OpenCensusClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, openCensus.GetName())
+	out.Logger().DebugF(`api-strategy %s trigger`, openCensus.GetName())
 	defer func() {
 		if err := recover(); err != nil {
-			logger.LoggerDriver.Logger.Error(err)
+			out.Logger().Error(err)
 		}
 	}()
 	newParam := param.(OpenCensusStrategyParam)

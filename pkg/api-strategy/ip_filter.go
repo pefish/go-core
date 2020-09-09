@@ -3,7 +3,6 @@ package api_strategy
 import (
 	"errors"
 	_type "github.com/pefish/go-core/api-session/type"
-	"github.com/pefish/go-core/driver/logger"
 
 	"github.com/pefish/go-error"
 )
@@ -37,7 +36,7 @@ func (ipFilter *IpFilterStrategyClass) GetErrorCode() uint64 {
 }
 
 func (ipFilter *IpFilterStrategyClass) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriver.Logger.DebugF(`api-strategy %s trigger`, ipFilter.GetName())
+	out.Logger().DebugF(`api-strategy %s trigger`, ipFilter.GetName())
 	if param == nil {
 		return go_error.WrapWithAll(errors.New(`strategy need param`), ipFilter.errorCode, nil)
 	}
