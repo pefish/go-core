@@ -7,13 +7,13 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
-	github.com/pefish/go-core/api-session/type v0.0.0-20200909082847-c1f37735bc9f
-	github.com/pefish/go-core/api/type v0.0.0-20200909082847-c1f37735bc9f
+	github.com/pefish/go-core/api-session/type v0.0.0-20210111031021-60feb68dde53
+	github.com/pefish/go-core/api/type v0.0.0-20210111031021-60feb68dde53
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.2
 	github.com/pefish/go-format v0.1.3
-	github.com/pefish/go-http v0.4.11
+	github.com/pefish/go-http v0.5.2
 	github.com/pefish/go-json v0.1.6
 	github.com/pefish/go-logger v0.4.9
 	github.com/pefish/go-reflect v0.2.1
