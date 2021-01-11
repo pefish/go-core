@@ -8,7 +8,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	_type "github.com/pefish/go-core/api-session/type"
 	_type0 "github.com/pefish/go-core/api/type"
-	go_interface_logger "github.com/pefish/go-interface-logger"
+	go_interface_logger "github.com/pefish/go-logger"
 	io "io"
 	http "net/http"
 	reflect "reflect"

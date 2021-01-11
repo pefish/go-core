@@ -2,7 +2,7 @@ package _type
 
 import (
 	_interface "github.com/pefish/go-core/api/type"
-	go_interface_logger "github.com/pefish/go-interface-logger"
+	go_logger "github.com/pefish/go-logger"
 	"io"
 	"net/http"
 )
@@ -47,5 +47,5 @@ type IApiSession interface {
 	Lang() string
 	SetClientType(clientType string)
 	ClientType() string
-	Logger() go_interface_logger.InterfaceLogger
+	Logger() go_logger.InterfaceLogger
 }

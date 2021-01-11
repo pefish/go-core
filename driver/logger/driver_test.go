@@ -1,11 +1,11 @@
 package logger
 
 import (
-	go_interface_logger "github.com/pefish/go-interface-logger"
+	go_logger "github.com/pefish/go-logger"
 )
 
 func ExampleLoggerDriver_Register() {
-	LoggerDriverInstance.Register(go_interface_logger.DefaultLogger)
+	LoggerDriverInstance.Register(go_logger.DefaultLogger)
 
 	LoggerDriverInstance.Startup()
 

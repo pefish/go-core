@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/pefish/go-core/driver/logger"
-	go_interface_logger "github.com/pefish/go-interface-logger"
+	go_logger "github.com/pefish/go-logger"
 
 	"github.com/mitchellh/mapstructure"
 	_type "github.com/pefish/go-core/api-session/type"
@@ -436,6 +436,6 @@ func (apiSession *apiSessionClass) ReadJSON(jsonObject interface{}) error {
 	return json.Unmarshal(rawData, jsonObject)
 }
 
-func (apiSession *apiSessionClass) Logger() go_interface_logger.InterfaceLogger {
+func (apiSession *apiSessionClass) Logger() go_logger.InterfaceLogger {
 	return logger.LoggerDriverInstance.Logger
 }

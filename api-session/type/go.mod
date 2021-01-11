@@ -4,5 +4,5 @@ go 1.14
 
 require (
 	github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a
-	github.com/pefish/go-interface-logger v0.0.6
+	github.com/pefish/go-logger v0.4.9
 )
