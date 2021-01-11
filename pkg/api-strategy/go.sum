@@ -2,8 +2,8 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumC
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/golang/mock v1.4.4 h1:l75CXGRSwbaYNpl/Z2X1XIIAMSCquvXgpVZDhwEIJsc=
 github.com/golang/mock v1.4.4/go.mod h1:l3mdAwkq5BuhzHwde/uurv3sEJeZMXNpwsxVWU71h+4=
-github.com/pefish/go-core/api-session/type v0.0.0-20200909071357-0e71a75f6e23 h1:8WlWbM39PNgXwCSjArT+j0hRNb0iWSESX5rwaED/S6k=
-github.com/pefish/go-core/api-session/type v0.0.0-20200909071357-0e71a75f6e23/go.mod h1:NicIlppDxGQkjDV4lP5exKIL/zay4ADHmhX81H6yAd4=
+github.com/pefish/go-core/api-session/type v0.0.0-20200909082847-c1f37735bc9f h1:uuBBwmy2GVsnvR1/YadU3LAa4bYKnm3OP2E6tAlt1Qg=
+github.com/pefish/go-core/api-session/type v0.0.0-20200909082847-c1f37735bc9f/go.mod h1:NicIlppDxGQkjDV4lP5exKIL/zay4ADHmhX81H6yAd4=
 github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a h1:EzekWd0ad9x6BcHoJ9QHsyf87uXCGWDZq2oOzcdjyGU=
 github.com/pefish/go-core/api/type v0.0.0-20200812110935-900caee6532a/go.mod h1:4uqw/W5sMndOu8S1mpyzZNmZffayAOqENkwAIK/xpdo=
 github.com/pefish/go-error v1.0.1 h1:Vr/nkqTYVp5SRRLRmD1vMgkI+RZ7tZem82WQv66HQRE=
