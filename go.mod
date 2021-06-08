@@ -8,7 +8,7 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
 	github.com/pefish/go-core-strategy v0.0.2 // indirect
-	github.com/pefish/go-core-type v0.0.3 // indirect
+	github.com/pefish/go-core-type v0.0.3
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.4

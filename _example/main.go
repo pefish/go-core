@@ -3,8 +3,8 @@ package main
 import (
 	api_strategy "github.com/pefish/go-core-strategy/api-strategy"
 	global_api_strategy3 "github.com/pefish/go-core-strategy/global-api-strategy"
+	_type2 "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
-	_type2 "github.com/pefish/go-core/api-session/type"
 	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"

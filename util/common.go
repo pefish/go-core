@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	_type "github.com/pefish/go-core/api-session/type"
+	_type "github.com/pefish/go-core-type/api-session"
 )
 
 func UpdateSessionErrorMsg(apiSession _type.IApiSession, key string, data interface{}) {
