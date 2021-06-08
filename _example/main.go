@@ -10,6 +10,7 @@ import (
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
+	"errors"
 	"log"
 	"time"
 )
@@ -40,10 +41,8 @@ func main() {
 					Test string `json:"test" validate:"is-mobile"`
 				}
 				apiSession.ScanParams(&params)
-				//return nil, go_error.WrapWithAll(errors.New("haha"), 2000, map[string]interface{}{
-				//	"haha": "u7ytu7",
-				//})
-				return params.Test, nil
+				return nil, go_error.Wrap(errors.New("haha"))
+				//return params.Test, nil
 			},
 			Params: struct {
 				Test string `json:"test" validate:"required,is-mobile"`

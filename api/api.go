@@ -41,9 +41,9 @@ func (api *Api) GetParams() interface{} {
 type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiResult struct {
-	Msg         string      `json:"msg"`
-	Code        uint64      `json:"code"`
-	Data        interface{} `json:"data"`
+	Msg  string      `json:"msg"`
+	Code uint64      `json:"code"`
+	Data interface{} `json:"data"`
 }
 
 type ApiHandlerType func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo)
@@ -84,10 +84,10 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		errorHandler := func(errorInfo *go_error.ErrorInfo) {
 			errMsg := fmt.Sprint(errorInfo)
 			logger.LoggerDriverInstance.Logger.Error(
-				"err: " +
-					errMsg +
+				apiSession.Data(`error_msg`).(string) +
 					"\n" +
-					apiSession.Data(`error_msg`).(string))
+					"err: " +
+					errMsg)
 			apiResult := &ApiResult{
 				Msg:  errorInfo.Err.Error(),
 				Code: errorInfo.Code,
