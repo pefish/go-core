@@ -2,7 +2,7 @@ package global_api_strategy
 
 import (
 	"errors"
-	_type "github.com/pefish/go-core/api-session/type"
+	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"

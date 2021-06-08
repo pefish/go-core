@@ -8,8 +8,8 @@ import (
 	go_logger "github.com/pefish/go-logger"
 
 	"github.com/mitchellh/mapstructure"
-	_type "github.com/pefish/go-core/api-session/type"
-	_interface "github.com/pefish/go-core/api/type"
+	_interface "github.com/pefish/go-core-type/api"
+	_type "github.com/pefish/go-core-type/api-session"
 	"io"
 	"io/ioutil"
 	"net"
@@ -25,7 +25,6 @@ const (
 	ApiMethod_Option ApiMethod = `OPTIONS`
 	ApiMethod_All    ApiMethod = `ALL`
 )
-
 
 const (
 	StatusCode_Continue           _type.StatusCode = 100 // RFC 7231, 6.2.1

@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/golang/mock/gomock"
+	_type "github.com/pefish/go-core-type/api-session"
 	api_session "github.com/pefish/go-core/api-session"
-	_type "github.com/pefish/go-core/api-session/type"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	mock_http "github.com/pefish/go-core/mock/mock-http"
 	"github.com/pefish/go-error"
@@ -22,7 +22,6 @@ func TestWrapJson(t *testing.T) {
 	}).AnyTimes()
 	httpResponseWriter.EXPECT().WriteHeader(gomock.AssignableToTypeOf(1)).AnyTimes()
 	httpResponseWriter.EXPECT().Header().Return(http.Header{}).AnyTimes()
-
 
 	handler := WrapJson(map[string]*Api{
 		string(api_session.ApiMethod_Get): &Api{

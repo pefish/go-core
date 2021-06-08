@@ -6,4 +6,4 @@ test: api-session/type/type.go
 	go test -cover ./...
 
 api-session/type/type.go:
-	mockgen github.com/pefish/go-core/api-session/type IApiSession > mock/mock-api-session/mock.go
+	mockgen github.com/pefish/go-core-type/api-session IApiSession > mock/mock-api-session/mock.go

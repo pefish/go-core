@@ -3,7 +3,7 @@ package global_api_strategy
 import (
 	"bytes"
 	"fmt"
-	_type "github.com/pefish/go-core/api-session/type"
+	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"

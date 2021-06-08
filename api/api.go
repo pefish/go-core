@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	_type2 "github.com/pefish/go-core/api-session/type"
+	_type2 "github.com/pefish/go-core-type/api-session"
 	_type "github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"

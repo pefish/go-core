@@ -1,7 +1,7 @@
 package _type
 
 import (
-	_type "github.com/pefish/go-core/api-session/type"
+	_type "github.com/pefish/go-core-type/api-session"
 	go_error "github.com/pefish/go-error"
 )
 
