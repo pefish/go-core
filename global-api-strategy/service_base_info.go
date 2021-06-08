@@ -45,7 +45,7 @@ func (serviceBaseInfo *ServiceBaseInfoStrategy) Init(param interface{}) {
 func (serviceBaseInfo *ServiceBaseInfoStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, serviceBaseInfo.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
-	logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`---------------- %s ----------------`, apiMsg))
+	logger.LoggerDriverInstance.Logger.DebugF(`---------------- %s ----------------`, apiMsg)
 	util.UpdateSessionErrorMsg(out, `apiMsg`, apiMsg)
 	logger.LoggerDriverInstance.Logger.DebugF(`UrlParams: %#v`, out.UrlParams())
 	logger.LoggerDriverInstance.Logger.DebugF(`Headers: %#v`, out.Request().Header)

@@ -164,7 +164,7 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	out.SetParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriverInstance.Logger.InfoF(`params: %s`, paramsStr)
+	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, paramsStr)
 	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
 	globalValidator := []string{validator.SQL_INJECT_CHECK}
 	if out.Api().GetParams() != nil {

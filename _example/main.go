@@ -7,10 +7,12 @@ import (
 	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
+	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	"errors"
+	go_logger "github.com/pefish/go-logger"
 	"log"
 	"time"
 )
@@ -18,6 +20,7 @@ import (
 func main() {
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
+	logger.LoggerDriverInstance.Register(go_logger.Logger)
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 	service.Service.SetRoutes([]*api.Api{
 		{
