@@ -164,8 +164,8 @@ github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 h1:Esafd1046DLD
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/pefish/go-application v0.1.4 h1:ykYrftZy7tuFjHRqomDIHwdoXeEoYW4KRtHKnlaf9E4=
 github.com/pefish/go-application v0.1.4/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
-github.com/pefish/go-core v1.1.2 h1:+gTSj9JJvl5q+3vZryN5pwYAWoHpgJ2D7+bFoYX3X40=
-github.com/pefish/go-core v1.1.2/go.mod h1:zuwmQC2QgouN/qihXtf2AOw1UrW4NSljkiRfk34rfQo=
+github.com/pefish/go-core v1.1.4 h1:RkPy84R2cQ/PVutkKz6CYWwiTu5e6oUP5QMnQK+WLSs=
+github.com/pefish/go-core v1.1.4/go.mod h1:JQWH2zPS+imKUlhzBnxiK++HHyWTOOOUuLVJH1JACTQ=
 github.com/pefish/go-core-strategy v0.0.2 h1:16FZOwLIJo9ovoCA3ZKXCk/FYBZqvOeAwadQkG7shXM=
 github.com/pefish/go-core-strategy v0.0.2/go.mod h1:1am3xVUW3YSW7k0xXU5ZgivgO1wehSkWYKmOLp3aZCg=
 github.com/pefish/go-core-type v0.0.3 h1:js1L2ywqQwpxMc7Gm0O1Irj73ew1qohx8L3aJ8vVq1Y=
