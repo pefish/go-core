@@ -7,7 +7,6 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
-	github.com/pefish/go-core-strategy v0.0.2 // indirect
 	github.com/pefish/go-core-type v0.0.3
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
@@ -20,7 +19,6 @@ require (
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/go-test-assert v0.0.1
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
 	golang.org/x/mod v0.4.0 // indirect
@@ -31,4 +29,4 @@ require (
 	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
 
-go 1.14
+go 1.19

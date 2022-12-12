@@ -11,7 +11,6 @@ import (
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
-	"errors"
 	go_logger "github.com/pefish/go-logger"
 	"log"
 	"time"
@@ -42,13 +41,15 @@ func main() {
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
 				var params struct {
 					Test string `json:"test" validate:"is-mobile"`
+					TestNum uint64 `json:"test_num" validate:"required,lte=100"`
 				}
 				apiSession.ScanParams(&params)
-				return nil, go_error.Wrap(errors.New("haha"))
-				//return params.Test, nil
+				//return nil, go_error.Wrap(errors.New("haha"))
+				return params, nil
 			},
 			Params: struct {
 				Test string `json:"test" validate:"required,is-mobile"`
+				TestNum uint64 `json:"test_num" validate:"required,lte=100"`
 			}{},
 		},
 	})
