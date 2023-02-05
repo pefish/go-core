@@ -154,6 +154,10 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 			if err := out.ReadJSON(&tempParam); err != nil {
 				return go_error.WrapWithAll(errors.New(`parse params error`), paramValidate.errorCode, nil)
 			}
+		} else if strings.HasPrefix(requestContentType, TEXT_TYPE) && (out.Api().GetParamType() == TEXT_TYPE || out.Api().GetParamType() == ``) {
+			if err := out.ReadJSON(&tempParam); err != nil {
+				return go_error.WrapWithAll(errors.New(`parse params error`), paramValidate.errorCode, nil)
+			}
 		} else {
 			return go_error.WrapWithAll(errors.New(`content-type not be supported`), paramValidate.errorCode, nil)
 		}
