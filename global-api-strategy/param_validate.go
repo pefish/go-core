@@ -2,6 +2,7 @@ package global_api_strategy
 
 import (
 	"errors"
+	"fmt"
 	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
@@ -152,14 +153,14 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 			}
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api().GetParamType() == JSON_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				return go_error.WrapWithAll(errors.New(`parse params error`), paramValidate.errorCode, nil)
+				return go_error.WrapWithAll(fmt.Errorf(`parse params error. err: %#v`, err), paramValidate.errorCode, nil)
 			}
 		} else if strings.HasPrefix(requestContentType, TEXT_TYPE) && (out.Api().GetParamType() == TEXT_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				return go_error.WrapWithAll(errors.New(`parse params error`), paramValidate.errorCode, nil)
+				return go_error.WrapWithAll(fmt.Errorf(`parse params error. err: %#v`, err), paramValidate.errorCode, nil)
 			}
 		} else {
-			return go_error.WrapWithAll(errors.New(`content-type not be supported`), paramValidate.errorCode, nil)
+			return go_error.WrapWithAll(fmt.Errorf(`content-type not be supported`), paramValidate.errorCode, nil)
 		}
 	} else {
 		return go_error.WrapWithAll(errors.New(`scan params not be supported`), paramValidate.errorCode, nil)
