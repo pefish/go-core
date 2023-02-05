@@ -202,6 +202,8 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 					apiSession.WriteText(`not ok`)
 				}
 			}()
+			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
+
 			if serviceInstance.healthyCheckFunc != nil {
 				serviceInstance.healthyCheckFunc()
 			}
@@ -221,6 +223,8 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		IgnoreGlobalStrategies: true,
 		Method:                 api_session.ApiMethod_All,
 		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
+			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
+
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
 			logger.LoggerDriverInstance.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
 			apiSession.WriteText(`Not Found`)
