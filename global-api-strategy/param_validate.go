@@ -107,7 +107,7 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 			err := myValidator.Validator.Var(map_[fieldName], newTag)
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
-				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`)+`; `+newTag
+				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
 				return go_error.WrapWithAll(errors.New(msg), paramValidate.errorCode, map[string]interface{}{
 					`field`: fieldName,
 				})
