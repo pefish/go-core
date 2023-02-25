@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"runtime"
 	"sync"
+	"github.com/gorilla/mux"
 )
 
 type ServiceClass struct {
@@ -31,7 +32,7 @@ type ServiceClass struct {
 	healthyCheckFunc func()                         // 健康检查函数
 	registeredApi    map[string]map[string]*api.Api // 所有注册了的api。path->method->api
 
-	Mux      *http.ServeMux
+	Mux      *mux.Router
 	stopChan chan bool
 	stopWg   sync.WaitGroup
 }
@@ -216,7 +217,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 	}
 
 	// 处理未知路由
-	var apiObject = &api.Api{
+	var unknownPathApi = &api.Api{
 		Description:            "404 not found",
 		Path:                   "/",
 		IgnoreRootPath:         true,
@@ -233,9 +234,9 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 		ParamType: global_api_strategy.ALL_TYPE,
 	}
 
-	serviceInstance.AddRoute(healthApi, apiObject) // 添加缺省api
+	serviceInstance.AddRoute(healthApi, unknownPathApi) // 添加缺省api
 
-	serviceInstance.Mux = http.NewServeMux()
+	serviceInstance.Mux = mux.NewRouter()
 	for _, apiObject := range serviceInstance.GetApis() {
 		// 得到apiPath
 		apiPath := serviceInstance.path + apiObject.Path

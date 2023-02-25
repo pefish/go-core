@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
 	logger.LoggerDriverInstance.Register(go_logger.Logger)
@@ -24,7 +25,7 @@ func main() {
 	service.Service.SetRoutes([]*api.Api{
 		{
 			Description: "this is a test api",
-			Path:        "/v1/test_api",
+			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
 			Method:      `POST`,
 			Strategies: []_type.StrategyData{
 				{
@@ -42,8 +43,10 @@ func main() {
 				var params struct {
 					Test string `json:"test" validate:"is-mobile"`
 					TestNum uint64 `json:"test_num" validate:"required,lte=100"`
+					TokenId string `json:"token_id"`
 				}
 				apiSession.ScanParams(&params)
+				params.TokenId = apiSession.PathVars()["token_id"]
 				//return nil, go_error.Wrap(errors.New("haha"))
 				return params, nil
 			},
@@ -68,3 +71,10 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+// curl --location --request POST 'http://0.0.0.0:8080/api/test/v1/test_api/1234.json' \
+// --header 'Content-Type: application/json' \
+// --data-raw '{
+//     "test": "16265445433",
+//     "test_num": 34
+// }'

@@ -19,6 +19,8 @@ github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e h1:JKmoR8x90Iww1ks85zJ1lfDGgIiMDuIptTOhJq+zKyg=
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/json-iterator/go v1.1.9 h1:9yzud/Ht36ygwatGx56VwCZtlI/2AD15T1X2sjSuGns=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/jtolds/gls v4.2.1+incompatible h1:fSuqC+Gmlu6l/ZYAoZzx2pyucC8Xza35fpRVWLVmUEE=
@@ -39,6 +41,8 @@ github.com/pefish/go-application v0.1.4 h1:ykYrftZy7tuFjHRqomDIHwdoXeEoYW4KRtHKn
 github.com/pefish/go-application v0.1.4/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
 github.com/pefish/go-core-type v0.0.3 h1:js1L2ywqQwpxMc7Gm0O1Irj73ew1qohx8L3aJ8vVq1Y=
 github.com/pefish/go-core-type v0.0.3/go.mod h1:W8E9+HFMUtir87s5vO6NIyfxmse4zhl1POclrsMrJJ0=
+github.com/pefish/go-core-type v0.0.4 h1:3pH9g6kJwqiaYRq3cWFP5/mp1wm31jo6+ISyGALV1EM=
+github.com/pefish/go-core-type v0.0.4/go.mod h1:1l+rSnIQYF86McSjQvX5SdtXVelyMseOcGN9mZS1tqg=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=

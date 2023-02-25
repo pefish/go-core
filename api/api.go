@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	_type2 "github.com/pefish/go-core-type/api-session"
 	_type "github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
@@ -54,6 +55,7 @@ wrap api处理器. 一个path一个，方法内分别处理method
 func WrapJson(methodController map[string]*Api) func(response http.ResponseWriter, request *http.Request) {
 	return func(response http.ResponseWriter, request *http.Request) {
 		apiSession := api_session.NewApiSession() // 新建会话
+		apiSession.SetPathVars(mux.Vars(request))
 		apiSession.SetResponseWriter(response)
 		apiSession.SetRequest(request)
 		apiSession.SetStatusCode(api_session.StatusCode_OK)

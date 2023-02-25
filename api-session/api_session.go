@@ -160,6 +160,7 @@ type apiSessionClass struct {
 	clientType string // web、android、ios
 
 	data map[string]interface{}
+	pathVars map[string]string
 
 	originalParams map[string]interface{} // 客户端传过来的原始参数
 	params         map[string]interface{} // 经过前置处理器修饰过的参数
@@ -172,6 +173,14 @@ func NewApiSession() *apiSessionClass {
 		data:   make(map[string]interface{}, 5),
 		defers: make([]func(), 0, 20),
 	}
+}
+
+func (apiSession *apiSessionClass) SetPathVars(vars map[string]string) {
+	apiSession.pathVars = vars
+}
+
+func (apiSession *apiSessionClass) PathVars() map[string]string {
+	return apiSession.pathVars
 }
 
 func (apiSession *apiSessionClass) SetJwtHeaderName(headerName string) {

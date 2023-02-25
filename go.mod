@@ -4,10 +4,11 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.24.0+incompatible
 	github.com/golang/mock v1.5.0
+	github.com/gorilla/mux v1.8.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
-	github.com/pefish/go-core-type v0.0.3
+	github.com/pefish/go-core-type v0.0.4
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.4
