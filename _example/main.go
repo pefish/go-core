@@ -55,6 +55,31 @@ func main() {
 				TestNum uint64 `json:"test_num" validate:"required,lte=100"`
 			}{},
 		},
+		{
+			Description: "this is a test api",
+			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
+			Method:      `GET`,
+			Strategies: []_type.StrategyData{
+				{
+					Strategy: &api_strategy.IpFilterStrategy,
+					Param: api_strategy.IpFilterParam{
+						GetValidIp: func(apiSession _type2.IApiSession) []string {
+							return []string{`127.0.0.1`}
+						},
+					},
+					Disable: true,
+				},
+			},
+			ParamType: global_api_strategy.ALL_TYPE,
+			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+				var params struct {
+					TokenId string `json:"token_id"`
+				}
+				params.TokenId = apiSession.PathVars()["token_id"]
+				//return nil, go_error.Wrap(errors.New("haha"))
+				return params, nil
+			},
+		},
 	})
 	global_api_strategy3.GlobalRateLimitStrategy.SetErrorCode(10000)
 	global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
