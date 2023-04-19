@@ -43,6 +43,8 @@ github.com/pefish/go-core-type v0.0.3 h1:js1L2ywqQwpxMc7Gm0O1Irj73ew1qohx8L3aJ8v
 github.com/pefish/go-core-type v0.0.3/go.mod h1:W8E9+HFMUtir87s5vO6NIyfxmse4zhl1POclrsMrJJ0=
 github.com/pefish/go-core-type v0.0.4 h1:3pH9g6kJwqiaYRq3cWFP5/mp1wm31jo6+ISyGALV1EM=
 github.com/pefish/go-core-type v0.0.4/go.mod h1:1l+rSnIQYF86McSjQvX5SdtXVelyMseOcGN9mZS1tqg=
+github.com/pefish/go-core-type v0.0.5 h1:nu1ViOY4e7Jp+H7Q+S2IZEXepJPqRBm3XWfYrKzmSFw=
+github.com/pefish/go-core-type v0.0.5/go.mod h1:1l+rSnIQYF86McSjQvX5SdtXVelyMseOcGN9mZS1tqg=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=
