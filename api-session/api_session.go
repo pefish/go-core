@@ -299,6 +299,10 @@ func (apiSession *ApiSessionClass) Data(key string) interface{} {
 	return apiSession.data[key]
 }
 
+func (apiSession *ApiSessionClass) Redirect(url string) {
+	http.Redirect(apiSession.responseWriter, apiSession.request, url, http.StatusTemporaryRedirect)
+}
+
 // Response json body.
 func (apiSession *ApiSessionClass) WriteJson(data interface{}) error {
 	apiSession.SetHeader(string(HeaderName_ContentType), string(ContentTypeValue_JSON))
