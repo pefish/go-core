@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/gorilla/mux"
 	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
@@ -17,7 +18,7 @@ import (
 	"net/http"
 	"runtime"
 	"sync"
-	"github.com/gorilla/mux"
+	"time"
 )
 
 type ServiceClass struct {
@@ -32,15 +33,13 @@ type ServiceClass struct {
 	healthyCheckFunc func()                         // 健康检查函数
 	registeredApi    map[string]map[string]*api.Api // 所有注册了的api。path->method->api
 
-	Mux      *mux.Router
-	stopChan chan bool
-	stopWg   sync.WaitGroup
+	Mux    *mux.Router
+	stopWg sync.WaitGroup
 }
 
 // New Service instance
 func NewService(name string) *ServiceClass {
 	svc := &ServiceClass{
-		stopChan:      make(chan bool),
 		registeredApi: make(map[string]map[string]*api.Api),
 		apis:          make([]*api.Api, 0, 20),
 	}
@@ -56,6 +55,10 @@ func NewService(name string) *ServiceClass {
 
 // Default Service instance
 var Service = NewService(`default`)
+
+func (serviceInstance *ServiceClass) GetInterval() time.Duration {
+	return 0
+}
 
 func (serviceInstance *ServiceClass) SetRoutes(routes ...[]*api.Api) {
 	for _, route := range routes {
@@ -133,12 +136,11 @@ func (serviceInstance *ServiceClass) GetApis() []*api.Api {
 }
 
 func (serviceInstance *ServiceClass) Stop() error {
-	close(serviceInstance.stopChan)
 	serviceInstance.stopWg.Wait()
 	return nil
 }
 
-func (serviceInstance *ServiceClass) Run() error {
+func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 	defer func() {
 		go_application.Application.Exit()
 	}()
@@ -181,7 +183,7 @@ func (serviceInstance *ServiceClass) Run() error {
 		}
 	}()
 	select {
-	case <-serviceInstance.stopChan:
+	case <-ctx.Done():
 		s.Shutdown(context.Background())
 	}
 	return nil

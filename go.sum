@@ -70,6 +70,8 @@ github.com/pefish/go-reflect v0.2.2 h1:rNYU5mMIouRaZyAjDt2/rooNm0zx2IaRBa344Bq1s
 github.com/pefish/go-reflect v0.2.2/go.mod h1:J1PmxXVMl+IqyzuL1OndaKqZjkvfKLaZA9LpUCUB99c=
 github.com/pefish/go-string v0.1.0 h1:44fqR5C5nx2c+mQC9k/k+bRMUuU829T8PswFrcDKc/M=
 github.com/pefish/go-string v0.1.0/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
+github.com/pefish/go-task-driver v0.1.8 h1:g8r6QqVvavhtGu978uLeLzdbulxMFi3Y3U9sFvIsO08=
+github.com/pefish/go-task-driver v0.1.8/go.mod h1:ORrE08xWrNOMjMsOPqy/W+UiFgR7I4eKxvTcHFaODms=
 github.com/pefish/go-test-assert v0.0.1 h1:zWV2Hnn/Rtjf+bEOlyB8qF9ThJb7gmXpRPWEqJtjzjg=
 github.com/pefish/go-test-assert v0.0.1/go.mod h1:kfcsv5ag411u06gdV4iRKU8D0zOglian/DBacnCoQdc=
 github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71 h1:6q36vxPqieHBoxi9S5MbBdcSuaQtdZWZDxWFzSKvihI=

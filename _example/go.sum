@@ -174,6 +174,8 @@ github.com/pefish/go-core-type v0.0.3 h1:js1L2ywqQwpxMc7Gm0O1Irj73ew1qohx8L3aJ8v
 github.com/pefish/go-core-type v0.0.3/go.mod h1:W8E9+HFMUtir87s5vO6NIyfxmse4zhl1POclrsMrJJ0=
 github.com/pefish/go-core-type v0.0.4 h1:3pH9g6kJwqiaYRq3cWFP5/mp1wm31jo6+ISyGALV1EM=
 github.com/pefish/go-core-type v0.0.4/go.mod h1:1l+rSnIQYF86McSjQvX5SdtXVelyMseOcGN9mZS1tqg=
+github.com/pefish/go-core-type v0.0.6 h1:bW86E5nne/9EjED5dp9YxO5tcLU6W4d6jyypsSyLUI4=
+github.com/pefish/go-core-type v0.0.6/go.mod h1:1l+rSnIQYF86McSjQvX5SdtXVelyMseOcGN9mZS1tqg=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=
@@ -197,6 +199,8 @@ github.com/pefish/go-reflect v0.2.2 h1:rNYU5mMIouRaZyAjDt2/rooNm0zx2IaRBa344Bq1s
 github.com/pefish/go-reflect v0.2.2/go.mod h1:J1PmxXVMl+IqyzuL1OndaKqZjkvfKLaZA9LpUCUB99c=
 github.com/pefish/go-string v0.1.0 h1:44fqR5C5nx2c+mQC9k/k+bRMUuU829T8PswFrcDKc/M=
 github.com/pefish/go-string v0.1.0/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
+github.com/pefish/go-task-driver v0.1.8 h1:g8r6QqVvavhtGu978uLeLzdbulxMFi3Y3U9sFvIsO08=
+github.com/pefish/go-task-driver v0.1.8/go.mod h1:ORrE08xWrNOMjMsOPqy/W+UiFgR7I4eKxvTcHFaODms=
 github.com/pefish/go-test-assert v0.0.1 h1:zWV2Hnn/Rtjf+bEOlyB8qF9ThJb7gmXpRPWEqJtjzjg=
 github.com/pefish/go-test-assert v0.0.1/go.mod h1:kfcsv5ag411u06gdV4iRKU8D0zOglian/DBacnCoQdc=
 github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71/go.mod h1:Kq1PFcvI1C/2CH5/EHYJ3GSyKCcsvkEwxDDoGwRsywg=

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	api_strategy "github.com/pefish/go-core-strategy/api-strategy"
 	global_api_strategy3 "github.com/pefish/go-core-strategy/global-api-strategy"
 	_type2 "github.com/pefish/go-core-type/api-session"
@@ -12,7 +13,7 @@ import (
 	"github.com/pefish/go-core/service"
 	"github.com/pefish/go-error"
 	go_logger "github.com/pefish/go-logger"
-	"log"
+	task_driver "github.com/pefish/go-task-driver"
 	"time"
 )
 
@@ -41,7 +42,7 @@ func main() {
 			ParamType: global_api_strategy.ALL_TYPE,
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
 				var params struct {
-					Test string `json:"test" validate:"is-mobile"`
+					Test    string `json:"test" validate:"is-mobile"`
 					TestNum uint64 `json:"test_num" validate:"required,lte=100"`
 					TokenId string `json:"token_id"`
 				}
@@ -51,7 +52,7 @@ func main() {
 				return params, nil
 			},
 			Params: struct {
-				Test string `json:"test" validate:"required,is-mobile"`
+				Test    string `json:"test" validate:"required,is-mobile"`
 				TestNum uint64 `json:"test_num" validate:"required,lte=100"`
 			}{},
 		},
@@ -91,10 +92,11 @@ func main() {
 	})
 	service.Service.SetPort(8080)
 
-	err := service.Service.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
+	taskDriver := task_driver.NewTaskDriver()
+	taskDriver.SetLogger(go_logger.Logger)
+	taskDriver.Register(service.Service)
+
+	taskDriver.RunWait(context.Background())
 }
 
 // curl --location --request POST 'http://0.0.0.0:8080/api/test/v1/test_api/1234.json' \
@@ -103,4 +105,3 @@ func main() {
 //     "test": "16265445433",
 //     "test_num": 34
 // }'
-
