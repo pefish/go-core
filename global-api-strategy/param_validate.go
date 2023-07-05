@@ -105,13 +105,18 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 				}
 			}
 
+			logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: value: %#v, tag: %s", map_[fieldName], newTag)
 			err := myValidator.Validator.Var(map_[fieldName], newTag)
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
-				return go_error.WrapWithAll(errors.New(msg), paramValidate.errorCode, map[string]interface{}{
-					`field`: fieldName,
-				})
+				logger.LoggerDriverInstance.Logger.Error(msg)
+				return go_error.WrapWithAll(
+					fmt.Errorf("Params error."),
+					paramValidate.errorCode, map[string]interface{}{
+						`field`: fieldName,
+					},
+				)
 			}
 		}
 	}

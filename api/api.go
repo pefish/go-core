@@ -49,7 +49,8 @@ type ApiResult struct {
 
 type ApiHandlerType func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo)
 
-/**
+/*
+*
 wrap api处理器. 一个path一个，方法内分别处理method
 */
 func WrapJson(methodController map[string]*Api) func(response http.ResponseWriter, request *http.Request) {
@@ -84,12 +85,6 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		}
 
 		errorHandler := func(errorInfo *go_error.ErrorInfo) {
-			errMsg := fmt.Sprint(errorInfo)
-			logger.LoggerDriverInstance.Logger.Error(
-				apiSession.Data(`error_msg`).(string) +
-					"\n" +
-					"err: " +
-					errMsg)
 			apiResult := &ApiResult{
 				Msg:  errorInfo.Err.Error(),
 				Code: errorInfo.Code,
@@ -114,8 +109,14 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 		}
 
-		defer go_error.Recover(func(errorInfo *go_error.ErrorInfo) {
-			errorHandler(errorInfo)
+		defer go_error.Recover(func(errInfo *go_error.ErrorInfo) {
+			errMsg := fmt.Sprint(errInfo)
+			logger.LoggerDriverInstance.Logger.Error(
+				apiSession.Data(`error_msg`).(string) +
+					"\n" +
+					"err: " +
+					errMsg)
+			errorHandler(go_error.INTERNAL_ERROR)
 		})
 
 		if !currentApi.IgnoreGlobalStrategies {
@@ -123,9 +124,15 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				if strategyData.Disable {
 					continue
 				}
-				err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
-				if err != nil {
-					errorHandler(err)
+				errInfo := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+				if errInfo != nil {
+					errMsg := fmt.Sprint(errInfo)
+					logger.LoggerDriverInstance.Logger.Error(
+						apiSession.Data(`error_msg`).(string) +
+							"\n" +
+							"err: " +
+							errMsg)
+					errorHandler(errInfo)
 					return
 				}
 			}
@@ -135,9 +142,15 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			if strategyData.Disable {
 				continue
 			}
-			err := strategyData.Strategy.Execute(apiSession, strategyData.Param)
-			if err != nil {
-				errorHandler(err)
+			errInfo := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+			if errInfo != nil {
+				errMsg := fmt.Sprint(errInfo)
+				logger.LoggerDriverInstance.Logger.Error(
+					apiSession.Data(`error_msg`).(string) +
+						"\n" +
+						"err: " +
+						errMsg)
+				errorHandler(errInfo)
 				return
 			}
 		}
@@ -153,6 +166,12 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			return
 		}
 		if errInfo != nil {
+			errMsg := fmt.Sprint(errInfo)
+			logger.LoggerDriverInstance.Logger.Error(
+				apiSession.Data(`error_msg`).(string) +
+					"\n" +
+					"err: " +
+					errMsg)
 			errorHandler(errInfo)
 			return
 		}

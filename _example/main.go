@@ -23,6 +23,13 @@ func main() {
 	service.Service.SetPath(`/api/test`)
 	logger.LoggerDriverInstance.Register(go_logger.Logger)
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
+
+	type Params1 struct {
+		Test     string `json:"test" validate:"is-mobile"`
+		TestNum  uint64 `json:"test_num" validate:"required,lte=100"`
+		TestNum1 uint64 `json:"test_num1" validate:"required,gte=1"`
+	}
+
 	service.Service.SetRoutes([]*api.Api{
 		{
 			Description: "this is a test api",
@@ -41,20 +48,16 @@ func main() {
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
-				var params struct {
-					Test    string `json:"test" validate:"is-mobile"`
-					TestNum uint64 `json:"test_num" validate:"required,lte=100"`
-					TokenId string `json:"token_id"`
-				}
-				apiSession.ScanParams(&params)
-				params.TokenId = apiSession.PathVars()["token_id"]
+				var params Params1
+				apiSession.MustScanParams(&params)
+				tokenId := apiSession.PathVars()["token_id"]
 				//return nil, go_error.Wrap(errors.New("haha"))
-				return params, nil
+				return map[string]interface{}{
+					"params":  params,
+					"tokenId": tokenId,
+				}, nil
 			},
-			Params: struct {
-				Test    string `json:"test" validate:"required,is-mobile"`
-				TestNum uint64 `json:"test_num" validate:"required,lte=100"`
-			}{},
+			Params: Params1{},
 		},
 		{
 			Description: "this is a test api",
@@ -73,12 +76,9 @@ func main() {
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
-				var params struct {
-					TokenId string `json:"token_id"`
-				}
-				params.TokenId = apiSession.PathVars()["token_id"]
+				tokenId := apiSession.PathVars()["token_id"]
 				//return nil, go_error.Wrap(errors.New("haha"))
-				return params, nil
+				return tokenId, nil
 			},
 		},
 	})

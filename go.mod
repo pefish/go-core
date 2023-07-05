@@ -6,14 +6,14 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
-	github.com/pefish/go-core-type v0.0.6
+	github.com/pefish/go-core-type v0.0.7
 	github.com/pefish/go-decimal v0.2.2
 	github.com/pefish/go-desensitize v0.0.6
-	github.com/pefish/go-error v1.0.4
+	github.com/pefish/go-error v1.0.7
 	github.com/pefish/go-format v0.1.3
 	github.com/pefish/go-http v0.5.2
 	github.com/pefish/go-json v0.1.7
-	github.com/pefish/go-logger v0.4.15
+	github.com/pefish/go-logger v0.4.16
 	github.com/pefish/go-reflect v0.2.2
 	github.com/pefish/go-string v0.1.0
 	github.com/pefish/go-test-assert v0.0.1

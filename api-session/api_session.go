@@ -263,7 +263,7 @@ func (apiSession *ApiSessionClass) UserId() uint64 {
 	return apiSession.userId
 }
 
-func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
+func (apiSession *ApiSessionClass) ScanParams(dest interface{}) error {
 	config := &mapstructure.DecoderConfig{
 		WeaklyTypedInput: true,
 		TagName:          "json",
@@ -272,10 +272,18 @@ func (apiSession *ApiSessionClass) ScanParams(dest interface{}) {
 
 	decoder, err := mapstructure.NewDecoder(config)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = decoder.Decode(apiSession.params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (apiSession *ApiSessionClass) MustScanParams(dest interface{}) {
+	err := apiSession.ScanParams(dest)
 	if err != nil {
 		panic(err)
 	}
