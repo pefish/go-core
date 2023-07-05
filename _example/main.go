@@ -21,13 +21,17 @@ func main() {
 
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
-	logger.LoggerDriverInstance.Register(go_logger.Logger)
+	logger.LoggerDriverInstance.Register(go_logger.Logger.CloneWithLevel("debug"))
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 
 	type Params1 struct {
 		Test     string `json:"test" validate:"is-mobile"`
 		TestNum  uint64 `json:"test_num" validate:"required,lte=100"`
 		TestNum1 uint64 `json:"test_num1" validate:"required,gte=1"`
+	}
+
+	type Params2 struct {
+		TestNum uint64 `json:"test_num" validate:"gte=1" default:"1"`
 	}
 
 	service.Service.SetRoutes([]*api.Api{
@@ -76,10 +80,17 @@ func main() {
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
 			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+				var params Params2
+				apiSession.MustScanParams(&params)
+
 				tokenId := apiSession.PathVars()["token_id"]
 				//return nil, go_error.Wrap(errors.New("haha"))
-				return tokenId, nil
+				return map[string]interface{}{
+					"params":  params,
+					"tokenId": tokenId,
+				}, nil
 			},
+			Params: Params2{},
 		},
 	})
 	global_api_strategy3.GlobalRateLimitStrategy.SetErrorCode(10000)

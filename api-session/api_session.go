@@ -265,7 +265,7 @@ func (apiSession *ApiSessionClass) UserId() uint64 {
 
 func (apiSession *ApiSessionClass) ScanParams(dest interface{}) error {
 	config := &mapstructure.DecoderConfig{
-		WeaklyTypedInput: true,
+		WeaklyTypedInput: false,
 		TagName:          "json",
 		Result:           &dest,
 	}

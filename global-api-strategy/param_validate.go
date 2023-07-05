@@ -10,6 +10,7 @@ import (
 	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
 	"github.com/pefish/go-json"
+	go_reflect "github.com/pefish/go-reflect"
 	"github.com/pefish/go-string"
 	"reflect"
 	"strings"
@@ -68,6 +69,8 @@ func (paramValidate *ParamValidateStrategy) processGlobalValidators(fieldValue r
 }
 
 func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
+	logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: map_: %#v", map_)
+
 	for i := 0; i < value_.NumField(); i++ {
 		typeField := type_.Field(i)
 		typeFieldType := typeField.Type
@@ -86,27 +89,89 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 			}
 			jsonTag := typeField.Tag.Get(`json`)
 			fieldName := strings.Split(jsonTag, `,`)[0]
-			if map_[fieldName] == nil { // map_[fieldName] 为nil的话，后面任何检查都不通过，不合理，所以这样处理
-				typeName := typeField.Type.String()
-				if typeName == `string` {
+
+			var value interface{}
+			// correct type
+			switch fieldKind {
+			case reflect.String:
+				if map_[fieldName] == nil {
 					map_[fieldName] = ``
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
-						out.Params()[fieldName] = defaultVal
 					}
-				} else if strings.Contains(typeName, `int`) || strings.Contains(typeName, `float`) {
+				}
+				value = go_reflect.Reflect.ToString(map_[fieldName])
+			case reflect.Uint64:
+				if map_[fieldName] == nil {
 					map_[fieldName] = 0
 					defaultVal := typeField.Tag.Get(`default`)
 					if defaultVal != `` {
 						map_[fieldName] = defaultVal
-						out.Params()[fieldName] = defaultVal
 					}
 				}
+				tmpValue, err := go_reflect.Reflect.ToUint64(map_[fieldName])
+				if err != nil {
+					logger.LoggerDriverInstance.Logger.ErrorF("ToUint64 error - %#v", err)
+					return go_error.WrapWithAll(
+						fmt.Errorf("Params error."),
+						paramValidate.errorCode, map[string]interface{}{
+							`field`: fieldName,
+						},
+					)
+				}
+				value = tmpValue
+			case reflect.Int64:
+				if map_[fieldName] == nil {
+					map_[fieldName] = 0
+					defaultVal := typeField.Tag.Get(`default`)
+					if defaultVal != `` {
+						map_[fieldName] = defaultVal
+					}
+				}
+				tmpValue, err := go_reflect.Reflect.ToInt64(map_[fieldName])
+				if err != nil {
+					logger.LoggerDriverInstance.Logger.ErrorF("ToInt64 error - %#v", err)
+					return go_error.WrapWithAll(
+						fmt.Errorf("Params error."),
+						paramValidate.errorCode, map[string]interface{}{
+							`field`: fieldName,
+						},
+					)
+				}
+				value = tmpValue
+			case reflect.Float64:
+				if map_[fieldName] == nil {
+					map_[fieldName] = 0
+					defaultVal := typeField.Tag.Get(`default`)
+					if defaultVal != `` {
+						map_[fieldName] = defaultVal
+					}
+				}
+				tmpValue, err := go_reflect.Reflect.ToFloat64(map_[fieldName])
+				if err != nil {
+					logger.LoggerDriverInstance.Logger.ErrorF("ToFloat64 error - %#v", err)
+					return go_error.WrapWithAll(
+						fmt.Errorf("Params error."),
+						paramValidate.errorCode, map[string]interface{}{
+							`field`: fieldName,
+						},
+					)
+				}
+				value = tmpValue
+			default:
+				logger.LoggerDriverInstance.Logger.Error("param kind error. fieldKind: %#v", fieldKind)
+				return go_error.WrapWithAll(
+					fmt.Errorf("Params error."),
+					paramValidate.errorCode, map[string]interface{}{
+						`field`: fieldName,
+					},
+				)
 			}
+			out.Params()[fieldName] = value
 
-			logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: value: %#v, tag: %s", map_[fieldName], newTag)
-			err := myValidator.Validator.Var(map_[fieldName], newTag)
+			logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: value: %#v, tag: %s", value, newTag)
+			err := myValidator.Validator.Var(value, newTag)
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
@@ -172,10 +237,9 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 	}
 	// 深拷贝
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
-	out.SetParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
-	paramsStr := go_desensitize.Desensitize.DesensitizeToString(tempParam)
-	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, paramsStr)
-	util.UpdateSessionErrorMsg(out, `params`, paramsStr)
+	out.SetParams(map[string]interface{}{})
+	logger.LoggerDriverInstance.Logger.DebugF(`original params: %s`, go_desensitize.Desensitize.DesensitizeToString(out.OriginalParams()))
+
 	globalValidator := []string{validator.SQL_INJECT_CHECK}
 	if out.Api().GetParams() != nil {
 		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
@@ -183,6 +247,9 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 			return err
 		}
 	}
+
+	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, go_desensitize.Desensitize.DesensitizeToString(out.Params()))
+	util.UpdateSessionErrorMsg(out, `params`, out.Params())
 
 	return nil
 }
