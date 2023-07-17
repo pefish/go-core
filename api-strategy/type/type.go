@@ -16,4 +16,7 @@ type IStrategy interface {
 	GetName() string
 	GetDescription() string
 	GetErrorCode() uint64
+	SetErrorCode(code uint64)
+	SetErrorMsg(msg string)
+	GetErrorMsg() string
 }

@@ -23,35 +23,46 @@ const (
 	TEXT_TYPE      = `text/plain`
 )
 
-// 默认自带
 type ParamValidateStrategy struct {
 	errorCode uint64
+	errorMsg  string
 }
 
 var ParamValidateStrategyInstance = ParamValidateStrategy{
 	errorCode: go_error.INTERNAL_ERROR_CODE,
 }
 
-func (paramValidate *ParamValidateStrategy) GetName() string {
-	return `paramValidate`
+func (pvs *ParamValidateStrategy) GetName() string {
+	return `ParamValidateStrategy`
 }
 
-func (paramValidate *ParamValidateStrategy) GetDescription() string {
+func (pvs *ParamValidateStrategy) GetDescription() string {
 	return `validate params`
 }
 
-func (paramValidate *ParamValidateStrategy) SetErrorCode(code uint64) {
-	paramValidate.errorCode = code
+func (pvs *ParamValidateStrategy) SetErrorCode(code uint64) {
+	pvs.errorCode = code
 }
 
-func (paramValidate *ParamValidateStrategy) GetErrorCode() uint64 {
-	if paramValidate.errorCode == 0 {
+func (pvs *ParamValidateStrategy) SetErrorMsg(msg string) {
+	pvs.errorMsg = msg
+}
+
+func (pvs *ParamValidateStrategy) GetErrorCode() uint64 {
+	if pvs.errorCode == 0 {
 		return go_error.INTERNAL_ERROR_CODE
 	}
-	return paramValidate.errorCode
+	return pvs.errorCode
 }
 
-func (paramValidate *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
+func (pvs *ParamValidateStrategy) GetErrorMsg() string {
+	if pvs.errorMsg == "" {
+		return "Params error."
+	}
+	return pvs.errorMsg
+}
+
+func (pvs *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
 	result := ``
 	for _, validatorName := range globalValidator {
 		if validatorName == validator.SQL_INJECT_CHECK && (strings.Contains(oldTag, validator.DISABLE_SQL_INJECT_CHECK) || fieldValue.Type().Kind() != reflect.String) {
@@ -68,7 +79,7 @@ func (paramValidate *ParamValidateStrategy) processGlobalValidators(fieldValue r
 	return result
 }
 
-func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) *go_error.ErrorInfo {
+func (pvs *ParamValidateStrategy) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) (string, error) {
 	logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: map_: %#v", map_)
 
 	for i := 0; i < value_.NumField(); i++ {
@@ -77,15 +88,15 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 		fieldKind := typeFieldType.Kind()
 		fieldValue := value_.Field(i)
 		if fieldKind == reflect.Struct {
-			err := paramValidate.recurValidate(out, myValidator, map_, globalValidator, typeFieldType, fieldValue)
+			fieldName, err := pvs.recurValidate(out, myValidator, map_, globalValidator, typeFieldType, fieldValue)
 			if err != nil {
-				return err
+				return fieldName, err
 			}
 		} else {
 			tagVal := typeField.Tag.Get(`validate`)
 			newTag := tagVal
 			if len(globalValidator) != 0 {
-				newTag = paramValidate.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
+				newTag = pvs.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
 			}
 			jsonTag := typeField.Tag.Get(`json`)
 			fieldName := strings.Split(jsonTag, `,`)[0]
@@ -112,13 +123,7 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 				}
 				tmpValue, err := go_reflect.Reflect.ToUint64(map_[fieldName])
 				if err != nil {
-					logger.LoggerDriverInstance.Logger.ErrorF("ToUint64 error - %#v", err)
-					return go_error.WrapWithAll(
-						fmt.Errorf("Params error."),
-						paramValidate.errorCode, map[string]interface{}{
-							`field`: fieldName,
-						},
-					)
+					return fieldName, fmt.Errorf("ToUint64 error - %#v", err)
 				}
 				value = tmpValue
 			case reflect.Int64:
@@ -131,13 +136,7 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 				}
 				tmpValue, err := go_reflect.Reflect.ToInt64(map_[fieldName])
 				if err != nil {
-					logger.LoggerDriverInstance.Logger.ErrorF("ToInt64 error - %#v", err)
-					return go_error.WrapWithAll(
-						fmt.Errorf("Params error."),
-						paramValidate.errorCode, map[string]interface{}{
-							`field`: fieldName,
-						},
-					)
+					return fieldName, fmt.Errorf("ToInt64 error - %#v", err)
 				}
 				value = tmpValue
 			case reflect.Float64:
@@ -150,23 +149,11 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 				}
 				tmpValue, err := go_reflect.Reflect.ToFloat64(map_[fieldName])
 				if err != nil {
-					logger.LoggerDriverInstance.Logger.ErrorF("ToFloat64 error - %#v", err)
-					return go_error.WrapWithAll(
-						fmt.Errorf("Params error."),
-						paramValidate.errorCode, map[string]interface{}{
-							`field`: fieldName,
-						},
-					)
+					return fieldName, fmt.Errorf("ToFloat64 error - %#v", err)
 				}
 				value = tmpValue
 			default:
-				logger.LoggerDriverInstance.Logger.Error("param kind error. fieldKind: %#v", fieldKind)
-				return go_error.WrapWithAll(
-					fmt.Errorf("Params error."),
-					paramValidate.errorCode, map[string]interface{}{
-						`field`: fieldName,
-					},
-				)
+				return fieldName, fmt.Errorf("param kind error. fieldKind: %#v", fieldKind)
 			}
 			out.Params()[fieldName] = value
 
@@ -175,30 +162,25 @@ func (paramValidate *ParamValidateStrategy) recurValidate(out _type.IApiSession,
 			if err != nil {
 				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
-				logger.LoggerDriverInstance.Logger.Error(msg)
-				return go_error.WrapWithAll(
-					fmt.Errorf("Params error."),
-					paramValidate.errorCode, map[string]interface{}{
-						`field`: fieldName,
-					},
-				)
+				return fieldName, fmt.Errorf(msg)
 			}
 		}
 	}
-	return nil
+	return "", nil
 }
 
-func (paramValidate *ParamValidateStrategy) Init(param interface{}) {
-	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, paramValidate.GetName())
-	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, paramValidate.GetName())
+func (pvs *ParamValidateStrategy) Init(param interface{}) {
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, pvs.GetName())
+	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, pvs.GetName())
 }
 
-func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
-	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, paramValidate.GetName())
+func (pvs *ParamValidateStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, pvs.GetName())
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()
 	if err != nil {
-		return go_error.WrapWithAll(errors.New(`validator init error`), paramValidate.errorCode, nil)
+		logger.LoggerDriverInstance.Logger.ErrorF(`validator init error`)
+		return go_error.WrapWithAll(fmt.Errorf(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 	}
 
 	tempParam := map[string]interface{}{}
@@ -210,7 +192,8 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 	} else if out.Method() == `POST` {
 		requestContentType := out.Header(`content-type`)
 		if out.Api().GetParamType() != `` && !strings.HasPrefix(requestContentType, out.Api().GetParamType()) {
-			return go_error.WrapWithAll(errors.New(`content-type error`), paramValidate.errorCode, nil)
+			logger.LoggerDriverInstance.Logger.ErrorF(`content-type error`)
+			return go_error.WrapWithAll(fmt.Errorf(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 		}
 
 		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api().GetParamType() == MULTIPART_TYPE || out.Api().GetParamType() == ``) {
@@ -223,17 +206,21 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 			}
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api().GetParamType() == JSON_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				return go_error.WrapWithAll(fmt.Errorf(`parse params error. err: %#v`, err), paramValidate.errorCode, nil)
+				logger.LoggerDriverInstance.Logger.ErrorF(`parse params error. err: %#v`, err)
+				return go_error.WrapWithAll(fmt.Errorf(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 			}
 		} else if strings.HasPrefix(requestContentType, TEXT_TYPE) && (out.Api().GetParamType() == TEXT_TYPE || out.Api().GetParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
-				return go_error.WrapWithAll(fmt.Errorf(`parse params error. err: %#v`, err), paramValidate.errorCode, nil)
+				logger.LoggerDriverInstance.Logger.ErrorF(`parse params error. err: %#v`, err)
+				return go_error.WrapWithAll(fmt.Errorf(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 			}
 		} else {
-			return go_error.WrapWithAll(fmt.Errorf(`content-type not be supported`), paramValidate.errorCode, nil)
+			logger.LoggerDriverInstance.Logger.ErrorF(`content-type not be supported`)
+			return go_error.WrapWithAll(fmt.Errorf(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 		}
 	} else {
-		return go_error.WrapWithAll(errors.New(`scan params not be supported`), paramValidate.errorCode, nil)
+		logger.LoggerDriverInstance.Logger.ErrorF(`scan params not be supported`)
+		return go_error.WrapWithAll(errors.New(pvs.GetErrorMsg()), pvs.GetErrorCode(), nil)
 	}
 	// 深拷贝
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
@@ -242,9 +229,12 @@ func (paramValidate *ParamValidateStrategy) Execute(out _type.IApiSession, param
 
 	globalValidator := []string{validator.SQL_INJECT_CHECK}
 	if out.Api().GetParams() != nil {
-		err := paramValidate.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
+		fieldName, err := pvs.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
 		if err != nil {
-			return err
+			logger.LoggerDriverInstance.Logger.ErrorF(`param validate error. - %#v`, err)
+			return go_error.WrapWithAll(errors.New(pvs.GetErrorMsg()), pvs.GetErrorCode(), map[string]interface{}{
+				`field`: fieldName,
+			})
 		}
 	}
 

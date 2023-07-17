@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/pefish/go-core v1.2.3
-	github.com/pefish/go-core-strategy v0.0.2
+	github.com/pefish/go-core-strategy v0.0.4
 	github.com/pefish/go-core-type v0.0.7
 	github.com/pefish/go-error v1.0.7
 	github.com/pefish/go-logger v0.4.16
@@ -33,7 +33,7 @@ require (
 	github.com/pefish/go-decimal v0.2.2 // indirect
 	github.com/pefish/go-desensitize v0.0.6 // indirect
 	github.com/pefish/go-json v0.1.7 // indirect
-	github.com/pefish/go-jwt v0.3.2 // indirect
+	github.com/pefish/go-jwt v0.3.3 // indirect
 	github.com/pefish/go-reflect v0.2.2 // indirect
 	github.com/pefish/go-string v0.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

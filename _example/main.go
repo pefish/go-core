@@ -41,7 +41,7 @@ func main() {
 			Method:      `POST`,
 			Strategies: []_type.StrategyData{
 				{
-					Strategy: &api_strategy.IpFilterStrategy,
+					Strategy: &api_strategy.IpFilterStrategyInstance,
 					Param: api_strategy.IpFilterParam{
 						GetValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
@@ -69,7 +69,7 @@ func main() {
 			Method:      `GET`,
 			Strategies: []_type.StrategyData{
 				{
-					Strategy: &api_strategy.IpFilterStrategy,
+					Strategy: &api_strategy.IpFilterStrategyInstance,
 					Param: api_strategy.IpFilterParam{
 						GetValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
@@ -93,9 +93,9 @@ func main() {
 			Params: Params2{},
 		},
 	})
-	global_api_strategy3.GlobalRateLimitStrategy.SetErrorCode(10000)
+	global_api_strategy3.GlobalRateLimitStrategyInstance.SetErrorCode(10000)
 	global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
-		Strategy: &global_api_strategy3.GlobalRateLimitStrategy,
+		Strategy: &global_api_strategy3.GlobalRateLimitStrategyInstance,
 		Param: global_api_strategy3.GlobalRateLimitStrategyParam{
 			FillInterval: 1000 * time.Millisecond,
 		},
@@ -104,7 +104,6 @@ func main() {
 	service.Service.SetPort(8080)
 
 	taskDriver := task_driver.NewTaskDriver()
-	taskDriver.SetLogger(go_logger.Logger)
 	taskDriver.Register(service.Service)
 
 	taskDriver.RunWait(context.Background())
