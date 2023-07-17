@@ -8,7 +8,7 @@ require (
 	github.com/pefish/go-core-type v0.0.7
 	github.com/pefish/go-error v1.0.7
 	github.com/pefish/go-logger v0.4.16
-	github.com/pefish/go-task-driver v0.1.8
+	github.com/pefish/go-task-driver v0.1.9
 )
 
 require (

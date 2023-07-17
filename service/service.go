@@ -13,6 +13,7 @@ import (
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	go_error "github.com/pefish/go-error"
+	go_logger "github.com/pefish/go-logger"
 	"github.com/pefish/go-reflect"
 	"golang.org/x/net/http2"
 	"net/http"
@@ -138,6 +139,10 @@ func (serviceInstance *ServiceClass) GetApis() []*api.Api {
 func (serviceInstance *ServiceClass) Stop() error {
 	serviceInstance.stopWg.Wait()
 	return nil
+}
+
+func (serviceInstance *ServiceClass) GetLogger() go_logger.InterfaceLogger {
+	return logger.LoggerDriverInstance.Logger
 }
 
 func (serviceInstance *ServiceClass) Run(ctx context.Context) error {

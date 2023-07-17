@@ -180,6 +180,8 @@ github.com/pefish/go-string v0.1.0 h1:44fqR5C5nx2c+mQC9k/k+bRMUuU829T8PswFrcDKc/
 github.com/pefish/go-string v0.1.0/go.mod h1:pCtpTZOvsAsTZNGByIevlSW85+Qv8DjTXljwDpEGYvs=
 github.com/pefish/go-task-driver v0.1.8 h1:g8r6QqVvavhtGu978uLeLzdbulxMFi3Y3U9sFvIsO08=
 github.com/pefish/go-task-driver v0.1.8/go.mod h1:ORrE08xWrNOMjMsOPqy/W+UiFgR7I4eKxvTcHFaODms=
+github.com/pefish/go-task-driver v0.1.9 h1:GQKQ4vriAuNtEpkaVVpOiLoyTohr/2+NuxY8uWAc0cI=
+github.com/pefish/go-task-driver v0.1.9/go.mod h1:ORrE08xWrNOMjMsOPqy/W+UiFgR7I4eKxvTcHFaODms=
 github.com/pefish/go-test-assert v0.0.1 h1:zWV2Hnn/Rtjf+bEOlyB8qF9ThJb7gmXpRPWEqJtjzjg=
 github.com/pefish/go-test-assert v0.0.1/go.mod h1:kfcsv5ag411u06gdV4iRKU8D0zOglian/DBacnCoQdc=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
