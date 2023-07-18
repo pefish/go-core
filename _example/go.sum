@@ -160,9 +160,15 @@ github.com/pefish/go-core-strategy v0.0.3 h1:2kL9PDcyCfwuPL3nFFAXKe5Oj8xlnkCRmnn
 github.com/pefish/go-core-strategy v0.0.3/go.mod h1:wy3JggkmOIaJAMAjaOZ7Rz1bdm6UFxpflhTj1xiY4TA=
 github.com/pefish/go-core-strategy v0.0.4 h1:lJt/WBv8GShsI+Y77NJL5a69znBdl4yTyfBXnR03xQY=
 github.com/pefish/go-core-strategy v0.0.4/go.mod h1:wy3JggkmOIaJAMAjaOZ7Rz1bdm6UFxpflhTj1xiY4TA=
+github.com/pefish/go-core-strategy v0.0.5 h1:uMoEqMpszvi8S9SMtEaFhssdgEXgggPVzRewyN0cVtA=
+github.com/pefish/go-core-strategy v0.0.5/go.mod h1:P/ivLKs7c/JtZh1ztAlOLVnoMJ7TatWaxL07qM9nX24=
+github.com/pefish/go-core-strategy v0.0.6 h1:/utQNeF+8T/xSIfPXz/fKTl0Ht9bwYm3jQcytssnwQM=
+github.com/pefish/go-core-strategy v0.0.6/go.mod h1:DLc9t3MeH2qioX016kCuz8eIVV32H+qOT9/Y77gyAz0=
 github.com/pefish/go-core-type v0.0.3/go.mod h1:W8E9+HFMUtir87s5vO6NIyfxmse4zhl1POclrsMrJJ0=
 github.com/pefish/go-core-type v0.0.7 h1:YcYC5riaXC5Aux2WSc8iKxt8icZ8euxs3m0od33BJyc=
 github.com/pefish/go-core-type v0.0.7/go.mod h1:Kypm2Mw+DyD3WN+fIIzcO5nFmQLGr2yRFMGzP3BYMic=
+github.com/pefish/go-core-type v0.1.0 h1:BQ+OlViLpwGs+fVrdAOBTSKjEW4altdeeyDVbb7RkcM=
+github.com/pefish/go-core-type v0.1.0/go.mod h1:YeCFjtW4h5wVv2YzTJyJLr0W1hcHUZGwuJJxy4dlO+Y=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=

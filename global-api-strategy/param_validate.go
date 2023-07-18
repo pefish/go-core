@@ -3,7 +3,8 @@ package global_api_strategy
 import (
 	"errors"
 	"fmt"
-	_type "github.com/pefish/go-core-type/api-session"
+	api_session "github.com/pefish/go-core-type/api-session"
+	global_api_strategy "github.com/pefish/go-core-type/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
@@ -40,12 +41,14 @@ func (pvs *ParamValidateStrategy) GetDescription() string {
 	return `validate params`
 }
 
-func (pvs *ParamValidateStrategy) SetErrorCode(code uint64) {
+func (pvs *ParamValidateStrategy) SetErrorCode(code uint64) global_api_strategy.IGlobalApiStrategy {
 	pvs.errorCode = code
+	return pvs
 }
 
-func (pvs *ParamValidateStrategy) SetErrorMsg(msg string) {
+func (pvs *ParamValidateStrategy) SetErrorMsg(msg string) global_api_strategy.IGlobalApiStrategy {
 	pvs.errorMsg = msg
+	return pvs
 }
 
 func (pvs *ParamValidateStrategy) GetErrorCode() uint64 {
@@ -79,7 +82,7 @@ func (pvs *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Val
 	return result
 }
 
-func (pvs *ParamValidateStrategy) recurValidate(out _type.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) (string, error) {
+func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) (string, error) {
 	logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: map_: %#v", map_)
 
 	for i := 0; i < value_.NumField(); i++ {
@@ -174,7 +177,7 @@ func (pvs *ParamValidateStrategy) Init(param interface{}) {
 	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, pvs.GetName())
 }
 
-func (pvs *ParamValidateStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, pvs.GetName())
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()

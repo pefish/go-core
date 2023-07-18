@@ -6,7 +6,6 @@ import (
 	global_api_strategy3 "github.com/pefish/go-core-strategy/global-api-strategy"
 	_type2 "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
-	"github.com/pefish/go-core/api-strategy/type"
 	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
@@ -39,9 +38,9 @@ func main() {
 			Description: "this is a test api",
 			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
 			Method:      `POST`,
-			Strategies: []_type.StrategyData{
+			Strategies: []api.StrategyData{
 				{
-					Strategy: &api_strategy.IpFilterStrategyInstance,
+					Strategy: api_strategy.IpFilterStrategyInstance,
 					Param: api_strategy.IpFilterParam{
 						GetValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
@@ -67,9 +66,9 @@ func main() {
 			Description: "this is a test api",
 			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
 			Method:      `GET`,
-			Strategies: []_type.StrategyData{
+			Strategies: []api.StrategyData{
 				{
-					Strategy: &api_strategy.IpFilterStrategyInstance,
+					Strategy: api_strategy.IpFilterStrategyInstance,
 					Param: api_strategy.IpFilterParam{
 						GetValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
@@ -95,7 +94,7 @@ func main() {
 	})
 	global_api_strategy3.GlobalRateLimitStrategyInstance.SetErrorCode(10000)
 	global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
-		Strategy: &global_api_strategy3.GlobalRateLimitStrategyInstance,
+		Strategy: global_api_strategy3.GlobalRateLimitStrategyInstance,
 		Param: global_api_strategy3.GlobalRateLimitStrategyParam{
 			FillInterval: 1000 * time.Millisecond,
 		},

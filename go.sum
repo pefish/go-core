@@ -32,8 +32,8 @@ github.com/mitchellh/mapstructure v1.1.2 h1:fmNYVwqnSfB9mZU6OS2O6GsXM+wcskZDuKQz
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/pefish/go-application v0.1.4 h1:ykYrftZy7tuFjHRqomDIHwdoXeEoYW4KRtHKnlaf9E4=
 github.com/pefish/go-application v0.1.4/go.mod h1:FJ0y7LQoSxI6tBPOmRWmzLWE6bTVNV/WSSSWWOtDOfw=
-github.com/pefish/go-core-type v0.0.7 h1:YcYC5riaXC5Aux2WSc8iKxt8icZ8euxs3m0od33BJyc=
-github.com/pefish/go-core-type v0.0.7/go.mod h1:Kypm2Mw+DyD3WN+fIIzcO5nFmQLGr2yRFMGzP3BYMic=
+github.com/pefish/go-core-type v0.1.0 h1:BQ+OlViLpwGs+fVrdAOBTSKjEW4altdeeyDVbb7RkcM=
+github.com/pefish/go-core-type v0.1.0/go.mod h1:YeCFjtW4h5wVv2YzTJyJLr0W1hcHUZGwuJJxy4dlO+Y=
 github.com/pefish/go-decimal v0.2.2 h1:9ZDBhA5qeKkGdK5b1fZm0WZpctZ6TzEfOzJFAIqOi7w=
 github.com/pefish/go-decimal v0.2.2/go.mod h1:9WQjA0tIud5oB9K4FfUCZEDjbDxXnlpkOMMoGAUaUQQ=
 github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbCdCC2t0=

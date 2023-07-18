@@ -3,7 +3,8 @@ package global_api_strategy
 import (
 	"bytes"
 	"fmt"
-	_type "github.com/pefish/go-core-type/api-session"
+	api_session "github.com/pefish/go-core-type/api-session"
+	global_api_strategy "github.com/pefish/go-core-type/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-error"
@@ -25,8 +26,9 @@ func (sbis *ServiceBaseInfoStrategy) GetDescription() string {
 	return `get service base info`
 }
 
-func (sbis *ServiceBaseInfoStrategy) SetErrorCode(code uint64) {
+func (sbis *ServiceBaseInfoStrategy) SetErrorCode(code uint64) global_api_strategy.IGlobalApiStrategy {
 	sbis.errorCode = code
+	return sbis
 }
 
 func (sbis *ServiceBaseInfoStrategy) GetErrorCode() uint64 {
@@ -36,8 +38,9 @@ func (sbis *ServiceBaseInfoStrategy) GetErrorCode() uint64 {
 	return sbis.errorCode
 }
 
-func (sbis *ServiceBaseInfoStrategy) SetErrorMsg(msg string) {
+func (sbis *ServiceBaseInfoStrategy) SetErrorMsg(msg string) global_api_strategy.IGlobalApiStrategy {
 	sbis.errorMsg = msg
+	return sbis
 }
 
 func (sbis *ServiceBaseInfoStrategy) GetErrorMsg() string {
@@ -49,7 +52,7 @@ func (sbis *ServiceBaseInfoStrategy) Init(param interface{}) {
 	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, sbis.GetName())
 }
 
-func (sbis *ServiceBaseInfoStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (sbis *ServiceBaseInfoStrategy) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, sbis.GetName())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
 	logger.LoggerDriverInstance.Logger.DebugF(`---------------- %s ----------------`, apiMsg)

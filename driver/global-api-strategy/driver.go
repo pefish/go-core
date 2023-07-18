@@ -1,12 +1,12 @@
 package global_api_strategy
 
 import (
-	_type "github.com/pefish/go-core/driver/global-api-strategy/type"
+	global_api_strategy "github.com/pefish/go-core-type/global-api-strategy"
 	"sync"
 )
 
 type GlobalStrategyData struct {
-	Strategy _type.IGlobalStrategy
+	Strategy global_api_strategy.IGlobalApiStrategy
 	Param    interface{}
 	Disable  bool
 }
@@ -32,7 +32,6 @@ func (gasd *GlobalApiStrategyDriver) Register(strategyData GlobalStrategyData) b
 	gasd.globalStrategies = append(gasd.globalStrategies, strategyData)
 	return true
 }
-
 
 func (gasd *GlobalApiStrategyDriver) GlobalStrategies() []GlobalStrategyData {
 	return gasd.globalStrategies

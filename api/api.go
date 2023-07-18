@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	_type2 "github.com/pefish/go-core-type/api-session"
-	_type "github.com/pefish/go-core/api-strategy/type"
+	api_strategy "github.com/pefish/go-core-type/api-strategy"
 	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	"net/http"
@@ -13,13 +13,19 @@ import (
 	"github.com/pefish/go-error"
 )
 
+type StrategyData struct {
+	Strategy api_strategy.IApiStrategy
+	Param    interface{}
+	Disable  bool
+}
+
 type Api struct {
 	Description            string                // api描述
 	Path                   string                // api路径
 	IgnoreRootPath         bool                  // api路径是否忽略根路径
 	IgnoreGlobalStrategies bool                  // 是否跳过全局策略
 	Method                 api_session.ApiMethod // api方法
-	Strategies             []_type.StrategyData  // api前置处理策略,不包含全局策略
+	Strategies             []StrategyData        // api前置处理策略,不包含全局策略
 	Params                 interface{}           // api参数
 	Return                 interface{}           // api返回值
 	Controller             ApiHandlerType        // api业务处理器
