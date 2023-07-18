@@ -121,6 +121,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 
 		if !currentApi.IgnoreGlobalStrategies {
 			for _, strategyData := range global_api_strategy.GlobalApiStrategyDriverInstance.GlobalStrategies() {
+				logger.LoggerDriverInstance.Logger.DebugF("global strategy [%s]: %#v", strategyData.Strategy.GetName(), strategyData)
 				if strategyData.Disable {
 					continue
 				}
@@ -139,6 +140,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		}
 
 		for _, strategyData := range currentApi.Strategies {
+			logger.LoggerDriverInstance.Logger.DebugF("strategy [%s]: %#v", strategyData.Strategy.GetName(), strategyData)
 			if strategyData.Disable {
 				continue
 			}
