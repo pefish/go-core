@@ -18,7 +18,6 @@ import (
 	"golang.org/x/net/http2"
 	"net/http"
 	"runtime"
-	"sync"
 	"time"
 )
 
@@ -34,8 +33,7 @@ type ServiceClass struct {
 	healthyCheckFunc func()                         // 健康检查函数
 	registeredApi    map[string]map[string]*api.Api // 所有注册了的api。path->method->api
 
-	Mux    *mux.Router
-	stopWg sync.WaitGroup
+	Mux *mux.Router
 }
 
 // New Service instance
@@ -137,7 +135,6 @@ func (serviceInstance *ServiceClass) GetApis() []*api.Api {
 }
 
 func (serviceInstance *ServiceClass) Stop() error {
-	serviceInstance.stopWg.Wait()
 	return nil
 }
 
@@ -177,19 +174,22 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 	}
 	err := http2.ConfigureServer(s, &http2.Server{}) // 可以使用http2协议
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	exited := make(chan bool)
 	go func() {
-		serviceInstance.stopWg.Add(1)
-		defer serviceInstance.stopWg.Done()
 		err := s.ListenAndServe()
 		if err != nil {
 			logger.LoggerDriverInstance.Logger.Error(err)
+			exited <- true
 		}
 	}()
+
 	select {
 	case <-ctx.Done():
 		s.Shutdown(context.Background())
+	case <-exited:
 	}
 	return nil
 }
