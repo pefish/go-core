@@ -2,11 +2,27 @@ package global_api_strategy
 
 import (
 	_type "github.com/pefish/go-core-type/api-session"
+	global_api_strategy "github.com/pefish/go-core-type/global-api-strategy"
 	go_error "github.com/pefish/go-error"
 )
 
 type TestGlobalStrategy struct {
 	Test string
+}
+
+func (esd *TestGlobalStrategy) SetErrorCode(code uint64) global_api_strategy.IGlobalApiStrategy {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (esd *TestGlobalStrategy) SetErrorMsg(msg string) global_api_strategy.IGlobalApiStrategy {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (esd *TestGlobalStrategy) GetErrorMsg() string {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (esd *TestGlobalStrategy) Init(param interface{}) {

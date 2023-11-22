@@ -7,7 +7,7 @@ import (
 	api_session "github.com/pefish/go-core/api-session"
 	mock_type "github.com/pefish/go-core/mock/mock-api-session"
 	go_error "github.com/pefish/go-error"
-	"github.com/pefish/go-test-assert"
+	go_test_ "github.com/pefish/go-test"
 	"testing"
 )
 
@@ -16,13 +16,13 @@ func TestParamValidateStrategyClass_Execute(t *testing.T) {
 	apiSession := mock_type.NewMockIApiSession(ctrl)
 	apiSession.EXPECT().Method().Return("GET").AnyTimes()
 	apiSession.EXPECT().UrlParams().Return(map[string]string{
-		"test": "haha",
+		"go_test_": "haha",
 	}).AnyTimes()
 	apiSession.EXPECT().SetOriginalParams(gomock.Any()).Do(func(originalParams map[string]interface{}) {
-		test.Equal(t, "haha", originalParams["test"].(string))
+		go_test_.Equal(t, "haha", originalParams["go_test_"].(string))
 	}).AnyTimes()
 	apiSession.EXPECT().SetParams(gomock.Any()).Do(func(originalParams map[string]interface{}) {
-		test.Equal(t, "haha", originalParams["test"].(string))
+		go_test_.Equal(t, "haha", originalParams["go_test_"].(string))
 	}).AnyTimes()
 	apiSession.EXPECT().Data(gomock.Any()).DoAndReturn(func(p string) interface{} {
 		if p == "error_msg" {
@@ -32,7 +32,7 @@ func TestParamValidateStrategyClass_Execute(t *testing.T) {
 	}).AnyTimes()
 	apiSession.EXPECT().SetData(gomock.Any(), gomock.Any()).AnyTimes()
 	testApi := &api.Api{
-		Description:            "test",
+		Description:            "go_test_",
 		Path:                   "/",
 		IgnoreRootPath:         true,
 		IgnoreGlobalStrategies: true,
@@ -48,13 +48,13 @@ func TestParamValidateStrategyClass_Execute(t *testing.T) {
 	ParamValidateStrategyInstance.Init(nil)
 
 	err := ParamValidateStrategyInstance.Execute(apiSession, nil)
-	test.Equal(t, (*go_error.ErrorInfo)(nil), err)
+	go_test_.Equal(t, (*go_error.ErrorInfo)(nil), err)
 
 	testApi.Params = struct {
-		Test string `json:"test" validate:"required,is-mobile"`
+		Test string `json:"go_test_" validate:"required,is-mobile"`
 	}{}
 	err = ParamValidateStrategyInstance.Execute(apiSession, nil)
-	test.Equal(t, uint64(1), err.Code)
-	test.Equal(t, "test", err.Data.(map[string]interface{})["field"].(string))
-	test.Equal(t, `ErrorInfo -> msg: Key: 'Test'; Error:Field validation for 'test' failed on the 'is-mobile' tag; sql-inject-check,required,is-mobile, code: 1, data: map[string]interface {}{"field":"test"}, err: &errors.errorString{s:"Key: 'Test'; Error:Field validation for 'test' failed on the 'is-mobile' tag; sql-inject-check,required,is-mobile"}`, err.String())
+	go_test_.Equal(t, uint64(1), err.Code)
+	go_test_.Equal(t, "go_test_", err.Data.(map[string]interface{})["field"].(string))
+	go_test_.Equal(t, `ErrorInfo -> msg: Key: 'Test'; Error:Field validation for 'go_test_' failed on the 'is-mobile' tag; sql-inject-check,required,is-mobile, code: 1, data: map[string]interface {}{"field":"go_test_"}, err: &errors.errorString{s:"Key: 'Test'; Error:Field validation for 'go_test_' failed on the 'is-mobile' tag; sql-inject-check,required,is-mobile"}`, err.String())
 }

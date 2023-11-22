@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	mock_http "github.com/pefish/go-core/mock/mock-http"
-	"github.com/pefish/go-test-assert"
+	go_test_ "github.com/pefish/go-test"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -18,23 +18,23 @@ func TestApiSessionClass_ScanParams(t *testing.T) {
 	}
 
 	type Result struct {
-		Test string `json:"test"`
+		Test string `json:"go_test_"`
 		Haha uint64 `json:"haha"`
-		Xixi Test `json:"xixi"`
+		Xixi Test   `json:"xixi"`
 	}
 
 	apiSession := NewApiSession()
 	apiSession.params = map[string]interface{}{
-		"test": "test",
-		"haha": 4,
-		"xixi": Test{a: "a"},
+		"go_test_": "go_test_",
+		"haha":     4,
+		"xixi":     Test{a: "a"},
 	}
 	var result Result
 	apiSession.ScanParams(&result)
 
-	test.Equal(t, "test", result.Test)
-	test.Equal(t, uint64(4), result.Haha)
-	test.Equal(t, "a", result.Xixi.a)
+	go_test_.Equal(t, "go_test_", result.Test)
+	go_test_.Equal(t, uint64(4), result.Haha)
+	go_test_.Equal(t, "a", result.Xixi.a)
 }
 
 func TestApiSessionClass_WriteJson(t *testing.T) {
@@ -59,17 +59,17 @@ func TestApiSessionClass_WriteJson(t *testing.T) {
 	err := apiSession.WriteJson(map[string]interface{}{
 		"haha": "xixi",
 	})
-	test.Equal(t, nil, err)
-	test.Equal(t, `{"haha":"xixi"}`, result)
-	test.Equal(t, 400, statusCode)
-	test.Equal(t, string(ContentTypeValue_JSON), resHeaders.Get(string(HeaderName_ContentType)))
+	go_test_.Equal(t, nil, err)
+	go_test_.Equal(t, `{"haha":"xixi"}`, result)
+	go_test_.Equal(t, 400, statusCode)
+	go_test_.Equal(t, string(ContentTypeValue_JSON), resHeaders.Get(string(HeaderName_ContentType)))
 
 	type Test struct {
 		A string `json:"a"`
 	}
-	err = apiSession.WriteJson(&Test{A:"a"})
-	test.Equal(t, nil, err)
-	test.Equal(t, `{"a":"a"}`, result)
+	err = apiSession.WriteJson(&Test{A: "a"})
+	go_test_.Equal(t, nil, err)
+	go_test_.Equal(t, `{"a":"a"}`, result)
 }
 
 func TestApiSessionClass_WriteText(t *testing.T) {
@@ -91,19 +91,19 @@ func TestApiSessionClass_WriteText(t *testing.T) {
 	apiSession.responseWriter = httpResponseWriter
 	apiSession.SetStatusCode(400)
 	err := apiSession.WriteText("hgfhdfghd")
-	test.Equal(t, nil, err)
-	test.Equal(t, `hgfhdfghd`, result)
-	test.Equal(t, 400, statusCode)
+	go_test_.Equal(t, nil, err)
+	go_test_.Equal(t, `hgfhdfghd`, result)
+	go_test_.Equal(t, 400, statusCode)
 }
 
 func TestApiSessionClass_GetRemoteAddress(t *testing.T) {
 	apiSession := NewApiSession()
 	apiSession.request = &http.Request{
-		Method: "GET",
-		Header: http.Header{},
+		Method:     "GET",
+		Header:     http.Header{},
 		RemoteAddr: "124.56.66.7",
 	}
-	test.Equal(t, "124.56.66.7", apiSession.RemoteAddress())
+	go_test_.Equal(t, "124.56.66.7", apiSession.RemoteAddress())
 
 	apiSession.request = &http.Request{
 		Method: "GET",
@@ -112,7 +112,7 @@ func TestApiSessionClass_GetRemoteAddress(t *testing.T) {
 		},
 		RemoteAddr: "124.56.66.7",
 	}
-	test.Equal(t, "24.56.11.23", apiSession.RemoteAddress())
+	go_test_.Equal(t, "24.56.11.23", apiSession.RemoteAddress())
 }
 
 func TestApiSessionClass_GetUrlParams(t *testing.T) {
@@ -121,10 +121,10 @@ func TestApiSessionClass_GetUrlParams(t *testing.T) {
 		Method: "GET",
 		Header: http.Header{},
 		URL: &url.URL{
-			RawQuery:   "test=qq&aa=aa&bb=bb",
+			RawQuery: "go_test_=qq&aa=aa&bb=bb",
 		},
 	}
-	test.Equal(t, "map[aa:aa bb:bb test:qq]", fmt.Sprint(apiSession.UrlParams()))
+	go_test_.Equal(t, "map[aa:aa bb:bb go_test_:qq]", fmt.Sprint(apiSession.UrlParams()))
 }
 
 func TestApiSessionClass_GetFormValues(t *testing.T) {
@@ -153,9 +153,9 @@ value2
 
 	apiSession.request = req
 	result, err := apiSession.FormValues()
-	test.Equal(t, nil, err)
-	test.Equal(t, "[value1 value1_value1]", fmt.Sprint(result["field1"]))
-	test.Equal(t, "[value2]", fmt.Sprint(result["field2"]))
+	go_test_.Equal(t, nil, err)
+	go_test_.Equal(t, "[value1 value1_value1]", fmt.Sprint(result["field1"]))
+	go_test_.Equal(t, "[value2]", fmt.Sprint(result["field2"]))
 }
 
 func TestApiSessionClass_ReadJSON(t *testing.T) {
@@ -164,17 +164,17 @@ func TestApiSessionClass_ReadJSON(t *testing.T) {
 	req := &http.Request{
 		Method: "POST",
 		Header: http.Header{},
-		Body:   ioutil.NopCloser(bytes.NewReader([]byte(`{"test":"test","a":"a"}`))),
+		Body:   ioutil.NopCloser(bytes.NewReader([]byte(`{"go_test_":"go_test_","a":"a"}`))),
 	}
 
 	apiSession.request = req
 	type Test struct {
-		Test string `json:"test"`
-		A string `json:"a"`
+		Test string `json:"go_test_"`
+		A    string `json:"a"`
 	}
 	var test_ Test
 	err := apiSession.ReadJSON(&test_)
-	test.Equal(t, nil, err)
-	test.Equal(t, "test", test_.Test)
-	test.Equal(t, "a", test_.A)
+	go_test_.Equal(t, nil, err)
+	go_test_.Equal(t, "go_test_", test_.Test)
+	go_test_.Equal(t, "a", test_.A)
 }

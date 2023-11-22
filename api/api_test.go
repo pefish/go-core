@@ -7,7 +7,7 @@ import (
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	mock_http "github.com/pefish/go-core/mock/mock-http"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-test-assert"
+	go_test_ "github.com/pefish/go-test"
 	"net/http"
 	"testing"
 )
@@ -25,7 +25,7 @@ func TestWrapJson(t *testing.T) {
 
 	handler := WrapJson(map[string]*Api{
 		string(api_session.ApiMethod_Get): &Api{
-			Description:            "test",
+			Description:            "go_test_",
 			Path:                   "/",
 			IgnoreRootPath:         true,
 			IgnoreGlobalStrategies: true,
@@ -53,11 +53,11 @@ func TestWrapJson(t *testing.T) {
 		Method: "GET",
 		Header: http.Header{},
 	})
-	test.Equal(t, "this is a get api", result)
+	go_test_.Equal(t, "this is a get api", result)
 
 	handler(httpResponseWriter, &http.Request{
 		Method: "POST",
 		Header: http.Header{},
 	})
-	test.Equal(t, "this is a post api", result)
+	go_test_.Equal(t, "this is a post api", result)
 }

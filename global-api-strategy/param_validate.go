@@ -10,8 +10,8 @@ import (
 	"github.com/pefish/go-core/validator"
 	"github.com/pefish/go-desensitize"
 	"github.com/pefish/go-error"
+	go_format "github.com/pefish/go-format"
 	"github.com/pefish/go-json"
-	go_reflect "github.com/pefish/go-reflect"
 	"github.com/pefish/go-string"
 	"reflect"
 	"strings"
@@ -77,7 +77,7 @@ func (pvs *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Val
 	if oldTag != `` {
 		result += oldTag
 	} else if len(result) > 0 {
-		result = go_string.String.RemoveLast(result, 1)
+		result = go_string.StringUtilInstance.RemoveLast(result, 1)
 	}
 	return result
 }
@@ -115,7 +115,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 						map_[fieldName] = defaultVal
 					}
 				}
-				value = go_reflect.Reflect.ToString(map_[fieldName])
+				value = go_format.FormatInstance.ToString(map_[fieldName])
 			case reflect.Uint64:
 				if map_[fieldName] == nil {
 					map_[fieldName] = 0
@@ -124,7 +124,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_reflect.Reflect.ToUint64(map_[fieldName])
+				tmpValue, err := go_format.FormatInstance.ToUint64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToUint64 error - %#v", err)
 				}
@@ -137,7 +137,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_reflect.Reflect.ToInt64(map_[fieldName])
+				tmpValue, err := go_format.FormatInstance.ToInt64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToInt64 error - %#v", err)
 				}
@@ -150,7 +150,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_reflect.Reflect.ToFloat64(map_[fieldName])
+				tmpValue, err := go_format.FormatInstance.ToFloat64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToFloat64 error - %#v", err)
 				}
@@ -163,8 +163,8 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 			logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: value: %#v, tag: %s", value, newTag)
 			err := myValidator.Validator.Var(value, newTag)
 			if err != nil {
-				tempStr := go_string.String.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
-				msg := go_string.String.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
+				tempStr := go_string.StringUtilInstance.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
+				msg := go_string.StringUtilInstance.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
 				return fieldName, fmt.Errorf(msg)
 			}
 		}

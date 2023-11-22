@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/go-playground/validator"
 	"github.com/pefish/go-decimal"
-	"github.com/pefish/go-reflect"
+	go_format "github.com/pefish/go-format"
 	"github.com/pefish/go-string"
 	"reflect"
 	"regexp"
@@ -16,7 +16,7 @@ type ValidatorClass struct {
 }
 
 const (
-	SQL_INJECT_CHECK = "sql-inject-check"
+	SQL_INJECT_CHECK         = "sql-inject-check"
 	DISABLE_SQL_INJECT_CHECK = "disable-inject-check"
 )
 
@@ -56,7 +56,7 @@ func (validatorInstance *ValidatorClass) IsMobile(val interface{}, target interf
 }
 
 func (validatorInstance *ValidatorClass) ContainAlphabet(val interface{}, target interface{}) bool {
-	str := go_reflect.Reflect.ToString(val)
+	str := go_format.FormatInstance.ToString(val)
 	allAlphabet := `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	for _, charInt := range str {
 		if strings.Contains(allAlphabet, string(charInt)) {
@@ -67,7 +67,7 @@ func (validatorInstance *ValidatorClass) ContainAlphabet(val interface{}, target
 }
 
 func (validatorInstance *ValidatorClass) ContainNumber(val interface{}, target interface{}) bool {
-	str := go_reflect.Reflect.ToString(val)
+	str := go_format.FormatInstance.ToString(val)
 	allNumbers := `0123456789`
 	for _, charInt := range str {
 		if strings.Contains(allNumbers, string(charInt)) {
@@ -78,34 +78,34 @@ func (validatorInstance *ValidatorClass) ContainNumber(val interface{}, target i
 }
 
 func (validatorInstance *ValidatorClass) StrGte(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Gte(target)
+	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Gte(target)
 }
 
 func (validatorInstance *ValidatorClass) StrLte(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Lte(target)
+	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Lte(target)
 }
 
 func (validatorInstance *ValidatorClass) StrGt(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Gt(target)
+	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Gt(target)
 }
 
 func (validatorInstance *ValidatorClass) StrLt(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_reflect.Reflect.ToString(val)).Lt(target)
+	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Lt(target)
 }
 
 func (validatorInstance *ValidatorClass) StartWith(val interface{}, target interface{}) bool {
-	return go_string.String.StartWith(go_reflect.Reflect.ToString(val), go_reflect.Reflect.ToString(target))
+	return go_string.StringUtilInstance.StartWith(go_format.FormatInstance.ToString(val), go_format.FormatInstance.ToString(target))
 }
 
 func (validatorInstance *ValidatorClass) EndWith(val interface{}, target interface{}) bool {
-	return go_string.String.EndWith(go_reflect.Reflect.ToString(val), go_reflect.Reflect.ToString(target))
+	return go_string.StringUtilInstance.EndWith(go_format.FormatInstance.ToString(val), go_format.FormatInstance.ToString(target))
 }
 
 func (validatorInstance *ValidatorClass) NoSqlInject(val interface{}, target interface{}) bool {
 	if reflect.TypeOf(val).Kind() != reflect.String {
 		return true
 	}
-	err := validatorInstance.checkInjectWithErr(go_reflect.Reflect.ToString(val))
+	err := validatorInstance.checkInjectWithErr(go_format.FormatInstance.ToString(val))
 	return err == nil
 }
 

@@ -1,16 +1,16 @@
 package external_service
 
 import (
-	"github.com/pefish/go-test-assert"
+	go_test_ "github.com/pefish/go-test"
 	"testing"
 )
 
 func TestExternalServiceDriver_Register(t *testing.T) {
-	ExternalServiceDriverInstance.Register("test", &TestExternalServiceInstance)
+	ExternalServiceDriverInstance.Register("go_test_", &TestExternalServiceInstance)
 
 	ExternalServiceDriverInstance.Startup()
 
 	svcs := ExternalServiceDriverInstance.ExternalServices()
-	_, ok := svcs["test"]
-	test.Equal(t, true, ok)
+	_, ok := svcs["go_test_"]
+	go_test_.Equal(t, true, ok)
 }

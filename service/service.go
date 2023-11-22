@@ -13,8 +13,8 @@ import (
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	go_error "github.com/pefish/go-error"
+	go_format "github.com/pefish/go-format"
 	go_logger "github.com/pefish/go-logger"
-	"github.com/pefish/go-reflect"
 	"golang.org/x/net/http2"
 	"net/http"
 	"runtime"
@@ -142,11 +142,7 @@ func (serviceInstance *ServiceClass) GetLogger() go_logger.InterfaceLogger {
 	return logger.LoggerDriverInstance.Logger
 }
 
-func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
-	defer func() {
-		go_application.Application.Exit()
-	}()
-
+func (serviceInstance *ServiceClass) Init(ctx context.Context) error {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	external_service.ExternalServiceDriverInstance.Startup() // 启动外接服务驱动
@@ -154,12 +150,19 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 	api_strategy.GlobalApiStrategyDriverInstance.Startup()   // 启动外接全局前置处理器驱动
 
 	serviceInstance.buildRoutes()
+
+	return nil
+}
+
+func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
+	defer go_application.Application.Exit()
+
 	host := serviceInstance.host
 	if host == `` {
 		host = `0.0.0.0`
 	}
 
-	addr := host + `:` + go_reflect.Reflect.ToString(serviceInstance.port)
+	addr := host + `:` + go_format.FormatInstance.ToString(serviceInstance.port)
 	logger.LoggerDriverInstance.Logger.InfoF(`server started!!! http://%s`, addr)
 
 	for apiPath, map_ := range serviceInstance.registeredApi {
@@ -188,7 +191,7 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		s.Shutdown(context.Background())
+		s.Shutdown(ctx)
 	case <-exited:
 	}
 	return nil

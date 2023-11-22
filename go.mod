@@ -7,16 +7,15 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pefish/go-application v0.1.4
 	github.com/pefish/go-core-type v0.1.0
-	github.com/pefish/go-decimal v0.2.2
+	github.com/pefish/go-decimal v0.3.3
 	github.com/pefish/go-desensitize v0.0.6
 	github.com/pefish/go-error v1.0.7
-	github.com/pefish/go-format v0.1.3
-	github.com/pefish/go-http v0.5.2
+	github.com/pefish/go-format v0.2.6
+	github.com/pefish/go-http v0.5.14
 	github.com/pefish/go-json v0.1.7
-	github.com/pefish/go-logger v0.4.16
-	github.com/pefish/go-reflect v0.2.2
-	github.com/pefish/go-string v0.1.0
-	github.com/pefish/go-test-assert v0.0.1
+	github.com/pefish/go-logger v0.5.3
+	github.com/pefish/go-string v0.1.1
+	github.com/pefish/go-test v0.0.4
 	github.com/pefish/yaml v0.0.0-20181228075832-84d204bc9b71
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
 )
@@ -28,6 +27,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/pefish/go-reflect v0.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	go.uber.org/atomic v1.5.0 // indirect
