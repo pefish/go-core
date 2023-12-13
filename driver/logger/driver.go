@@ -9,7 +9,7 @@ type LoggerDriver struct {
 }
 
 var LoggerDriverInstance = LoggerDriver{
-	Logger: go_logger.DefaultLogger,
+	Logger: go_logger.Logger,
 }
 
 func (loggerDriver *LoggerDriver) Startup() {
