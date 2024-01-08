@@ -38,8 +38,8 @@ github.com/pefish/go-desensitize v0.0.6 h1:GRgZ+dUMByZYJ1OYO1a6czXpzYJEhHQBl1mbC
 github.com/pefish/go-desensitize v0.0.6/go.mod h1:uXY6qOL5bhJVNZALEUaWiIZ1uGe6d7u0pKsKBdBHHEg=
 github.com/pefish/go-error v1.0.7 h1:bSvBtQ6PGYxtLLIPDbxh7X7XSTCELc0C0KwiEYjRwy4=
 github.com/pefish/go-error v1.0.7/go.mod h1:DrrC/osWSJTTaH/txuos6t1YIitr1Y2GGhnxzfZ7VAI=
-github.com/pefish/go-format v0.2.9 h1:Bz+mJy6j2wMYm18NEjFEql67YfGmZmgxT9CkAq8KoNk=
-github.com/pefish/go-format v0.2.9/go.mod h1:+uvTouHD3etU8rXK07QE9qGhmxahhmMt3zqzLQWC57I=
+github.com/pefish/go-format v0.3.0 h1:iRDF1ffCF01AofMkFan+VWI5HKeHf2DBHnT1LO49k0c=
+github.com/pefish/go-format v0.3.0/go.mod h1:rI2ykz+2t8VattiNtK1yxm0KwsBOJTyPOMwSFblW62A=
 github.com/pefish/go-json v0.1.7 h1:2zg5e7CqjdLFFhbSAYrpPvVVzJ85k6nbI6Z8fwqgwNs=
 github.com/pefish/go-json v0.1.7/go.mod h1:z478hbwAD/l3Gxs8IGByt2HU6K8A+jRy8IJ5h2weOYc=
 github.com/pefish/go-jwt v0.3.3 h1:3j6dnb9WD/v+2TWTEBwLLAV/qbOBBY+Ez2E/mIBvRbM=
@@ -48,8 +48,8 @@ github.com/pefish/go-logger v0.5.5 h1:GqOUXQdVrafMhBy0Hlq7A9Oqp65GppSSsnw8zyDEIE
 github.com/pefish/go-logger v0.5.5/go.mod h1:IN1qdbxaVfsT518o9lsj8YY0bCi6E8kakuiVzG6pICA=
 github.com/pefish/go-reflect v0.2.2 h1:rNYU5mMIouRaZyAjDt2/rooNm0zx2IaRBa344Bq1s9o=
 github.com/pefish/go-reflect v0.2.2/go.mod h1:J1PmxXVMl+IqyzuL1OndaKqZjkvfKLaZA9LpUCUB99c=
-github.com/pefish/go-string v0.1.1 h1:/ahBixZFSUQ0+V9Hr1GI0HfEJO7Od3RSgFEaSAGfslo=
-github.com/pefish/go-string v0.1.1/go.mod h1:9lbzUcV4Gzxg3U3hbeOCjrjhz8guCP3BxaqqiswrBis=
+github.com/pefish/go-string v0.1.2 h1:l4c8082Fp+Niy+/yapax2p2Tnck9Y5D1Z9iBhUDoP4I=
+github.com/pefish/go-string v0.1.2/go.mod h1:ZMKPtawOqjSiE40Rm2zg1mAMwFqSh0ENORRDJLKa2Nk=
 github.com/pefish/go-task-driver v0.2.1 h1:fKDPJzaQPxVGej79nHYMjIII9jpk9Stz5KPXVNilxOA=
 github.com/pefish/go-task-driver v0.2.1/go.mod h1:xxSt9ZMWuZOz25wizVy6BAQFcm6Yhk/rrY1QATtJ6Lc=
 github.com/pefish/go-test v0.0.4 h1:s1RmZWe91K1MtENJUcl7CjGUFK/TmleZ5h3OkHq/BTI=

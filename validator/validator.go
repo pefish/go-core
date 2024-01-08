@@ -15,11 +15,6 @@ type ValidatorClass struct {
 	Validator *validator.Validate
 }
 
-const (
-	SQL_INJECT_CHECK         = "sql-inject-check"
-	DISABLE_SQL_INJECT_CHECK = "disable-inject-check"
-)
-
 var Validator = ValidatorClass{}
 
 func (validatorInstance *ValidatorClass) Init() error {
@@ -33,8 +28,6 @@ func (validatorInstance *ValidatorClass) Init() error {
 	err = validatorInstance.Validator.RegisterValidation(`str-lt`, validatorInstance.Wrap(validatorInstance.StrLt))
 	err = validatorInstance.Validator.RegisterValidation(`start-with`, validatorInstance.Wrap(validatorInstance.StartWith))
 	err = validatorInstance.Validator.RegisterValidation(`end-with`, validatorInstance.Wrap(validatorInstance.EndWith))
-	err = validatorInstance.Validator.RegisterValidation(SQL_INJECT_CHECK, validatorInstance.Wrap(validatorInstance.NoSqlInject))
-	err = validatorInstance.Validator.RegisterValidation(DISABLE_SQL_INJECT_CHECK, validatorInstance.EmptyFun)
 	if err != nil {
 		return err
 	}

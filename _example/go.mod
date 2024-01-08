@@ -24,11 +24,11 @@ require (
 	github.com/pefish/go-application v0.1.4 // indirect
 	github.com/pefish/go-decimal v0.3.3 // indirect
 	github.com/pefish/go-desensitize v0.0.6 // indirect
-	github.com/pefish/go-format v0.2.9 // indirect
+	github.com/pefish/go-format v0.3.0 // indirect
 	github.com/pefish/go-json v0.1.7 // indirect
 	github.com/pefish/go-jwt v0.3.3 // indirect
 	github.com/pefish/go-reflect v0.2.2 // indirect
-	github.com/pefish/go-string v0.1.1 // indirect
+	github.com/pefish/go-string v0.1.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/atomic v1.5.0 // indirect
 	go.uber.org/multierr v1.3.0 // indirect

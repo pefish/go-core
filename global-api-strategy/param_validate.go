@@ -65,23 +65,6 @@ func (pvs *ParamValidateStrategy) GetErrorMsg() string {
 	return pvs.errorMsg
 }
 
-func (pvs *ParamValidateStrategy) processGlobalValidators(fieldValue reflect.Value, globalValidator []string, oldTag string) string {
-	result := ``
-	for _, validatorName := range globalValidator {
-		if validatorName == validator.SQL_INJECT_CHECK && (strings.Contains(oldTag, validator.DISABLE_SQL_INJECT_CHECK) || fieldValue.Type().Kind() != reflect.String) {
-			// 不是string类型 或者 有 DISABLE_SQL_INJECT_CHECK tag，就不校验 SQL_INJECT_CHECK
-			continue
-		}
-		result += validatorName + `,`
-	}
-	if oldTag != `` {
-		result += oldTag
-	} else if len(result) > 0 {
-		result = go_string.StringUtilInstance.RemoveLast(result, 1)
-	}
-	return result
-}
-
 func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myValidator validator.ValidatorClass, map_ map[string]interface{}, globalValidator []string, type_ reflect.Type, value_ reflect.Value) (string, error) {
 	logger.LoggerDriverInstance.Logger.DebugF("[global_api_strategy.param_validate]: map_: %#v", map_)
 
@@ -99,7 +82,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 			tagVal := typeField.Tag.Get(`validate`)
 			newTag := tagVal
 			if len(globalValidator) != 0 {
-				newTag = pvs.processGlobalValidators(value_.Field(i), globalValidator, tagVal)
+				newTag = strings.Join(globalValidator, ",") + "," + newTag
 			}
 			jsonTag := typeField.Tag.Get(`json`)
 			fieldName := strings.Split(jsonTag, `,`)[0]
@@ -230,7 +213,7 @@ func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param int
 	out.SetParams(map[string]interface{}{})
 	logger.LoggerDriverInstance.Logger.DebugF(`original params: %s`, go_desensitize.Desensitize.DesensitizeToString(out.OriginalParams()))
 
-	globalValidator := []string{validator.SQL_INJECT_CHECK}
+	globalValidator := make([]string, 0)
 	if out.Api().GetParams() != nil {
 		fieldName, err := pvs.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().GetParams()), reflect.ValueOf(out.Api().GetParams()))
 		if err != nil {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	go_application "github.com/pefish/go-application"
 	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
 	api_session "github.com/pefish/go-core/api-session"
@@ -155,8 +154,6 @@ func (serviceInstance *ServiceClass) Init(ctx context.Context) error {
 }
 
 func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
-	defer go_application.Application.Exit()
-
 	host := serviceInstance.host
 	if host == `` {
 		host = `0.0.0.0`
