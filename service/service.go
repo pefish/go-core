@@ -54,7 +54,7 @@ func NewService(name string) *ServiceClass {
 // Default Service instance
 var Service = NewService(`default`)
 
-func (serviceInstance *ServiceClass) GetInterval() time.Duration {
+func (serviceInstance *ServiceClass) Interval() time.Duration {
 	return 0
 }
 
@@ -76,7 +76,7 @@ func (serviceInstance *ServiceClass) SetName(name string) {
 	serviceInstance.name = name
 }
 
-func (serviceInstance *ServiceClass) GetHost() string {
+func (serviceInstance *ServiceClass) Host() string {
 	return serviceInstance.host
 }
 
@@ -84,7 +84,7 @@ func (serviceInstance *ServiceClass) SetHost(host string) {
 	serviceInstance.host = host
 }
 
-func (serviceInstance *ServiceClass) GetPort() uint64 {
+func (serviceInstance *ServiceClass) Port() uint64 {
 	return serviceInstance.port
 }
 
@@ -92,7 +92,7 @@ func (serviceInstance *ServiceClass) SetPort(port uint64) {
 	serviceInstance.port = port
 }
 
-func (serviceInstance *ServiceClass) GetAccessHost() string {
+func (serviceInstance *ServiceClass) AccessHost() string {
 	return serviceInstance.accessHost
 }
 
@@ -100,7 +100,7 @@ func (serviceInstance *ServiceClass) SetAccessHost(accessHost string) {
 	serviceInstance.accessHost = accessHost
 }
 
-func (serviceInstance *ServiceClass) GetAccessPort() uint64 {
+func (serviceInstance *ServiceClass) AccessPort() uint64 {
 	return serviceInstance.accessPort
 }
 
@@ -117,19 +117,19 @@ func (serviceInstance *ServiceClass) SetHealthyCheckFunc(func_ func()) *ServiceC
 	return serviceInstance
 }
 
-func (serviceInstance *ServiceClass) GetName() string {
+func (serviceInstance *ServiceClass) Name() string {
 	return serviceInstance.name
 }
 
-func (serviceInstance *ServiceClass) GetDescription() string {
+func (serviceInstance *ServiceClass) Description() string {
 	return serviceInstance.description
 }
 
-func (serviceInstance *ServiceClass) GetPath() string {
+func (serviceInstance *ServiceClass) Path() string {
 	return serviceInstance.path
 }
 
-func (serviceInstance *ServiceClass) GetApis() []*api.Api {
+func (serviceInstance *ServiceClass) Apis() []*api.Api {
 	return serviceInstance.apis
 }
 
@@ -137,7 +137,7 @@ func (serviceInstance *ServiceClass) Stop() error {
 	return nil
 }
 
-func (serviceInstance *ServiceClass) GetLogger() go_logger.InterfaceLogger {
+func (serviceInstance *ServiceClass) Logger() go_logger.InterfaceLogger {
 	return logger.LoggerDriverInstance.Logger
 }
 
@@ -164,9 +164,6 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 
 	for apiPath, map_ := range serviceInstance.registeredApi {
 		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
-		for method, api_ := range map_ {
-			logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, api_.Description))
-		}
 	}
 	s := &http.Server{
 		Addr:    addr,
@@ -244,7 +241,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 	serviceInstance.AddRoute(healthApi, unknownPathApi) // 添加缺省api
 
 	serviceInstance.Mux = mux.NewRouter()
-	for _, apiObject := range serviceInstance.GetApis() {
+	for _, apiObject := range serviceInstance.Apis() {
 		// 得到apiPath
 		apiPath := serviceInstance.path + apiObject.Path
 		if apiObject.IgnoreRootPath == true {
@@ -263,6 +260,9 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 					serviceInstance.registeredApi[apiPath][string(method)] = apiObject
 				}
 			}
+
+			logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, apiObject.Description))
+
 		}
 	}
 }

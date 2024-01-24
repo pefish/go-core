@@ -1,12 +1,10 @@
 package validator
 
 import (
-	"errors"
 	"github.com/go-playground/validator"
 	"github.com/pefish/go-decimal"
 	go_format "github.com/pefish/go-format"
 	"github.com/pefish/go-string"
-	"reflect"
 	"regexp"
 	"strings"
 )
@@ -71,19 +69,51 @@ func (validatorInstance *ValidatorClass) ContainNumber(val interface{}, target i
 }
 
 func (validatorInstance *ValidatorClass) StrGte(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Gte(target)
+	dc, err := go_decimal.Decimal.Start(val)
+	if err != nil {
+		return false
+	}
+	result, err := dc.Gte(target)
+	if err != nil {
+		return false
+	}
+	return result
 }
 
 func (validatorInstance *ValidatorClass) StrLte(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Lte(target)
+	dc, err := go_decimal.Decimal.Start(val)
+	if err != nil {
+		return false
+	}
+	result, err := dc.Lte(target)
+	if err != nil {
+		return false
+	}
+	return result
 }
 
 func (validatorInstance *ValidatorClass) StrGt(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Gt(target)
+	dc, err := go_decimal.Decimal.Start(val)
+	if err != nil {
+		return false
+	}
+	result, err := dc.Gt(target)
+	if err != nil {
+		return false
+	}
+	return result
 }
 
 func (validatorInstance *ValidatorClass) StrLt(val interface{}, target interface{}) bool {
-	return go_decimal.Decimal.Start(go_format.FormatInstance.ToString(val)).Lt(target)
+	dc, err := go_decimal.Decimal.Start(val)
+	if err != nil {
+		return false
+	}
+	result, err := dc.Lt(target)
+	if err != nil {
+		return false
+	}
+	return result
 }
 
 func (validatorInstance *ValidatorClass) StartWith(val interface{}, target interface{}) bool {
@@ -92,24 +122,4 @@ func (validatorInstance *ValidatorClass) StartWith(val interface{}, target inter
 
 func (validatorInstance *ValidatorClass) EndWith(val interface{}, target interface{}) bool {
 	return go_string.StringUtilInstance.EndWith(go_format.FormatInstance.ToString(val), go_format.FormatInstance.ToString(target))
-}
-
-func (validatorInstance *ValidatorClass) NoSqlInject(val interface{}, target interface{}) bool {
-	if reflect.TypeOf(val).Kind() != reflect.String {
-		return true
-	}
-	err := validatorInstance.checkInjectWithErr(go_format.FormatInstance.ToString(val))
-	return err == nil
-}
-
-func (validatorInstance *ValidatorClass) checkInjectWithErr(str string) error {
-	arr := []string{
-		`=`, `{`, `}`, `;`, `|`, `>`, `<`, `"`, `[`, `]`, `\`, `/`, `?`, `%`, `1 = 1`, `1=1`, `1 =1`, `1= 1`,
-	}
-	for _, char := range arr {
-		if strings.Contains(str, char) {
-			return errors.New(`inject error`)
-		}
-	}
-	return nil
 }

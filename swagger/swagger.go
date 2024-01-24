@@ -15,7 +15,6 @@ import (
 )
 
 type SwaggerClass struct {
-
 }
 
 var swagger *SwaggerClass
@@ -192,7 +191,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 
 	paths := map[string]map[string]Yaml_Path{}
 
-	for _, api := range service.Service.GetApis() {
+	for _, api := range service.Service.Apis() {
 		temp := map[string]Yaml_Path{}
 
 		desc := api.Description
@@ -255,7 +254,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			kind := type_.Kind()
 			properties := map[string]Yaml_Property{}
 			if kind == reflect.Struct {
-				this.recuReturn(go_format.Format.StructToMap(api.Return), properties)
+				this.recuReturn(go_format.FormatInstance.StructToMap(api.Return), properties)
 			} else {
 				go_error.ThrowInternal(errors.New(`return config type error`))
 			}
@@ -279,7 +278,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		temp[strings.ToLower(string(api.Method))] = Yaml_Path{
-			Tags:        []string{service.Service.GetName()},
+			Tags:        []string{service.Service.Name()},
 			Summary:     desc,
 			Consumes:    paramTypes,
 			Produces:    []string{`application/json`},
@@ -287,22 +286,22 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			Responses:   responses,
 			Description: description,
 		}
-		paths[service.Service.GetPath()+api.Path] = temp
+		paths[service.Service.Path()+api.Path] = temp
 	}
 
 	swagger := Yaml_Swagger{
 		`2.0`,
 		Yaml_Info{
-			Title:       service.Service.GetName(),
-			Description: service.Service.GetDescription(),
+			Title:       service.Service.Name(),
+			Description: service.Service.Description(),
 			Version:     `1.0.0`,
 		},
 		hostAndPort,
-		service.Service.GetPath(),
+		service.Service.Path(),
 		[]Yaml_Tag{
 			{
-				Name:        service.Service.GetName(),
-				Description: service.Service.GetDescription(),
+				Name:        service.Service.Name(),
+				Description: service.Service.Description(),
 			},
 		},
 		[]string{`http`},

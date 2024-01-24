@@ -5,7 +5,7 @@ import (
 )
 
 func ExampleLoggerDriver_Register() {
-	LoggerDriverInstance.Register(go_logger.DefaultLogger)
+	LoggerDriverInstance.Register(go_logger.Logger)
 
 	LoggerDriverInstance.Startup()
 
