@@ -8,7 +8,7 @@ require (
 	github.com/pefish/go-core-type v0.1.0
 	github.com/pefish/go-decimal v0.4.0
 	github.com/pefish/go-desensitize v0.0.6
-	github.com/pefish/go-error v1.0.7
+	github.com/pefish/go-error v1.0.8
 	github.com/pefish/go-format v0.3.0
 	github.com/pefish/go-http v0.6.5
 	github.com/pefish/go-json v0.1.7

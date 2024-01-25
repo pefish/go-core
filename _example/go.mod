@@ -6,7 +6,7 @@ require (
 	github.com/pefish/go-core v1.2.3
 	github.com/pefish/go-core-strategy v0.0.6
 	github.com/pefish/go-core-type v0.1.0
-	github.com/pefish/go-error v1.0.7
+	github.com/pefish/go-error v1.0.8
 	github.com/pefish/go-logger v0.5.5
 	github.com/pefish/go-task-driver v0.2.3
 )
