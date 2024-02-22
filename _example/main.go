@@ -23,11 +23,18 @@ func main() {
 	logger.LoggerDriverInstance.Register(loggerInstance)
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 
+	type TestType uint64
+
+	const (
+		TestType_One TestType = 1
+	)
+
 	type Params1 struct {
 		Test     string                 `json:"test" validate:"is-mobile"`
 		TestNum  uint64                 `json:"test_num" validate:"required,lte=100"`
 		TestNum1 uint64                 `json:"test_num1" validate:"required,gte=1" default:"100"`
 		TestMap  map[string]interface{} `json:"test_map" validate:"required"`
+		TestType TestType               `json:"test_type" validate:"required"`
 	}
 
 	type Params2 struct {
