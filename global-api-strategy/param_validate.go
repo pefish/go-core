@@ -140,11 +140,15 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 				}
 				value = tmpValue
 			case reflect.Map:
-				v, ok := map_[fieldName].(map[string]interface{})
-				if !ok {
-					return fieldName, fmt.Errorf("Param <%#v> to map error", map_[fieldName])
+				if map_[fieldName] == nil {
+					value = nil
+				} else {
+					v, ok := map_[fieldName].(map[string]interface{})
+					if !ok {
+						return fieldName, fmt.Errorf("Param <%#v> to map error", map_[fieldName])
+					}
+					value = v
 				}
-				value = v
 			default:
 				return fieldName, fmt.Errorf("Param kind error. fieldKind: %s", fieldKind.String())
 			}

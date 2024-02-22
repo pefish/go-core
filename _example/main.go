@@ -27,7 +27,7 @@ func main() {
 		Test     string                 `json:"test" validate:"is-mobile"`
 		TestNum  uint64                 `json:"test_num" validate:"required,lte=100"`
 		TestNum1 uint64                 `json:"test_num1" validate:"required,gte=1" default:"100"`
-		TestMap  map[string]interface{} `json:"test_map"`
+		TestMap  map[string]interface{} `json:"test_map" validate:"required"`
 	}
 
 	type Params2 struct {
