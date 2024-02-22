@@ -24,9 +24,10 @@ func main() {
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 
 	type Params1 struct {
-		Test     string `json:"test" validate:"is-mobile"`
-		TestNum  uint64 `json:"test_num" validate:"required,lte=100"`
-		TestNum1 uint64 `json:"test_num1" validate:"required,gte=1"`
+		Test     string                 `json:"test" validate:"is-mobile"`
+		TestNum  uint64                 `json:"test_num" validate:"required,lte=100"`
+		TestNum1 uint64                 `json:"test_num1" validate:"required,gte=1" default:"100"`
+		TestMap  map[string]interface{} `json:"test_map"`
 	}
 
 	type Params2 struct {

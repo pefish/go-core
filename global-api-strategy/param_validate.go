@@ -139,8 +139,14 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 					return fieldName, fmt.Errorf("ToFloat64 error - %#v", err)
 				}
 				value = tmpValue
+			case reflect.Map:
+				v, ok := map_[fieldName].(map[string]interface{})
+				if !ok {
+					return fieldName, fmt.Errorf("Param <%#v> to map error", map_[fieldName])
+				}
+				value = v
 			default:
-				return fieldName, fmt.Errorf("param kind error. fieldKind: %#v", fieldKind)
+				return fieldName, fmt.Errorf("Param kind error. fieldKind: %s", fieldKind.String())
 			}
 			out.Params()[fieldName] = value
 
@@ -219,7 +225,7 @@ func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param int
 	if out.Api().Params() != nil {
 		fieldName, err := pvs.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().Params()), reflect.ValueOf(out.Api().Params()))
 		if err != nil {
-			logger.LoggerDriverInstance.Logger.ErrorF(`param validate error. - %#v`, err)
+			logger.LoggerDriverInstance.Logger.ErrorF(`Param validate error. - %#v`, err)
 			return go_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), map[string]interface{}{
 				`field`: fieldName,
 			})
