@@ -2,25 +2,25 @@ package main
 
 import (
 	"context"
+	"time"
+
 	api_strategy "github.com/pefish/go-core-strategy/api-strategy"
-	global_api_strategy3 "github.com/pefish/go-core-strategy/global-api-strategy"
 	_type2 "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
-	global_api_strategy2 "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
-	"github.com/pefish/go-error"
+	go_error "github.com/pefish/go-error"
 	go_logger "github.com/pefish/go-logger"
 	task_driver "github.com/pefish/go-task-driver"
-	"time"
 )
 
 func main() {
 
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
-	logger.LoggerDriverInstance.Register(go_logger.Logger.CloneWithLevel("debug"))
+	loggerInstance := go_logger.Logger.CloneWithLevel("debug")
+	logger.LoggerDriverInstance.Register(loggerInstance)
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 
 	type Params1 struct {
@@ -34,23 +34,27 @@ func main() {
 	}
 
 	service.Service.SetRoutes([]*api.Api{
-		{
+		api.NewApi(&api.NewApiParamsType{
 			Description: "this is a test api",
 			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
 			Method:      `POST`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.IpFilterStrategyInstance,
+					Strategy: api_strategy.NewIpFilterStrategy(),
 					Param: api_strategy.IpFilterParam{
-						GetValidIp: func(apiSession _type2.IApiSession) []string {
+						ValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
 					},
 					Disable: true,
 				},
+				{
+					Strategy: api_strategy.NewRateLimitStrategy(context.Background(), loggerInstance, time.Second, 2),
+					Disable:  false,
+				},
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
-			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+			ControllerFunc: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
 				var params Params1
 				apiSession.MustScanParams(&params)
 				tokenId := apiSession.PathVars()["token_id"]
@@ -61,16 +65,16 @@ func main() {
 				}, nil
 			},
 			Params: Params1{},
-		},
-		{
+		}),
+		api.NewApi(&api.NewApiParamsType{
 			Description: "this is a test api",
 			Path:        "/v1/test_api/{token_id:[0-9]*}.json",
 			Method:      `GET`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.IpFilterStrategyInstance,
+					Strategy: api_strategy.NewIpFilterStrategy(),
 					Param: api_strategy.IpFilterParam{
-						GetValidIp: func(apiSession _type2.IApiSession) []string {
+						ValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
 					},
@@ -78,7 +82,7 @@ func main() {
 				},
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
-			Controller: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+			ControllerFunc: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
 				var params Params2
 				apiSession.MustScanParams(&params)
 
@@ -90,16 +94,16 @@ func main() {
 				}, nil
 			},
 			Params: Params2{},
-		},
+		}),
 	})
-	global_api_strategy3.GlobalRateLimitStrategyInstance.SetErrorCode(10000)
-	global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
-		Strategy: global_api_strategy3.GlobalRateLimitStrategyInstance,
-		Param: global_api_strategy3.GlobalRateLimitStrategyParam{
-			FillInterval: 1000 * time.Millisecond,
-		},
-		Disable: false,
-	})
+	// global_api_strategy3.GlobalRateLimitStrategyInstance.SetErrorCode(10000)
+	// global_api_strategy2.GlobalApiStrategyDriverInstance.Register(global_api_strategy2.GlobalStrategyData{
+	// 	Strategy: global_api_strategy3.GlobalRateLimitStrategyInstance,
+	// 	Param: global_api_strategy3.GlobalRateLimitStrategyParam{
+	// 		FillInterval: 1000 * time.Millisecond,
+	// 	},
+	// 	Disable: false,
+	// })
 	service.Service.SetPort(8080)
 
 	taskDriver := task_driver.NewTaskDriver()

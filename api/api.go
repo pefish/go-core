@@ -2,15 +2,17 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gorilla/mux"
 	_type2 "github.com/pefish/go-core-type/api-session"
 	api_strategy "github.com/pefish/go-core-type/api-strategy"
-	global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
+	driver_global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
-	"net/http"
+	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 
 	api_session "github.com/pefish/go-core/api-session"
-	"github.com/pefish/go-error"
+	go_error "github.com/pefish/go-error"
 )
 
 type StrategyData struct {
@@ -20,29 +22,98 @@ type StrategyData struct {
 }
 
 type Api struct {
-	Description            string                // api描述
-	Path                   string                // api路径
-	IgnoreRootPath         bool                  // api路径是否忽略根路径
-	IgnoreGlobalStrategies bool                  // 是否跳过全局策略
-	Method                 api_session.ApiMethod // api方法
-	Strategies             []StrategyData        // api前置处理策略,不包含全局策略
-	Params                 interface{}           // api参数
-	Return                 interface{}           // api返回值
-	Controller             ApiHandlerType        // api业务处理器
-	ParamType              string                // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
-	ReturnHookFunc         ReturnHookFuncType    // 返回前的处理函数
+	description              string                // api描述
+	path                     string                // api路径
+	isIgnoreRootPath         bool                  // api路径是否忽略根路径
+	isIgnoreGlobalStrategies bool                  // 是否跳过全局策略
+	method                   api_session.ApiMethod // api方法
+	strategies               []StrategyData        // api前置处理策略,不包含全局策略
+	params                   interface{}           // api参数
+	returnValue              interface{}           // api返回值
+	controllerFunc           ApiHandlerType        // api业务处理器
+	paramType                string                // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+	returnHookFunc           ReturnHookFuncType    // 返回前的处理函数
 }
 
-func (api *Api) GetDescription() string {
-	return api.Description
+type NewApiParamsType struct {
+	Description              string
+	Path                     string                // api路径
+	IsIgnoreRootPath         bool                  // api路径是否忽略根路径
+	IsIgnoreGlobalStrategies bool                  // 是否跳过全局策略
+	Method                   api_session.ApiMethod // api方法
+	Strategies               []StrategyData        // api前置处理策略,不包含全局策略
+	Params                   interface{}           // api参数
+	ReturnValue              interface{}           // api返回值
+	ControllerFunc           ApiHandlerType        // api业务处理器
+	ParamType                string                // 参数类型。默认 application/json，可选 multipart/form-data，空表示都支持
+	ReturnHookFunc           ReturnHookFuncType    // 返回前的处理函数
 }
 
-func (api *Api) GetParamType() string {
-	return api.ParamType
+func NewApi(params *NewApiParamsType) *Api {
+	return &Api{
+		description:              params.Description,
+		path:                     params.Path,
+		isIgnoreRootPath:         params.IsIgnoreRootPath,
+		isIgnoreGlobalStrategies: params.IsIgnoreGlobalStrategies,
+		method:                   params.Method,
+		strategies:               params.Strategies,
+		params:                   params.Params,
+		returnValue:              params.ReturnValue,
+		controllerFunc:           params.ControllerFunc,
+		paramType:                params.ParamType,
+		returnHookFunc:           params.ReturnHookFunc,
+	}
 }
 
-func (api *Api) GetParams() interface{} {
-	return api.Params
+func New404Api() *Api {
+	return &Api{
+		description:              "404 not found",
+		path:                     "/",
+		isIgnoreRootPath:         true,
+		isIgnoreGlobalStrategies: true,
+		method:                   api_session.ApiMethod_All,
+		controllerFunc: func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo) {
+			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
+
+			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
+			logger.LoggerDriverInstance.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
+			apiSession.WriteText(`Not Found`)
+			return nil, nil
+		},
+		paramType: global_api_strategy.ALL_TYPE,
+	}
+}
+
+func (api *Api) Strategies() []StrategyData {
+	return api.strategies
+}
+
+func (api *Api) Path() string {
+	return api.path
+}
+
+func (api *Api) ControllerFunc() ApiHandlerType {
+	return api.controllerFunc
+}
+
+func (api *Api) IsIgnoreRootPath() bool {
+	return api.isIgnoreRootPath
+}
+
+func (api *Api) Description() string {
+	return api.description
+}
+
+func (api *Api) Method() api_session.ApiMethod {
+	return api.method
+}
+
+func (api *Api) ParamType() string {
+	return api.paramType
+}
+
+func (api *Api) Params() interface{} {
+	return api.params
 }
 
 type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
@@ -96,8 +167,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				Code: errorInfo.Code,
 				Data: errorInfo.Data,
 			}
-			if currentApi.ReturnHookFunc != nil {
-				hookApiResult, errorInfo := currentApi.ReturnHookFunc(apiSession, apiResult)
+			if currentApi.returnHookFunc != nil {
+				hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 				if errorInfo != nil {
 					apiSession.WriteJson(&ApiResult{
 						Msg:  errorInfo.Err.Error(),
@@ -125,9 +196,9 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			errorHandler(go_error.INTERNAL_ERROR)
 		})
 
-		if !currentApi.IgnoreGlobalStrategies {
-			for _, strategyData := range global_api_strategy.GlobalApiStrategyDriverInstance.GlobalStrategies() {
-				logger.LoggerDriverInstance.Logger.DebugF("global strategy [%s]: %#v", strategyData.Strategy.GetName(), strategyData)
+		if !currentApi.isIgnoreGlobalStrategies {
+			for _, strategyData := range driver_global_api_strategy.GlobalApiStrategyDriverInstance.GlobalStrategies() {
+				logger.LoggerDriverInstance.Logger.DebugF("global strategy [%s]: %#v", strategyData.Strategy.Name(), strategyData)
 				if strategyData.Disable {
 					continue
 				}
@@ -145,8 +216,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 		}
 
-		for _, strategyData := range currentApi.Strategies {
-			logger.LoggerDriverInstance.Logger.DebugF("strategy [%s]: %#v", strategyData.Strategy.GetName(), strategyData)
+		for _, strategyData := range currentApi.strategies {
+			logger.LoggerDriverInstance.Logger.DebugF("strategy [%s]: %#v", strategyData.Strategy.Name(), strategyData)
 			if strategyData.Disable {
 				continue
 			}
@@ -169,7 +240,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 		}()
 
-		result, errInfo := currentApi.Controller(apiSession)
+		result, errInfo := currentApi.controllerFunc(apiSession)
 		if result == nil && errInfo == nil {
 			return
 		}
@@ -188,8 +259,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			Code: 0,
 			Data: result,
 		}
-		if currentApi.ReturnHookFunc != nil {
-			hookApiResult, errorInfo := currentApi.ReturnHookFunc(apiSession, apiResult)
+		if currentApi.returnHookFunc != nil {
+			hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 			if errorInfo != nil {
 				apiSession.WriteJson(&ApiResult{
 					Msg:  errorInfo.Err.Error(),

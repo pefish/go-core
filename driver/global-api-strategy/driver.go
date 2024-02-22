@@ -1,12 +1,13 @@
 package global_api_strategy
 
 import (
-	global_api_strategy "github.com/pefish/go-core-type/global-api-strategy"
 	"sync"
+
+	api_strategy "github.com/pefish/go-core-type/api-strategy"
 )
 
 type GlobalStrategyData struct {
-	Strategy global_api_strategy.IGlobalApiStrategy
+	Strategy api_strategy.IApiStrategy
 	Param    interface{}
 	Disable  bool
 }

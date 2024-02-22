@@ -3,21 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"runtime"
+	"time"
+
 	"github.com/gorilla/mux"
-	_type "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
-	api_session "github.com/pefish/go-core/api-session"
 	external_service "github.com/pefish/go-core/driver/external-service"
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
-	go_error "github.com/pefish/go-error"
 	go_format "github.com/pefish/go-format"
 	go_logger "github.com/pefish/go-logger"
 	"golang.org/x/net/http2"
-	"net/http"
-	"runtime"
-	"time"
 )
 
 type ServiceClass struct {
@@ -59,13 +57,18 @@ func (serviceInstance *ServiceClass) Interval() time.Duration {
 }
 
 func (serviceInstance *ServiceClass) SetRoutes(routes ...[]*api.Api) {
-	for _, route := range routes {
-		serviceInstance.apis = append(serviceInstance.apis, route...)
+	for _, apis := range routes {
+		serviceInstance.AddApis(apis...)
 	}
 }
 
-func (serviceInstance *ServiceClass) AddRoute(routes ...*api.Api) {
-	serviceInstance.apis = append(serviceInstance.apis, routes...)
+func (serviceInstance *ServiceClass) AddApis(apis ...*api.Api) {
+	for _, api := range apis {
+		for _, s := range api.Strategies() {
+			s.Strategy.Init(s.Param)
+		}
+	}
+	serviceInstance.apis = append(serviceInstance.apis, apis...)
 }
 
 func (serviceInstance *ServiceClass) SetPath(path string) {
@@ -192,65 +195,19 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 }
 
 func (serviceInstance *ServiceClass) buildRoutes() {
-	// healthz
-	var healthApi = &api.Api{
-		Description:            "健康检查api",
-		Path:                   "/healthz",
-		IgnoreRootPath:         true,
-		IgnoreGlobalStrategies: true,
-		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
-			defer func() {
-				if err := recover(); err != nil {
-					logger.LoggerDriverInstance.Logger.Error(err)
-					apiSession.SetStatusCode(api_session.StatusCode_InternalServerError)
-					apiSession.WriteText(`not ok`)
-				}
-			}()
-			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
-
-			if serviceInstance.healthyCheckFunc != nil {
-				serviceInstance.healthyCheckFunc()
-			}
-
-			apiSession.SetStatusCode(api_session.StatusCode_OK)
-			apiSession.WriteText(`ok`)
-			return nil, nil
-		},
-		ParamType: global_api_strategy.ALL_TYPE,
-	}
-
-	// 处理未知路由
-	var unknownPathApi = &api.Api{
-		Description:            "404 not found",
-		Path:                   "/",
-		IgnoreRootPath:         true,
-		IgnoreGlobalStrategies: true,
-		Method:                 api_session.ApiMethod_All,
-		Controller: func(apiSession _type.IApiSession) (interface{}, *go_error.ErrorInfo) {
-			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
-
-			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
-			logger.LoggerDriverInstance.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
-			apiSession.WriteText(`Not Found`)
-			return nil, nil
-		},
-		ParamType: global_api_strategy.ALL_TYPE,
-	}
-
-	serviceInstance.AddRoute(healthApi, unknownPathApi) // 添加缺省api
+	serviceInstance.AddApis(api.New404Api()) // 添加缺省api
 
 	serviceInstance.Mux = mux.NewRouter()
 	for _, apiObject := range serviceInstance.Apis() {
 		// 得到apiPath
-		apiPath := serviceInstance.path + apiObject.Path
-		if apiObject.IgnoreRootPath == true {
-			apiPath = apiObject.Path
+		apiPath := serviceInstance.path + apiObject.Path()
+		if apiObject.IsIgnoreRootPath() == true {
+			apiPath = apiObject.Path()
 		}
-		method := apiObject.Method
+		method := apiObject.Method()
 
 		// 挂载处理器
-		if apiObject.Controller != nil {
+		if apiObject.ControllerFunc() != nil {
 			if serviceInstance.registeredApi[apiPath] == nil {
 				serviceInstance.registeredApi[apiPath] = map[string]*api.Api{
 					string(method): apiObject,
@@ -261,7 +218,7 @@ func (serviceInstance *ServiceClass) buildRoutes() {
 				}
 			}
 
-			logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, apiObject.Description))
+			logger.LoggerDriverInstance.Logger.Info(fmt.Sprintf(`--- %s %s %s ---`, method, apiPath, apiObject.Description()))
 
 		}
 	}
