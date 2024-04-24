@@ -223,7 +223,7 @@ func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param int
 	// 深拷贝
 	out.SetOriginalParams(go_json.Json.MustParseToMap(go_json.Json.MustStringify(tempParam)))
 	out.SetParams(map[string]interface{}{})
-	logger.LoggerDriverInstance.Logger.DebugF(`original params: %s`, go_desensitize.Desensitize.DesensitizeToString(out.OriginalParams()))
+	logger.LoggerDriverInstance.Logger.DebugF(`original params: %s`, go_desensitize.Desensitize.MustDesensitizeToString(out.OriginalParams()))
 
 	globalValidator := make([]string, 0)
 	if out.Api().Params() != nil {
@@ -236,7 +236,7 @@ func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param int
 		}
 	}
 
-	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, go_desensitize.Desensitize.DesensitizeToString(out.Params()))
+	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, go_desensitize.Desensitize.MustDesensitizeToString(out.Params()))
 	util.UpdateSessionErrorMsg(out, `params`, out.Params())
 
 	return nil
