@@ -48,7 +48,7 @@ func main() {
 			Method:      `POST`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy(api_strategy.IpFilterParams{
+					Strategy: api_strategy.NewIpFilterStrategy().SetParams(api_strategy.IpFilterParams{
 						ValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
@@ -56,8 +56,10 @@ func main() {
 					Disable: true,
 				},
 				{
-					Strategy: api_strategy.NewRateLimitStrategy(context.Background(), loggerInstance, time.Second, 2),
-					Disable:  false,
+					Strategy: api_strategy.NewRateLimitStrategy(context.Background(), loggerInstance, 20).SetParamsAndRun(api_strategy.RateLimitStrategyParams{
+						SecondPerToken: time.Second,
+					}),
+					Disable: false,
 				},
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
@@ -79,13 +81,11 @@ func main() {
 			Method:      `GET`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy(
-						api_strategy.IpFilterParams{
-							ValidIp: func(apiSession _type2.IApiSession) []string {
-								return []string{`127.0.0.1`}
-							},
+					Strategy: api_strategy.NewIpFilterStrategy().SetParams(api_strategy.IpFilterParams{
+						ValidIp: func(apiSession _type2.IApiSession) []string {
+							return []string{`127.0.0.1`}
 						},
-					),
+					}),
 					Disable: true,
 				},
 			},
