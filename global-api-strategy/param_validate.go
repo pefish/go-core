@@ -166,13 +166,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out api_session.IApiSession, myV
 	return "", nil
 }
 
-func (pvs *ParamValidateStrategy) Init(param interface{}) api_strategy.IApiStrategy {
-	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, pvs.Name())
-	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, pvs.Name())
-	return pvs
-}
-
-func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (pvs *ParamValidateStrategy) Execute(out api_session.IApiSession) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, pvs.Name())
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()

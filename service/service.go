@@ -63,11 +63,6 @@ func (serviceInstance *ServiceClass) SetRoutes(routes ...[]*api.Api) {
 }
 
 func (serviceInstance *ServiceClass) AddApis(apis ...*api.Api) {
-	for _, api := range apis {
-		for _, s := range api.Strategies() {
-			s.Strategy.Init(s.Param)
-		}
-	}
 	serviceInstance.apis = append(serviceInstance.apis, apis...)
 }
 
@@ -163,7 +158,7 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 	}
 
 	addr := host + `:` + go_format.FormatInstance.ToString(serviceInstance.port)
-	logger.LoggerDriverInstance.Logger.InfoF(`server started!!! http://%s`, addr)
+	logger.LoggerDriverInstance.Logger.InfoF(`Server started!!! http://%s`, addr)
 
 	for apiPath, map_ := range serviceInstance.registeredApi {
 		serviceInstance.Mux.HandleFunc(apiPath, api.WrapJson(map_))
@@ -172,7 +167,7 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 		Addr:    addr,
 		Handler: serviceInstance.Mux,
 	}
-	err := http2.ConfigureServer(s, &http2.Server{}) // 可以使用http2协议
+	err := http2.ConfigureServer(s, &http2.Server{}) // 可以使用 http2 协议
 	if err != nil {
 		return err
 	}

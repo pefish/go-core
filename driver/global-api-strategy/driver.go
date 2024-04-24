@@ -8,7 +8,6 @@ import (
 
 type GlobalStrategyData struct {
 	Strategy api_strategy.IApiStrategy
-	Param    interface{}
 	Disable  bool
 }
 
@@ -22,11 +21,7 @@ var GlobalApiStrategyDriverInstance = GlobalApiStrategyDriver{
 }
 
 func (gasd *GlobalApiStrategyDriver) Startup() {
-	gasd.Do(func() {
-		for _, globalStrategy := range gasd.globalStrategies {
-			globalStrategy.Strategy.Init(globalStrategy.Param)
-		}
-	})
+
 }
 
 func (gasd *GlobalApiStrategyDriver) Register(strategyData GlobalStrategyData) bool {

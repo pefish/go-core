@@ -23,8 +23,8 @@ github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjS
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/pefish/go-core-type v0.1.3 h1:NFef2oueHMVQD1b2rqbQT+/x2OZDA13MRbvBa92tkFc=
-github.com/pefish/go-core-type v0.1.3/go.mod h1:D0xHk/Rzs/xuyyRDggnl4njgphLFiOjZGoTDmp4oQ9I=
+github.com/pefish/go-core-type v0.1.4 h1:q32bLvKtDUhu7W+WRRJmz420hfm8LpS0Ea12fEKz6S8=
+github.com/pefish/go-core-type v0.1.4/go.mod h1:i0JVI3T3BSWXLLCR4JA06YgBbQ35TO5UrMV9hdFiavc=
 github.com/pefish/go-decimal v0.4.0 h1:RAPcIgoJmP1L4n2XnLMuWdOFv3TzP2Rn1UfbbLOk7Dk=
 github.com/pefish/go-decimal v0.4.0/go.mod h1:p9D+rI1i86a7/NP87r3ryqk9Bj30ZWkj9tFXXQx6Kbk=
 github.com/pefish/go-desensitize v0.0.7 h1:7YZMo6nWvb8soIB0HIG5qc0Zy1t9RBjZ6E7XcbzosBE=

@@ -48,13 +48,7 @@ func (sbis *ServiceBaseInfoStrategy) ErrorMsg() string {
 	return sbis.errorMsg
 }
 
-func (sbis *ServiceBaseInfoStrategy) Init(param interface{}) api_strategy.IApiStrategy {
-	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init`, sbis.Name())
-	defer logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s Init defer`, sbis.Name())
-	return sbis
-}
-
-func (sbis *ServiceBaseInfoStrategy) Execute(out api_session.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (sbis *ServiceBaseInfoStrategy) Execute(out api_session.IApiSession) *go_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, sbis.Name())
 	apiMsg := fmt.Sprintf(`%s %s %s`, out.RemoteAddress(), out.Path(), out.Method())
 	logger.LoggerDriverInstance.Logger.DebugF(`---------------- %s ----------------`, apiMsg)

@@ -48,12 +48,11 @@ func main() {
 			Method:      `POST`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy(),
-					Param: api_strategy.IpFilterParam{
+					Strategy: api_strategy.NewIpFilterStrategy(api_strategy.IpFilterParams{
 						ValidIp: func(apiSession _type2.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
-					},
+					}),
 					Disable: true,
 				},
 				{
@@ -80,12 +79,13 @@ func main() {
 			Method:      `GET`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy(),
-					Param: api_strategy.IpFilterParam{
-						ValidIp: func(apiSession _type2.IApiSession) []string {
-							return []string{`127.0.0.1`}
+					Strategy: api_strategy.NewIpFilterStrategy(
+						api_strategy.IpFilterParams{
+							ValidIp: func(apiSession _type2.IApiSession) []string {
+								return []string{`127.0.0.1`}
+							},
 						},
-					},
+					),
 					Disable: true,
 				},
 			},

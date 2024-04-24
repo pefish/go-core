@@ -17,7 +17,6 @@ import (
 
 type StrategyData struct {
 	Strategy api_strategy.IApiStrategy
-	Param    interface{}
 	Disable  bool
 }
 
@@ -73,7 +72,7 @@ func New404Api() *Api {
 		isIgnoreGlobalStrategies: true,
 		method:                   api_session.ApiMethod_All,
 		controllerFunc: func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo) {
-			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession, nil)
+			global_api_strategy.ServiceBaseInfoApiStrategyInstance.Execute(apiSession)
 
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
 			logger.LoggerDriverInstance.Logger.DebugF("api not found. request path: %s, request method: %s", apiSession.Path(), apiSession.Method())
@@ -202,7 +201,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 				if strategyData.Disable {
 					continue
 				}
-				errInfo := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+				errInfo := strategyData.Strategy.Execute(apiSession)
 				if errInfo != nil {
 					errMsg := fmt.Sprint(errInfo)
 					logger.LoggerDriverInstance.Logger.Error(
@@ -221,7 +220,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			if strategyData.Disable {
 				continue
 			}
-			errInfo := strategyData.Strategy.Execute(apiSession, strategyData.Param)
+			errInfo := strategyData.Strategy.Execute(apiSession)
 			if errInfo != nil {
 				errMsg := fmt.Sprint(errInfo)
 				logger.LoggerDriverInstance.Logger.Error(
