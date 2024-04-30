@@ -17,7 +17,11 @@ type ServiceBaseInfoStrategy struct {
 	errorMsg  string
 }
 
-var ServiceBaseInfoApiStrategyInstance = ServiceBaseInfoStrategy{}
+var ServiceBaseInfoStrategyInstance = NewServiceBaseInfoStrategy()
+
+func NewServiceBaseInfoStrategy() *ServiceBaseInfoStrategy {
+	return &ServiceBaseInfoStrategy{}
+}
 
 func (sbis *ServiceBaseInfoStrategy) Name() string {
 	return `ServiceBaseInfoStrategy`

@@ -30,8 +30,10 @@ type ParamValidateStrategy struct {
 	errorMsg  string
 }
 
-var ParamValidateStrategyInstance = ParamValidateStrategy{
-	errorCode: go_error.INTERNAL_ERROR_CODE,
+var ParamValidateStrategyInstance = NewParamValidateStrategy()
+
+func NewParamValidateStrategy() *ParamValidateStrategy {
+	return &ParamValidateStrategy{}
 }
 
 func (pvs *ParamValidateStrategy) Name() string {
