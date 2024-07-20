@@ -11,6 +11,7 @@ import (
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 
+	go_core_type_api "github.com/pefish/go-core-type/api"
 	api_session "github.com/pefish/go-core/api-session"
 	go_error "github.com/pefish/go-error"
 )
@@ -115,13 +116,7 @@ func (api *Api) Params() interface{} {
 	return api.params
 }
 
-type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *ApiResult) (interface{}, *go_error.ErrorInfo)
-
-type ApiResult struct {
-	Msg  string      `json:"msg"`
-	Code uint64      `json:"code"`
-	Data interface{} `json:"data"`
-}
+type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *go_core_type_api.ApiResult) (interface{}, *go_error.ErrorInfo)
 
 type ApiHandlerType func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo)
 
@@ -161,7 +156,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		}
 
 		errorHandler := func(errorInfo *go_error.ErrorInfo) {
-			apiResult := &ApiResult{
+			apiResult := &go_core_type_api.ApiResult{
 				Msg:  errorInfo.Err.Error(),
 				Code: errorInfo.Code,
 				Data: errorInfo.Data,
@@ -169,7 +164,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			if currentApi.returnHookFunc != nil {
 				hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 				if errorInfo != nil {
-					apiSession.WriteJson(&ApiResult{
+					apiSession.WriteJson(&go_core_type_api.ApiResult{
 						Msg:  errorInfo.Err.Error(),
 						Code: errorInfo.Code,
 						Data: errorInfo.Data,
@@ -253,7 +248,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			errorHandler(errInfo)
 			return
 		}
-		apiResult := &ApiResult{
+		apiResult := &go_core_type_api.ApiResult{
 			Msg:  ``,
 			Code: 0,
 			Data: result,
@@ -261,7 +256,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		if currentApi.returnHookFunc != nil {
 			hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 			if errorInfo != nil {
-				apiSession.WriteJson(&ApiResult{
+				apiSession.WriteJson(&go_core_type_api.ApiResult{
 					Msg:  errorInfo.Err.Error(),
 					Code: errorInfo.Code,
 					Data: errorInfo.Data,

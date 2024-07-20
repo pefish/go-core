@@ -5,7 +5,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/pefish/go-core-type v0.1.4
+	github.com/pefish/go-core-type v0.1.5
 	github.com/pefish/go-decimal v0.4.0
 	github.com/pefish/go-desensitize v0.0.7
 	github.com/pefish/go-error v1.0.8
