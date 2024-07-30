@@ -1,22 +1,22 @@
 package logger
 
 import (
-	go_logger "github.com/pefish/go-logger"
+	i_logger "github.com/pefish/go-interface/i-logger"
 )
 
 type LoggerDriver struct {
-	Logger go_logger.InterfaceLogger
+	Logger i_logger.ILogger
 }
 
 var LoggerDriverInstance = LoggerDriver{
-	Logger: go_logger.Logger,
+	Logger: &i_logger.DefaultLogger,
 }
 
 func (loggerDriver *LoggerDriver) Startup() {
 
 }
 
-func (loggerDriver *LoggerDriver) Register(logger go_logger.InterfaceLogger) bool {
+func (loggerDriver *LoggerDriver) Register(logger i_logger.ILogger) bool {
 	loggerDriver.Logger = logger
 	return true
 }

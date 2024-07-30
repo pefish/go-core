@@ -5,19 +5,18 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	_type2 "github.com/pefish/go-core-type/api-session"
-	api_strategy "github.com/pefish/go-core-type/api-strategy"
 	driver_global_api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 
-	go_core_type_api "github.com/pefish/go-core-type/api"
 	api_session "github.com/pefish/go-core/api-session"
-	go_error "github.com/pefish/go-error"
+	i_core "github.com/pefish/go-interface/i-core"
+	t_core "github.com/pefish/go-interface/t-core"
+	t_error "github.com/pefish/go-interface/t-error"
 )
 
 type StrategyData struct {
-	Strategy api_strategy.IApiStrategy
+	Strategy i_core.IApiStrategy
 	Disable  bool
 }
 
@@ -72,7 +71,7 @@ func New404Api() *Api {
 		isIgnoreRootPath:         true,
 		isIgnoreGlobalStrategies: true,
 		method:                   api_session.ApiMethod_All,
-		controllerFunc: func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo) {
+		controllerFunc: func(apiSession i_core.IApiSession) (interface{}, *t_error.ErrorInfo) {
 			global_api_strategy.ServiceBaseInfoStrategyInstance.Execute(apiSession)
 
 			apiSession.SetStatusCode(api_session.StatusCode_NotFound)
@@ -116,9 +115,9 @@ func (api *Api) Params() interface{} {
 	return api.params
 }
 
-type ReturnHookFuncType func(apiSession _type2.IApiSession, apiResult *go_core_type_api.ApiResult) (interface{}, *go_error.ErrorInfo)
+type ReturnHookFuncType func(apiSession i_core.IApiSession, apiResult *t_core.ApiResult) (interface{}, *t_error.ErrorInfo)
 
-type ApiHandlerType func(apiSession _type2.IApiSession) (interface{}, *go_error.ErrorInfo)
+type ApiHandlerType func(apiSession i_core.IApiSession) (interface{}, *t_error.ErrorInfo)
 
 /*
 *
@@ -155,8 +154,8 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			return
 		}
 
-		errorHandler := func(errorInfo *go_error.ErrorInfo) {
-			apiResult := &go_core_type_api.ApiResult{
+		errorHandler := func(errorInfo *t_error.ErrorInfo) {
+			apiResult := &t_core.ApiResult{
 				Msg:  errorInfo.Err.Error(),
 				Code: errorInfo.Code,
 				Data: errorInfo.Data,
@@ -164,7 +163,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			if currentApi.returnHookFunc != nil {
 				hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 				if errorInfo != nil {
-					apiSession.WriteJson(&go_core_type_api.ApiResult{
+					apiSession.WriteJson(&t_core.ApiResult{
 						Msg:  errorInfo.Err.Error(),
 						Code: errorInfo.Code,
 						Data: errorInfo.Data,
@@ -180,14 +179,14 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			}
 		}
 
-		defer go_error.Recover(func(errInfo *go_error.ErrorInfo) {
+		defer t_error.Recover(func(errInfo *t_error.ErrorInfo) {
 			errMsg := fmt.Sprint(errInfo)
 			logger.LoggerDriverInstance.Logger.Error(
 				apiSession.Data(`error_msg`).(string) +
 					"\n" +
 					"err: " +
 					errMsg)
-			errorHandler(go_error.INTERNAL_ERROR)
+			errorHandler(t_error.INTERNAL_ERROR)
 		})
 
 		if !currentApi.isIgnoreGlobalStrategies {
@@ -248,7 +247,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 			errorHandler(errInfo)
 			return
 		}
-		apiResult := &go_core_type_api.ApiResult{
+		apiResult := &t_core.ApiResult{
 			Msg:  ``,
 			Code: 0,
 			Data: result,
@@ -256,7 +255,7 @@ func WrapJson(methodController map[string]*Api) func(response http.ResponseWrite
 		if currentApi.returnHookFunc != nil {
 			hookApiResult, errorInfo := currentApi.returnHookFunc(apiSession, apiResult)
 			if errorInfo != nil {
-				apiSession.WriteJson(&go_core_type_api.ApiResult{
+				apiSession.WriteJson(&t_core.ApiResult{
 					Msg:  errorInfo.Err.Error(),
 					Code: errorInfo.Code,
 					Data: errorInfo.Data,

@@ -1,21 +1,20 @@
 package global_api_strategy
 
 import (
-	_type "github.com/pefish/go-core-type/api-session"
-	api_strategy "github.com/pefish/go-core-type/api-strategy"
-	go_error "github.com/pefish/go-error"
+	i_core "github.com/pefish/go-interface/i-core"
+	t_error "github.com/pefish/go-interface/t-error"
 )
 
 type TestGlobalStrategy struct {
 	Test string
 }
 
-func (esd *TestGlobalStrategy) SetErrorCode(code uint64) api_strategy.IApiStrategy {
+func (esd *TestGlobalStrategy) SetErrorCode(code uint64) i_core.IApiStrategy {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (esd *TestGlobalStrategy) SetErrorMsg(msg string) api_strategy.IApiStrategy {
+func (esd *TestGlobalStrategy) SetErrorMsg(msg string) i_core.IApiStrategy {
 	//TODO implement me
 	panic("implement me")
 }
@@ -25,12 +24,7 @@ func (esd *TestGlobalStrategy) ErrorMsg() string {
 	panic("implement me")
 }
 
-func (esd *TestGlobalStrategy) Init(param interface{}) api_strategy.IApiStrategy {
-	esd.Test = "test"
-	return esd
-}
-
-func (esd *TestGlobalStrategy) Execute(out _type.IApiSession, param interface{}) *go_error.ErrorInfo {
+func (esd *TestGlobalStrategy) Execute(out i_core.IApiSession) *t_error.ErrorInfo {
 	return nil
 }
 func (esd *TestGlobalStrategy) Name() string {

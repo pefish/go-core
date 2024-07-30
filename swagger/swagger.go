@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/pefish/go-core/global-api-strategy"
-	"github.com/pefish/go-core/service"
-	"github.com/pefish/go-error"
-	"github.com/pefish/go-format"
-	"github.com/pefish/yaml"
 	"io/ioutil"
 	"reflect"
 	"strings"
+
+	api_session "github.com/pefish/go-core/api-session"
+	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
+	"github.com/pefish/go-core/service"
+	t_error "github.com/pefish/go-interface/t-error"
+	"github.com/pefish/yaml"
 )
 
 type SwaggerClass struct {
@@ -194,14 +195,14 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 	for _, api := range service.Service.Apis() {
 		temp := map[string]Yaml_Path{}
 
-		desc := api.Description
+		desc := api.Description()
 
 		parameters := []Yaml_Parameter{}
 
 		description := ``
-		if api.Strategies != nil {
-			for _, strategy := range api.Strategies {
-				if strategy.Disable == false && strategy.Strategy.GetName() == `jwtAuth` {
+		if api.Strategies() != nil {
+			for _, strategy := range api.Strategies() {
+				if strategy.Disable == false && strategy.Strategy.Name() == `jwtAuth` {
 					// 添加 jwt header
 					parameters = append(parameters, Yaml_Parameter{
 						Name:        `Json-Web-Token`,
@@ -211,11 +212,11 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 						Type:        this.getType(`string`),
 					})
 				}
-				description += strategy.Strategy.GetName() + ": " + strategy.Strategy.GetDescription() + "\n"
+				description += strategy.Strategy.Name() + ": " + strategy.Strategy.Description() + "\n"
 			}
 		}
 
-		if api.Params != nil {
+		if api.Params() != nil {
 			paramsType := reflect.TypeOf(api.Params)
 			if paramsType.Kind() == reflect.Ptr {
 				paramsType = paramsType.Elem()
@@ -224,7 +225,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			requiredParams := []string{}
 			// 解析 properties
 			properties := map[string]Yaml_Property{}
-			if api.Method == `POST` {
+			if api.Method() == api_session.ApiMethod_Post {
 				this.recuPostParams(paramsType, reflect.ValueOf(api.Params), properties, &requiredParams)
 				parameter := Yaml_Parameter{
 					In:       `body`,
@@ -235,10 +236,10 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 					},
 				}
 				parameters = append(parameters, parameter)
-			} else if api.Method == `GET` {
+			} else if api.Method() == api_session.ApiMethod_Get {
 				this.recuGetParams(paramsType, reflect.ValueOf(api.Params), properties, &requiredParams, &parameters)
 			} else {
-				go_error.ThrowInternal(errors.New(`method error`))
+				t_error.ThrowInternal(errors.New(`method error`))
 			}
 			definitions[paramsTypeName] = Yaml_Definition{
 				Type:       `object`,
@@ -248,36 +249,15 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 		}
 
 		responses := map[string]Yaml_Response{}
-		if api.Return != nil {
-			type_ := reflect.TypeOf(api.Return)
-			returnTypeName := type_.Name()
-			kind := type_.Kind()
-			properties := map[string]Yaml_Property{}
-			if kind == reflect.Struct {
-				this.recuReturn(go_format.FormatInstance.StructToMap(api.Return), properties)
-			} else {
-				go_error.ThrowInternal(errors.New(`return config type error`))
-			}
-			definitions[api.Path+`_`+returnTypeName] = Yaml_Definition{
-				Type:       `object`,
-				Properties: properties,
-			}
-			responses[`200`] = Yaml_Response{
-				Description: `正确返回`,
-				Schema: map[string]interface{}{
-					`$ref`: fmt.Sprintf(`#/definitions/%s`, api.Path+`_`+returnTypeName),
-				},
-			}
-		}
 
 		paramTypes := []string{}
-		if api.ParamType == global_api_strategy.ALL_TYPE {
+		if api.ParamType() == global_api_strategy.ALL_TYPE {
 			paramTypes = append(paramTypes, `application/json`, `multipart/form-data`)
 		} else {
-			paramTypes = append(paramTypes, api.ParamType)
+			paramTypes = append(paramTypes, api.ParamType())
 		}
 
-		temp[strings.ToLower(string(api.Method))] = Yaml_Path{
+		temp[strings.ToLower(string(api.Method()))] = Yaml_Path{
 			Tags:        []string{service.Service.Name()},
 			Summary:     desc,
 			Consumes:    paramTypes,
@@ -286,7 +266,7 @@ func (this *SwaggerClass) GeneSwagger(hostAndPort string, filename string, type_
 			Responses:   responses,
 			Description: description,
 		}
-		paths[service.Service.Path()+api.Path] = temp
+		paths[service.Service.Path()+api.Path()] = temp
 	}
 
 	swagger := Yaml_Swagger{

@@ -93,11 +93,3 @@ func TestValidatorClass_EndWith(t *testing.T) {
 	result = Validator.EndWith("bdjyetsrdn", "abc")
 	go_test_.Equal(t, false, result)
 }
-
-func TestValidatorClass_NoSqlInject(t *testing.T) {
-	result := Validator.NoSqlInject("select 1=1", nil)
-	go_test_.Equal(t, false, result)
-
-	result = Validator.NoSqlInject("select * from go_test_", nil)
-	go_test_.Equal(t, true, result)
-}

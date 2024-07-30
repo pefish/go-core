@@ -4,17 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/pefish/go-core/driver/logger"
-	go_logger "github.com/pefish/go-logger"
 
-	"github.com/mitchellh/mapstructure"
-	_interface "github.com/pefish/go-core-type/api"
-	_type "github.com/pefish/go-core-type/api-session"
+	"github.com/pefish/go-core/driver/logger"
+
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
+
+	"github.com/mitchellh/mapstructure"
+
+	i_core "github.com/pefish/go-interface/i-core"
+	i_logger "github.com/pefish/go-interface/i-logger"
+	t_core "github.com/pefish/go-interface/t-core"
 )
 
 type ApiMethod string
@@ -27,72 +30,72 @@ const (
 )
 
 const (
-	StatusCode_Continue           _type.StatusCode = 100 // RFC 7231, 6.2.1
-	StatusCode_SwitchingProtocols _type.StatusCode = 101 // RFC 7231, 6.2.2
-	StatusCode_Processing         _type.StatusCode = 102 // RFC 2518, 10.1
+	StatusCode_Continue           t_core.StatusCode = 100 // RFC 7231, 6.2.1
+	StatusCode_SwitchingProtocols t_core.StatusCode = 101 // RFC 7231, 6.2.2
+	StatusCode_Processing         t_core.StatusCode = 102 // RFC 2518, 10.1
 
-	StatusCode_OK                   _type.StatusCode = 200 // RFC 7231, 6.3.1
-	StatusCode_Created              _type.StatusCode = 201 // RFC 7231, 6.3.2
-	StatusCode_Accepted             _type.StatusCode = 202 // RFC 7231, 6.3.3
-	StatusCode_NonAuthoritativeInfo _type.StatusCode = 203 // RFC 7231, 6.3.4
-	StatusCode_NoContent            _type.StatusCode = 204 // RFC 7231, 6.3.5
-	StatusCode_ResetContent         _type.StatusCode = 205 // RFC 7231, 6.3.6
-	StatusCode_PartialContent       _type.StatusCode = 206 // RFC 7233, 4.1
-	StatusCode_MultiStatus          _type.StatusCode = 207 // RFC 4918, 11.1
-	StatusCode_AlreadyReported      _type.StatusCode = 208 // RFC 5842, 7.1
-	StatusCode_IMUsed               _type.StatusCode = 226 // RFC 3229, 10.4.1
+	StatusCode_OK                   t_core.StatusCode = 200 // RFC 7231, 6.3.1
+	StatusCode_Created              t_core.StatusCode = 201 // RFC 7231, 6.3.2
+	StatusCode_Accepted             t_core.StatusCode = 202 // RFC 7231, 6.3.3
+	StatusCode_NonAuthoritativeInfo t_core.StatusCode = 203 // RFC 7231, 6.3.4
+	StatusCode_NoContent            t_core.StatusCode = 204 // RFC 7231, 6.3.5
+	StatusCode_ResetContent         t_core.StatusCode = 205 // RFC 7231, 6.3.6
+	StatusCode_PartialContent       t_core.StatusCode = 206 // RFC 7233, 4.1
+	StatusCode_MultiStatus          t_core.StatusCode = 207 // RFC 4918, 11.1
+	StatusCode_AlreadyReported      t_core.StatusCode = 208 // RFC 5842, 7.1
+	StatusCode_IMUsed               t_core.StatusCode = 226 // RFC 3229, 10.4.1
 
-	StatusCode_MultipleChoices  _type.StatusCode = 300 // RFC 7231, 6.4.1
-	StatusCode_MovedPermanently _type.StatusCode = 301 // RFC 7231, 6.4.2
-	StatusCode_Found            _type.StatusCode = 302 // RFC 7231, 6.4.3
-	StatusCode_SeeOther         _type.StatusCode = 303 // RFC 7231, 6.4.4
-	StatusCode_NotModified      _type.StatusCode = 304 // RFC 7232, 4.1
-	StatusCode_UseProxy         _type.StatusCode = 305 // RFC 7231, 6.4.5
+	StatusCode_MultipleChoices  t_core.StatusCode = 300 // RFC 7231, 6.4.1
+	StatusCode_MovedPermanently t_core.StatusCode = 301 // RFC 7231, 6.4.2
+	StatusCode_Found            t_core.StatusCode = 302 // RFC 7231, 6.4.3
+	StatusCode_SeeOther         t_core.StatusCode = 303 // RFC 7231, 6.4.4
+	StatusCode_NotModified      t_core.StatusCode = 304 // RFC 7232, 4.1
+	StatusCode_UseProxy         t_core.StatusCode = 305 // RFC 7231, 6.4.5
 
-	StatusCode_TemporaryRedirect _type.StatusCode = 307 // RFC 7231, 6.4.7
-	StatusCode_PermanentRedirect _type.StatusCode = 308 // RFC 7538, 3
+	StatusCode_TemporaryRedirect t_core.StatusCode = 307 // RFC 7231, 6.4.7
+	StatusCode_PermanentRedirect t_core.StatusCode = 308 // RFC 7538, 3
 
-	StatusCode_BadRequest                   _type.StatusCode = 400 // RFC 7231, 6.5.1
-	StatusCode_Unauthorized                 _type.StatusCode = 401 // RFC 7235, 3.1
-	StatusCode_PaymentRequired              _type.StatusCode = 402 // RFC 7231, 6.5.2
-	StatusCode_Forbidden                    _type.StatusCode = 403 // RFC 7231, 6.5.3
-	StatusCode_NotFound                     _type.StatusCode = 404 // RFC 7231, 6.5.4
-	StatusCode_MethodNotAllowed             _type.StatusCode = 405 // RFC 7231, 6.5.5
-	StatusCode_NotAcceptable                _type.StatusCode = 406 // RFC 7231, 6.5.6
-	StatusCode_ProxyAuthRequired            _type.StatusCode = 407 // RFC 7235, 3.2
-	StatusCode_RequestTimeout               _type.StatusCode = 408 // RFC 7231, 6.5.7
-	StatusCode_Conflict                     _type.StatusCode = 409 // RFC 7231, 6.5.8
-	StatusCode_Gone                         _type.StatusCode = 410 // RFC 7231, 6.5.9
-	StatusCode_LengthRequired               _type.StatusCode = 411 // RFC 7231, 6.5.10
-	StatusCode_PreconditionFailed           _type.StatusCode = 412 // RFC 7232, 4.2
-	StatusCode_RequestEntityTooLarge        _type.StatusCode = 413 // RFC 7231, 6.5.11
-	StatusCode_RequestURITooLong            _type.StatusCode = 414 // RFC 7231, 6.5.12
-	StatusCode_UnsupportedMediaType         _type.StatusCode = 415 // RFC 7231, 6.5.13
-	StatusCode_RequestedRangeNotSatisfiable _type.StatusCode = 416 // RFC 7233, 4.4
-	StatusCode_ExpectationFailed            _type.StatusCode = 417 // RFC 7231, 6.5.14
-	StatusCode_Teapot                       _type.StatusCode = 418 // RFC 7168, 2.3.3
-	StatusCode_MisdirectedRequest           _type.StatusCode = 421 // RFC 7540, 9.1.2
-	StatusCode_UnprocessableEntity          _type.StatusCode = 422 // RFC 4918, 11.2
-	StatusCode_Locked                       _type.StatusCode = 423 // RFC 4918, 11.3
-	StatusCode_FailedDependency             _type.StatusCode = 424 // RFC 4918, 11.4
-	StatusCode_TooEarly                     _type.StatusCode = 425 // RFC 8470, 5.2.
-	StatusCode_UpgradeRequired              _type.StatusCode = 426 // RFC 7231, 6.5.15
-	StatusCode_PreconditionRequired         _type.StatusCode = 428 // RFC 6585, 3
-	StatusCode_TooManyRequests              _type.StatusCode = 429 // RFC 6585, 4
-	StatusCode_RequestHeaderFieldsTooLarge  _type.StatusCode = 431 // RFC 6585, 5
-	StatusCode_UnavailableForLegalReasons   _type.StatusCode = 451 // RFC 7725, 3
+	StatusCode_BadRequest                   t_core.StatusCode = 400 // RFC 7231, 6.5.1
+	StatusCode_Unauthorized                 t_core.StatusCode = 401 // RFC 7235, 3.1
+	StatusCode_PaymentRequired              t_core.StatusCode = 402 // RFC 7231, 6.5.2
+	StatusCode_Forbidden                    t_core.StatusCode = 403 // RFC 7231, 6.5.3
+	StatusCode_NotFound                     t_core.StatusCode = 404 // RFC 7231, 6.5.4
+	StatusCode_MethodNotAllowed             t_core.StatusCode = 405 // RFC 7231, 6.5.5
+	StatusCode_NotAcceptable                t_core.StatusCode = 406 // RFC 7231, 6.5.6
+	StatusCode_ProxyAuthRequired            t_core.StatusCode = 407 // RFC 7235, 3.2
+	StatusCode_RequestTimeout               t_core.StatusCode = 408 // RFC 7231, 6.5.7
+	StatusCode_Conflict                     t_core.StatusCode = 409 // RFC 7231, 6.5.8
+	StatusCode_Gone                         t_core.StatusCode = 410 // RFC 7231, 6.5.9
+	StatusCode_LengthRequired               t_core.StatusCode = 411 // RFC 7231, 6.5.10
+	StatusCode_PreconditionFailed           t_core.StatusCode = 412 // RFC 7232, 4.2
+	StatusCode_RequestEntityTooLarge        t_core.StatusCode = 413 // RFC 7231, 6.5.11
+	StatusCode_RequestURITooLong            t_core.StatusCode = 414 // RFC 7231, 6.5.12
+	StatusCode_UnsupportedMediaType         t_core.StatusCode = 415 // RFC 7231, 6.5.13
+	StatusCode_RequestedRangeNotSatisfiable t_core.StatusCode = 416 // RFC 7233, 4.4
+	StatusCode_ExpectationFailed            t_core.StatusCode = 417 // RFC 7231, 6.5.14
+	StatusCode_Teapot                       t_core.StatusCode = 418 // RFC 7168, 2.3.3
+	StatusCode_MisdirectedRequest           t_core.StatusCode = 421 // RFC 7540, 9.1.2
+	StatusCode_UnprocessableEntity          t_core.StatusCode = 422 // RFC 4918, 11.2
+	StatusCode_Locked                       t_core.StatusCode = 423 // RFC 4918, 11.3
+	StatusCode_FailedDependency             t_core.StatusCode = 424 // RFC 4918, 11.4
+	StatusCode_TooEarly                     t_core.StatusCode = 425 // RFC 8470, 5.2.
+	StatusCode_UpgradeRequired              t_core.StatusCode = 426 // RFC 7231, 6.5.15
+	StatusCode_PreconditionRequired         t_core.StatusCode = 428 // RFC 6585, 3
+	StatusCode_TooManyRequests              t_core.StatusCode = 429 // RFC 6585, 4
+	StatusCode_RequestHeaderFieldsTooLarge  t_core.StatusCode = 431 // RFC 6585, 5
+	StatusCode_UnavailableForLegalReasons   t_core.StatusCode = 451 // RFC 7725, 3
 
-	StatusCode_InternalServerError           _type.StatusCode = 500 // RFC 7231, 6.6.1
-	StatusCode_NotImplemented                _type.StatusCode = 501 // RFC 7231, 6.6.2
-	StatusCode_BadGateway                    _type.StatusCode = 502 // RFC 7231, 6.6.3
-	StatusCode_ServiceUnavailable            _type.StatusCode = 503 // RFC 7231, 6.6.4
-	StatusCode_GatewayTimeout                _type.StatusCode = 504 // RFC 7231, 6.6.5
-	StatusCode_HTTPVersionNotSupported       _type.StatusCode = 505 // RFC 7231, 6.6.6
-	StatusCode_VariantAlsoNegotiates         _type.StatusCode = 506 // RFC 2295, 8.1
-	StatusCode_InsufficientStorage           _type.StatusCode = 507 // RFC 4918, 11.5
-	StatusCode_LoopDetected                  _type.StatusCode = 508 // RFC 5842, 7.2
-	StatusCode_NotExtended                   _type.StatusCode = 510 // RFC 2774, 7
-	StatusCode_NetworkAuthenticationRequired _type.StatusCode = 511 // RFC 6585, 6
+	StatusCode_InternalServerError           t_core.StatusCode = 500 // RFC 7231, 6.6.1
+	StatusCode_NotImplemented                t_core.StatusCode = 501 // RFC 7231, 6.6.2
+	StatusCode_BadGateway                    t_core.StatusCode = 502 // RFC 7231, 6.6.3
+	StatusCode_ServiceUnavailable            t_core.StatusCode = 503 // RFC 7231, 6.6.4
+	StatusCode_GatewayTimeout                t_core.StatusCode = 504 // RFC 7231, 6.6.5
+	StatusCode_HTTPVersionNotSupported       t_core.StatusCode = 505 // RFC 7231, 6.6.6
+	StatusCode_VariantAlsoNegotiates         t_core.StatusCode = 506 // RFC 2295, 8.1
+	StatusCode_InsufficientStorage           t_core.StatusCode = 507 // RFC 4918, 11.5
+	StatusCode_LoopDetected                  t_core.StatusCode = 508 // RFC 5842, 7.2
+	StatusCode_NotExtended                   t_core.StatusCode = 510 // RFC 2774, 7
+	StatusCode_NetworkAuthenticationRequired t_core.StatusCode = 511 // RFC 6585, 6
 )
 
 type HeaderName string
@@ -146,9 +149,9 @@ const (
 )
 
 type ApiSessionType struct {
-	statusCode _type.StatusCode
+	statusCode t_core.StatusCode
 
-	api            _interface.IApi
+	api            i_core.IApi
 	responseWriter http.ResponseWriter
 	request        *http.Request
 
@@ -247,11 +250,11 @@ func (apiSession *ApiSessionType) SetOriginalParams(originalParams map[string]in
 	apiSession.originalParams = originalParams
 }
 
-func (apiSession *ApiSessionType) Api() _interface.IApi {
+func (apiSession *ApiSessionType) Api() i_core.IApi {
 	return apiSession.api
 }
 
-func (apiSession *ApiSessionType) SetApi(api _interface.IApi) {
+func (apiSession *ApiSessionType) SetApi(api i_core.IApi) {
 	apiSession.api = api
 }
 
@@ -343,7 +346,7 @@ func (apiSession *ApiSessionType) WriteText(text string) error {
 }
 
 // Set status code of response.
-func (apiSession *ApiSessionType) SetStatusCode(code _type.StatusCode) {
+func (apiSession *ApiSessionType) SetStatusCode(code t_core.StatusCode) {
 	apiSession.statusCode = code
 }
 
@@ -461,6 +464,6 @@ func (apiSession *ApiSessionType) ReadJSON(jsonObject interface{}) error {
 	return json.Unmarshal(rawData, jsonObject)
 }
 
-func (apiSession *ApiSessionType) Logger() go_logger.InterfaceLogger {
+func (apiSession *ApiSessionType) Logger() i_logger.ILogger {
 	return logger.LoggerDriverInstance.Logger
 }

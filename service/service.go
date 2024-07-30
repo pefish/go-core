@@ -14,7 +14,7 @@ import (
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	go_format "github.com/pefish/go-format"
-	go_logger "github.com/pefish/go-logger"
+	i_logger "github.com/pefish/go-interface/i-logger"
 	"golang.org/x/net/http2"
 )
 
@@ -135,7 +135,7 @@ func (serviceInstance *ServiceClass) Stop() error {
 	return nil
 }
 
-func (serviceInstance *ServiceClass) Logger() go_logger.InterfaceLogger {
+func (serviceInstance *ServiceClass) Logger() i_logger.ILogger {
 	return logger.LoggerDriverInstance.Logger
 }
 

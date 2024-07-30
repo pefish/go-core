@@ -5,22 +5,20 @@ import (
 	"time"
 
 	api_strategy "github.com/pefish/go-core-strategy/api-strategy"
-	_type2 "github.com/pefish/go-core-type/api-session"
 	"github.com/pefish/go-core/api"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
 	"github.com/pefish/go-core/service"
-	go_error "github.com/pefish/go-error"
+	i_core "github.com/pefish/go-interface/i-core"
+	t_error "github.com/pefish/go-interface/t-error"
 	go_logger "github.com/pefish/go-logger"
 	task_driver "github.com/pefish/go-task-driver"
 )
 
 func main() {
-
 	service.Service.SetName(`test service`) // set service name
 	service.Service.SetPath(`/api/test`)
-	loggerInstance := go_logger.Logger.CloneWithLevel("debug")
-	logger.LoggerDriverInstance.Register(loggerInstance)
+	logger.LoggerDriverInstance.Register(go_logger.Logger)
 	global_api_strategy.ParamValidateStrategyInstance.SetErrorCode(2005)
 
 	type TestType uint64
@@ -48,22 +46,22 @@ func main() {
 			Method:      `POST`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy().SetParams(api_strategy.IpFilterParams{
-						ValidIp: func(apiSession _type2.IApiSession) []string {
+					Strategy: api_strategy.NewIpFilterStrategy().SetParams(&api_strategy.IpFilterParams{
+						ValidIp: func(apiSession i_core.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
 					}),
 					Disable: true,
 				},
 				{
-					Strategy: api_strategy.NewRateLimitStrategy(context.Background(), loggerInstance, 20).SetParamsAndRun(api_strategy.RateLimitStrategyParams{
+					Strategy: api_strategy.NewRateLimitStrategy(context.Background(), go_logger.Logger, 20).SetParamsAndRun(&api_strategy.RateLimitStrategyParams{
 						SecondPerToken: time.Second,
 					}),
 					Disable: false,
 				},
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
-			ControllerFunc: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+			ControllerFunc: func(apiSession i_core.IApiSession) (i interface{}, info *t_error.ErrorInfo) {
 				var params Params1
 				apiSession.MustScanParams(&params)
 				tokenId := apiSession.PathVars()["token_id"]
@@ -81,8 +79,8 @@ func main() {
 			Method:      `GET`,
 			Strategies: []api.StrategyData{
 				{
-					Strategy: api_strategy.NewIpFilterStrategy().SetParams(api_strategy.IpFilterParams{
-						ValidIp: func(apiSession _type2.IApiSession) []string {
+					Strategy: api_strategy.NewIpFilterStrategy().SetParams(&api_strategy.IpFilterParams{
+						ValidIp: func(apiSession i_core.IApiSession) []string {
 							return []string{`127.0.0.1`}
 						},
 					}),
@@ -90,7 +88,7 @@ func main() {
 				},
 			},
 			ParamType: global_api_strategy.ALL_TYPE,
-			ControllerFunc: func(apiSession _type2.IApiSession) (i interface{}, info *go_error.ErrorInfo) {
+			ControllerFunc: func(apiSession i_core.IApiSession) (i interface{}, info *t_error.ErrorInfo) {
 				var params Params2
 				apiSession.MustScanParams(&params)
 
