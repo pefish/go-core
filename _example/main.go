@@ -23,10 +23,6 @@ func main() {
 
 	type TestType uint64
 
-	const (
-		TestType_One TestType = 1
-	)
-
 	type Params1 struct {
 		Test     string                 `json:"test" validate:"is-mobile"`
 		TestNum  uint64                 `json:"test_num" validate:"required,lte=100"`
