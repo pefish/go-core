@@ -100,7 +100,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				value = go_format.FormatInstance.ToString(map_[fieldName])
+				value = go_format.ToString(map_[fieldName])
 			case reflect.Uint64:
 				if map_[fieldName] == nil {
 					map_[fieldName] = 0
@@ -109,7 +109,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.FormatInstance.ToUint64(map_[fieldName])
+				tmpValue, err := go_format.ToUint64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToUint64 error - %#v", err)
 				}
@@ -122,7 +122,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.FormatInstance.ToInt64(map_[fieldName])
+				tmpValue, err := go_format.ToInt64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToInt64 error - %#v", err)
 				}
@@ -135,7 +135,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.FormatInstance.ToFloat64(map_[fieldName])
+				tmpValue, err := go_format.ToFloat64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToFloat64 error - %#v", err)
 				}

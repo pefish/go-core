@@ -157,7 +157,7 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 		host = `0.0.0.0`
 	}
 
-	addr := host + `:` + go_format.FormatInstance.ToString(serviceInstance.port)
+	addr := host + `:` + go_format.ToString(serviceInstance.port)
 	logger.LoggerDriverInstance.Logger.InfoF(`Server started!!! http://%s`, addr)
 
 	for apiPath, map_ := range serviceInstance.registeredApi {
