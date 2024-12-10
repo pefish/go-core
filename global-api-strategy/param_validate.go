@@ -1,10 +1,11 @@
 package global_api_strategy
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/pefish/go-core/driver/logger"
 	"github.com/pefish/go-core/util"
@@ -137,7 +138,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 				}
 				tmpValue, err := go_format.ToFloat64(map_[fieldName])
 				if err != nil {
-					return fieldName, fmt.Errorf("ToFloat64 error - %#v", err)
+					return fieldName, errors.Errorf("ToFloat64 error - %#v", err)
 				}
 				value = tmpValue
 			case reflect.Map:
@@ -146,12 +147,12 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 				} else {
 					v, ok := map_[fieldName].(map[string]interface{})
 					if !ok {
-						return fieldName, fmt.Errorf("Param <%#v> to map error", map_[fieldName])
+						return fieldName, errors.Errorf("Param <%#v> to map error", map_[fieldName])
 					}
 					value = v
 				}
 			default:
-				return fieldName, fmt.Errorf("Param kind error. fieldKind: %s", fieldKind.String())
+				return fieldName, errors.Errorf("Param kind error. fieldKind: %s", fieldKind.String())
 			}
 			out.Params()[fieldName] = value
 
@@ -160,7 +161,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 			if err != nil {
 				tempStr := go_string.StringUtilInstance.ReplaceAll(err.Error(), `for '' failed`, `for '`+fieldName+`' failed`)
 				msg := go_string.StringUtilInstance.ReplaceAll(tempStr, `Key: ''`, `Key: '`+typeField.Name+`';`) + `; ` + newTag
-				return fieldName, fmt.Errorf(msg)
+				return fieldName, errors.Errorf(msg)
 			}
 		}
 	}
@@ -169,14 +170,19 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 
 func (pvs *ParamValidateStrategy) Execute(out i_core.IApiSession) *t_error.ErrorInfo {
 	logger.LoggerDriverInstance.Logger.DebugF(`api-strategy %s trigger`, pvs.Name())
+	if out.Api().Params() == nil {
+		logger.LoggerDriverInstance.Logger.DebugF(`Params not be defined in api.`)
+		return nil
+	}
+
 	myValidator := validator.ValidatorClass{}
 	err := myValidator.Init()
 	if err != nil {
 		logger.LoggerDriverInstance.Logger.ErrorF(`validator init error`)
-		return t_error.WrapWithAll(fmt.Errorf(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
+		return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
 	}
 
-	tempParam := map[string]interface{}{}
+	tempParam := make(map[string]interface{})
 
 	if out.Method() == `GET` { // +号和%都有特殊含义，+会被替换成空格
 		for k, v := range out.UrlParams() {
@@ -186,7 +192,7 @@ func (pvs *ParamValidateStrategy) Execute(out i_core.IApiSession) *t_error.Error
 		requestContentType := out.Header(`content-type`)
 		if out.Api().ParamType() != `` && !strings.HasPrefix(requestContentType, out.Api().ParamType()) {
 			logger.LoggerDriverInstance.Logger.ErrorF(`content-type error`)
-			return t_error.WrapWithAll(fmt.Errorf(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
+			return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
 		}
 
 		if strings.HasPrefix(requestContentType, MULTIPART_TYPE) && (out.Api().ParamType() == MULTIPART_TYPE || out.Api().ParamType() == ``) {
@@ -200,16 +206,16 @@ func (pvs *ParamValidateStrategy) Execute(out i_core.IApiSession) *t_error.Error
 		} else if strings.HasPrefix(requestContentType, JSON_TYPE) && (out.Api().ParamType() == JSON_TYPE || out.Api().ParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
 				logger.LoggerDriverInstance.Logger.ErrorF(`parse params error. err: %#v`, err)
-				return t_error.WrapWithAll(fmt.Errorf(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
+				return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
 			}
 		} else if strings.HasPrefix(requestContentType, TEXT_TYPE) && (out.Api().ParamType() == TEXT_TYPE || out.Api().ParamType() == ``) {
 			if err := out.ReadJSON(&tempParam); err != nil {
 				logger.LoggerDriverInstance.Logger.ErrorF(`parse params error. err: %#v`, err)
-				return t_error.WrapWithAll(fmt.Errorf(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
+				return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
 			}
 		} else {
 			logger.LoggerDriverInstance.Logger.ErrorF(`content-type not be supported`)
-			return t_error.WrapWithAll(fmt.Errorf(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
+			return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), nil)
 		}
 	} else {
 		logger.LoggerDriverInstance.Logger.ErrorF(`scan params not be supported`)
@@ -221,14 +227,12 @@ func (pvs *ParamValidateStrategy) Execute(out i_core.IApiSession) *t_error.Error
 	logger.LoggerDriverInstance.Logger.DebugF(`original params: %s`, go_desensitize.Desensitize.MustDesensitizeToString(out.OriginalParams()))
 
 	globalValidator := make([]string, 0)
-	if out.Api().Params() != nil {
-		fieldName, err := pvs.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().Params()), reflect.ValueOf(out.Api().Params()))
-		if err != nil {
-			logger.LoggerDriverInstance.Logger.ErrorF(`Param validate error. - %#v`, err)
-			return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), map[string]interface{}{
-				`field`: fieldName,
-			})
-		}
+	fieldName, err := pvs.recurValidate(out, myValidator, tempParam, globalValidator, reflect.TypeOf(out.Api().Params()), reflect.ValueOf(out.Api().Params()))
+	if err != nil {
+		logger.LoggerDriverInstance.Logger.ErrorF(`Param validate error. - %#v`, err)
+		return t_error.WrapWithAll(errors.New(pvs.ErrorMsg()), pvs.ErrorCode(), map[string]interface{}{
+			`field`: fieldName,
+		})
 	}
 
 	logger.LoggerDriverInstance.Logger.DebugF(`params: %s`, go_desensitize.Desensitize.MustDesensitizeToString(out.Params()))
