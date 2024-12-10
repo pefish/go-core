@@ -8,7 +8,6 @@ import (
 	"github.com/pefish/go-core/driver/logger"
 
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
@@ -415,10 +414,8 @@ func (apiSession *ApiSessionType) UrlParams() map[string]string {
 	values := make(map[string]string, 10)
 
 	q := apiSession.request.URL.Query()
-	if q != nil {
-		for k, v := range q {
-			values[k] = strings.Join(v, ",")
-		}
+	for k, v := range q {
+		values[k] = strings.Join(v, ",")
 	}
 
 	return values
@@ -454,14 +451,33 @@ func (apiSession *ApiSessionType) ReadJSON(jsonObject interface{}) error {
 		return errors.New("unmarshal: empty body")
 	}
 
-	rawData, err := ioutil.ReadAll(apiSession.request.Body)
+	rawData, err := io.ReadAll(apiSession.request.Body)
 	if err != nil {
 		return err
 	}
 
-	apiSession.request.Body = ioutil.NopCloser(bytes.NewBuffer(rawData))
+	apiSession.request.Body = io.NopCloser(bytes.NewBuffer(rawData))
 
 	return json.Unmarshal(rawData, jsonObject)
+}
+
+func (apiSession *ApiSessionType) ReadMap() (map[string]interface{}, error) {
+	if apiSession.request.Body == nil {
+		return nil, errors.New("unmarshal: empty body")
+	}
+
+	rawData, err := io.ReadAll(apiSession.request.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	apiSession.request.Body = io.NopCloser(bytes.NewBuffer(rawData))
+	map_ := make(map[string]interface{})
+	err = json.Unmarshal(rawData, &map_)
+	if err != nil {
+		return nil, err
+	}
+	return map_, nil
 }
 
 func (apiSession *ApiSessionType) Logger() i_logger.ILogger {
