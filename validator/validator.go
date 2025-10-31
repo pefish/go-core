@@ -19,13 +19,37 @@ var Validator = ValidatorClass{}
 func (validatorInstance *ValidatorClass) Init() error {
 	validatorInstance.Validator = validator.New()
 	err := validatorInstance.Validator.RegisterValidation(`is-mobile`, validatorInstance.Wrap(validatorInstance.IsMobile))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`contain-alphabet`, validatorInstance.Wrap(validatorInstance.ContainAlphabet))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`contain-number`, validatorInstance.Wrap(validatorInstance.ContainNumber))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`str-gte`, validatorInstance.Wrap(validatorInstance.StrGte))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`str-lte`, validatorInstance.Wrap(validatorInstance.StrLte))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`str-gt`, validatorInstance.Wrap(validatorInstance.StrGt))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`str-lt`, validatorInstance.Wrap(validatorInstance.StrLt))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`start-with`, validatorInstance.Wrap(validatorInstance.StartWith))
+	if err != nil {
+		return err
+	}
 	err = validatorInstance.Validator.RegisterValidation(`end-with`, validatorInstance.Wrap(validatorInstance.EndWith))
 	if err != nil {
 		return err
@@ -70,7 +94,7 @@ func (validatorInstance *ValidatorClass) ContainNumber(val interface{}, target i
 }
 
 func (validatorInstance *ValidatorClass) StrGte(val interface{}, target interface{}) bool {
-	dc, err := go_decimal.Decimal.Start(val)
+	dc, err := go_decimal.Start(val)
 	if err != nil {
 		return false
 	}
@@ -82,7 +106,7 @@ func (validatorInstance *ValidatorClass) StrGte(val interface{}, target interfac
 }
 
 func (validatorInstance *ValidatorClass) StrLte(val interface{}, target interface{}) bool {
-	dc, err := go_decimal.Decimal.Start(val)
+	dc, err := go_decimal.Start(val)
 	if err != nil {
 		return false
 	}
@@ -94,7 +118,7 @@ func (validatorInstance *ValidatorClass) StrLte(val interface{}, target interfac
 }
 
 func (validatorInstance *ValidatorClass) StrGt(val interface{}, target interface{}) bool {
-	dc, err := go_decimal.Decimal.Start(val)
+	dc, err := go_decimal.Start(val)
 	if err != nil {
 		return false
 	}
@@ -106,7 +130,7 @@ func (validatorInstance *ValidatorClass) StrGt(val interface{}, target interface
 }
 
 func (validatorInstance *ValidatorClass) StrLt(val interface{}, target interface{}) bool {
-	dc, err := go_decimal.Decimal.Start(val)
+	dc, err := go_decimal.Start(val)
 	if err != nil {
 		return false
 	}
