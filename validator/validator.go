@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-playground/validator"
 	go_decimal "github.com/pefish/go-decimal"
-	go_format "github.com/pefish/go-format"
+	go_format_any "github.com/pefish/go-format/any"
 	go_string "github.com/pefish/go-string"
 )
 
@@ -72,7 +72,7 @@ func (validatorInstance *ValidatorClass) IsMobile(val interface{}, target interf
 }
 
 func (validatorInstance *ValidatorClass) ContainAlphabet(val interface{}, target interface{}) bool {
-	str := go_format.ToString(val)
+	str := go_format_any.ToString(val)
 	allAlphabet := `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`
 	for _, charInt := range str {
 		if strings.Contains(allAlphabet, string(charInt)) {
@@ -83,7 +83,7 @@ func (validatorInstance *ValidatorClass) ContainAlphabet(val interface{}, target
 }
 
 func (validatorInstance *ValidatorClass) ContainNumber(val interface{}, target interface{}) bool {
-	str := go_format.ToString(val)
+	str := go_format_any.ToString(val)
 	allNumbers := `0123456789`
 	for _, charInt := range str {
 		if strings.Contains(allNumbers, string(charInt)) {
@@ -142,9 +142,9 @@ func (validatorInstance *ValidatorClass) StrLt(val interface{}, target interface
 }
 
 func (validatorInstance *ValidatorClass) StartWith(val interface{}, target interface{}) bool {
-	return go_string.StringUtilInstance.StartWith(go_format.ToString(val), go_format.ToString(target))
+	return go_string.StringUtilInstance.StartWith(go_format_any.ToString(val), go_format_any.ToString(target))
 }
 
 func (validatorInstance *ValidatorClass) EndWith(val interface{}, target interface{}) bool {
-	return go_string.StringUtilInstance.EndWith(go_format.ToString(val), go_format.ToString(target))
+	return go_string.StringUtilInstance.EndWith(go_format_any.ToString(val), go_format_any.ToString(target))
 }

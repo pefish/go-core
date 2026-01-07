@@ -1,4 +1,4 @@
-module _example
+module example
 
 go 1.24.0
 
@@ -17,13 +17,12 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pefish/go-decimal v0.4.6 // indirect
+	github.com/pefish/go-decimal v0.4.7 // indirect
 	github.com/pefish/go-desensitize v0.0.7 // indirect
-	github.com/pefish/go-format v0.5.3 // indirect
+	github.com/pefish/go-format v0.5.7 // indirect
 	github.com/pefish/go-json v0.1.7 // indirect
 	github.com/pefish/go-jwt v0.3.5 // indirect
 	github.com/pefish/go-reflect v0.2.2 // indirect
@@ -31,8 +30,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 )
 
 replace github.com/pefish/go-core => ../

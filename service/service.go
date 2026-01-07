@@ -13,7 +13,7 @@ import (
 	api_strategy "github.com/pefish/go-core/driver/global-api-strategy"
 	"github.com/pefish/go-core/driver/logger"
 	global_api_strategy "github.com/pefish/go-core/global-api-strategy"
-	go_format "github.com/pefish/go-format"
+	go_format_any "github.com/pefish/go-format/any"
 	i_logger "github.com/pefish/go-interface/i-logger"
 	"golang.org/x/net/http2"
 )
@@ -157,7 +157,7 @@ func (serviceInstance *ServiceClass) Run(ctx context.Context) error {
 		host = `0.0.0.0`
 	}
 
-	addr := host + `:` + go_format.ToString(serviceInstance.port)
+	addr := host + `:` + go_format_any.ToString(serviceInstance.port)
 	logger.LoggerDriverInstance.Logger.InfoF(`Server started!!! http://%s`, addr)
 
 	for apiPath, map_ := range serviceInstance.registeredApi {

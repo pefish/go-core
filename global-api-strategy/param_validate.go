@@ -11,7 +11,7 @@ import (
 	"github.com/pefish/go-core/util"
 	"github.com/pefish/go-core/validator"
 	go_desensitize "github.com/pefish/go-desensitize"
-	go_format "github.com/pefish/go-format"
+	go_format_any "github.com/pefish/go-format/any"
 	i_core "github.com/pefish/go-interface/i-core"
 	t_error "github.com/pefish/go-interface/t-error"
 	go_json "github.com/pefish/go-json"
@@ -101,7 +101,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				value = go_format.ToString(map_[fieldName])
+				value = go_format_any.ToString(map_[fieldName])
 			case reflect.Uint64:
 				if map_[fieldName] == nil {
 					map_[fieldName] = 0
@@ -110,7 +110,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.ToUint64(map_[fieldName])
+				tmpValue, err := go_format_any.ToUint64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToUint64 error - %#v", err)
 				}
@@ -123,7 +123,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.ToInt64(map_[fieldName])
+				tmpValue, err := go_format_any.ToInt64(map_[fieldName])
 				if err != nil {
 					return fieldName, fmt.Errorf("ToInt64 error - %#v", err)
 				}
@@ -136,7 +136,7 @@ func (pvs *ParamValidateStrategy) recurValidate(out i_core.IApiSession, myValida
 						map_[fieldName] = defaultVal
 					}
 				}
-				tmpValue, err := go_format.ToFloat64(map_[fieldName])
+				tmpValue, err := go_format_any.ToFloat64(map_[fieldName])
 				if err != nil {
 					return fieldName, errors.Errorf("ToFloat64 error - %#v", err)
 				}
